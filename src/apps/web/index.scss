@@ -1,0 +1,31 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+@font-face{
+    font-family: OPPOSans;
+    src: url("../../assets/fonts/OPPOSans-R.ttf");
+}
+
+html, body{
+    height: 100%;
+    font-size: 16px;
+    background: #272727;
+    background-image: url("../../assets/images/bg.png");
+    font-family: OPPOSans;
+    //overflow-x: hidden;   会导致window.onscroll事件失效
+}
+body{
+    overflow-x: hidden;
+}
+li{
+    list-style: none;
+}
+input {
+    outline: none;
+    border: none;
+}
+html {
+    color: #fff;
+}
+

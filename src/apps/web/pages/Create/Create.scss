@@ -1,0 +1,470 @@
+@import "../../../../style/variable.scss";
+
+$black-bg: #00000033;
+$subtag-margin-bottom: 8px;
+@mixin active {
+  color: $green;
+  background: #43CF7C33;
+  border-color: $green;
+}
+
+.create-page {
+  margin-top: 12px; //设计稿32
+  .create-page-content {
+    width: 1200px;
+    display: flex;
+    //justify-content: space-between;
+    margin: 0 auto 0;
+
+    .left {
+      width: 520px;
+      margin-right: 40px;
+
+      .choose-mode {
+        width: 312px;
+        height: 48px;
+        border-radius: 24px; //r是高度的一半
+        margin-bottom: 12px; //设计稿24
+        background-color: $black-bg;
+        color: #ccc;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-sizing: border-box;
+        border: 4px solid transparent;
+        position: relative;
+
+        .create {
+          margin-top: 12px; //设计稿24
+          width: 120px; //160px
+          height: 32px;
+          margin-bottom: 16px; //设计稿32
+          font-size: 14px;
+          font-family: OPPOSans;
+          //position: relative;
+          position: absolute;
+          right: -90px;
+          transform: translateX(100%);
+          background: $green !important;
+
+          &.disable {
+            background: #2A82E4 !important;
+            overflow: hidden;
+            border: none;
+            pointer-events: none;
+          }
+
+          .text {
+          }
+
+          .progress {
+            position: absolute;
+            width: 100%;
+            left: -1000px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            transform: translateX(-100%);
+          }
+        }
+
+        .capsule-button {
+          height: 100%;
+          flex-grow: 1;
+          font-size: 16px;
+
+          &:not(.active) {
+            background: transparent;
+          }
+        }
+      }
+
+      .user-input-area {
+        width: 100%;
+        //min-height: 120px;
+        border-radius: 20px;
+        background: $black-bg;
+        padding: 8px 16px;
+        box-sizing: border-box;
+        //overflow: auto;  //#TODO 滚动条样式要改
+        margin-bottom: 8px;
+        font-family: OPPOSans;
+
+        textarea {
+          color: #fff;
+          outline: none;
+          resize: none;
+          border: none;
+          min-height: 115px;
+          font-size: 14px; //设计稿14px
+          width: 100%;
+          background: transparent;
+          overflow: hidden;
+        }
+      }
+
+      .textarea-wrapper {
+        position: relative;
+      }
+
+      .small-tags {
+        //position: absolute;
+        width: 100%;
+
+        //min-height: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        padding-left: 16px;
+        flex-wrap: wrap;
+
+        .capsule-button {
+          height: 20px;
+          margin-bottom: 2px;
+          border: 1px solid #FFFFFF33;
+          box-sizing: border-box;
+          background: #38383833;
+          margin-right: 8px;
+          color: $green;
+          padding-left: 8px;
+          padding-right: 4px;
+          justify-content: flex-start;
+          pointer-events: none;
+          //max-width: 500px;
+        }
+
+        i {
+          pointer-events: auto;
+          width: 16px;
+          height: 16px;
+
+          img {
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
+
+      .text-limit {
+        color: rgba(255, 255, 255, 0.3);
+        text-align: right;
+      }
+
+      .choose-style {
+        .choose-style-limit {
+          position: relative;
+          overflow: hidden;
+          height: 100%;
+        }
+
+        .choose-style-content {
+          padding-top: 12px; //取24px的一半 滚动内容区域的padding-top也是12px, 加起来24
+        }
+
+        position: relative;
+        padding-top: 12px; //取24px的一半 滚动内容区域的padding-top也是12px, 加起来24
+        padding-bottom: 12px;
+        padding-left: 15px;
+        font-size: 12px;
+        border-radius: 20px;
+        background: $black-bg;
+        //height: 414px;
+        height: 380px;
+        box-sizing: border-box;
+        //通用样式
+        .capsule-button {
+          height: 24px;
+          background-color: #38383833;
+          color: #ccc;
+
+        }
+
+        //通用样式
+        .choose {
+          display: flex;
+          align-items: center;
+          margin-bottom: 24px;
+
+          .capsule-button[data-checked="checked"] {
+            @include active;
+          }
+
+          p {
+            flex-shrink: 0;
+            width: 64px;
+            white-space: nowrap;
+            height: 24px;
+            line-height: 24px;
+          }
+
+          .dimention-options {
+            display: flex;
+            width: 320px;
+            justify-content: space-between;
+
+            .capsule-button {
+              width: 96px;
+            }
+          }
+
+          &.choose-tags {
+            align-items: flex-start;
+            margin-bottom: 24 px- $subtag-margin-bottom;
+
+            .all {
+              margin-bottom: 8px;
+              width: 88px;
+              .capsule-button{
+                //min-width: 80px;
+              }
+            }
+
+            .sub {
+              display: flex;
+              flex-wrap: wrap;
+
+              .capsule-button {
+                margin-right: 16px;
+                margin-bottom: $subtag-margin-bottom;
+                min-width: 88px;
+                padding: 0 6px;
+
+                /*&:nth-child(4n) {
+                  margin-right: 0;
+                }*/
+              }
+            }
+          }
+        }
+
+        //上传图片创作
+        .upload-img {
+          width: 400px;
+          height: 200px;
+          border: 1px solid #FFFFFF33;
+          text-align: center;
+          line-height: 200px;
+          color: $green;
+          font-size: 20px;
+          position: relative;
+
+          img {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            max-height: 100%;
+            max-width: 100%;
+          }
+        }
+      }
+
+      .negative-prompt{
+        background: #00000033;
+        border-radius: 20px;
+        margin-top: 10px;
+        .input-negative{
+          padding: 8px 16px;
+          margin-bottom: 10px;
+          button{
+            background: #2A82E4;
+            border-radius: 15px;
+            border: none;
+            width: 80px;
+            height: 28px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+          }
+        }
+        .neg-prompt{
+          background: transparent;
+          font-size: 14px;
+          resize: none;
+          border: none;
+          outline: none;
+          color: #fff;
+          width: 100%;
+          margin-right: 10px;
+          height: 60px;
+          overflow: hidden;
+        }
+      }
+      //相关性
+      .relevance {
+        .slider {
+          width: 320px;
+          height: 6px;
+          background: #383838;
+          border-radius: 3px;
+          position: relative;
+
+          &::before {
+            content: '';
+            position: absolute;
+            width: 120%;
+            height: 30px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+          }
+
+          .slider-bar {
+            position: absolute;
+            left: 0;
+            height: 100%;
+            width: 40%;
+            //background-color: blue;
+            pointer-events: none;
+            border-radius: inherit;
+
+            .slider-button {
+              pointer-events: none;
+              width: 16px;
+              height: 16px;
+              position: absolute;
+              right: 0;
+              top: 50%;
+              transform: translate(50%, -50%);
+              background-color: $green;
+              border-radius: 50%;
+            }
+          }
+
+        }
+
+        .percentage {
+          color: $green;
+          padding-left: 16px;
+        }
+      }
+
+      .add-picture {
+        height: 40px;
+        width: 40px;
+        position: absolute;
+        right: 5px;
+        top: 12px;
+        cursor: pointer;
+        z-index: 9;
+        background: url("../../../../assets/images/addPic.svg");
+
+        [type=file] {
+          cursor: pointer;
+          border: 1px solid #000;
+          width: 100%;
+          height: 100%;
+          opacity: 0;
+        }
+      }
+    }
+
+    .right {
+      width: 620px;
+      height: 600px;
+      padding-top: 60px;
+
+      .change {
+        height: 48px;
+        color: $green;
+        margin-bottom: 24px;
+
+        span {
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+
+          img {
+            width: 16px;
+            height: 16px;
+            margin-right: 2px;
+          }
+        }
+      }
+
+      .img-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      .image {
+        width: 300px;
+        height: 280px;
+        flex-shrink: 0;
+        box-sizing: border-box;
+        margin-right: 16px;
+        margin-bottom: 30px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        &:hover {
+          .hover-icons {
+            visibility: visible;
+          }
+        }
+
+        > img {
+          max-width: 100%;
+          max-height: 100%;
+          vertical-align: top;
+          border: 2px solid transparent;
+          border-radius: 20px;
+          cursor: pointer;
+        }
+
+        &:hover {
+          > img {
+            border: 2px solid $green;
+          }
+        }
+
+        &:nth-child(2n) {
+          margin-right: 0;
+        }
+      }
+
+      .hover-icons {
+        height: 32px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        bottom: 16px;
+        width: 100%;
+        visibility: hidden;
+        &.row{
+          bottom: 50px;
+        }
+
+        span {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background-color: rgba(0, 0, 0, 0.6);
+          margin: 0 8px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer;
+
+          img {
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+    }
+  }
+
+  .bscroll-vertical-scrollbar {
+    z-index: 9 !important;
+  }
+
+  .bscroll-indicator {
+    border: none !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    width: 4px !important;
+  }
+}
+

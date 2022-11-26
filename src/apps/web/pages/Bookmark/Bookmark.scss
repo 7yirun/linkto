@@ -1,0 +1,79 @@
+@import "../../../../style/variable.scss";
+.bookmark{
+  display:flex;
+  .left{
+    font-size: 16px;
+    width: 96px;
+    flex-shrink: 0;
+    border-right: 1px solid #383838;
+    height: calc(100vh - 80px);
+    padding-left: 48px;
+    .left-nav{
+      padding-top: 57px;
+    }
+    li{
+      text-align: center;
+      height: 22px;
+      line-height: 22px;
+      margin-bottom: 38px;
+      cursor: pointer;
+      position: relative;
+      .sub-nav{
+        text-decoration: none;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        &::after{
+          content: '';
+          position: absolute;
+          height: 16px;
+          width: 2px;
+          right: -1px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: transparent;
+        }
+        &.active{
+          color: $green;
+          border-right-color: $green;
+          &::after{
+            background: $green;
+          }
+        }
+        &:visited{
+          color: #fff;
+        }
+        &:link{
+          color: #fff;
+        }
+        &.active{
+          color: $green;
+        }
+      }
+
+    }
+  }
+  .right{
+    width: 100%;
+    padding: 48px;
+    font-size: 14px;
+    .content{
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+    }
+    .img-wrapper{
+      width: 224px;
+      margin-right: 20px;
+    }
+    .img{
+      height: 168px;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 8px;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+
+  }
+}
