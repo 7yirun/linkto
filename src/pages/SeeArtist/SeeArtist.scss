@@ -1,0 +1,21 @@
+.see-artist{
+  .see-artist-header{
+    display: flex;
+    //padding: 48px 0;
+    margin: 0 auto;
+    margin-left: 120px;
+    align-items: center;
+    height: 176px;
+    .capsule-button{
+      width: 72px;
+      height: 38px;
+      margin-left: 24px;
+      &.gray{
+        background-color: #4D4D4D;
+      }
+    }
+  }
+  .bookmark{
+    border-top: 1px solid #383838;
+  }
+}

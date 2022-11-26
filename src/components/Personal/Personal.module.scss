@@ -1,0 +1,30 @@
+.personal{
+  width: 1200px;
+  height: 176px;
+  margin: 0 auto;
+  :global{
+    .personal-header{
+      padding: 48px 0;
+      display: flex;
+    }
+    .footer{
+      li{
+        display: flex;
+        font-size: 20px;
+      }
+      .title{
+        width: 96px;
+        height: 27px;
+        margin-bottom: 24px;
+      }
+      .edit{
+        margin-left: 6px;
+        cursor: pointer;
+        img{
+          vertical-align: top;
+        }
+      }
+    }
+  }
+
+}

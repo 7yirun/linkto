@@ -1,0 +1,84 @@
+@import "../../style/variable.scss";
+
+.login{
+  form{
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    .form-item{
+      height: 40px;
+      position: relative;
+      margin-bottom: 16px;
+      &:last-of-type{
+        margin-bottom: 32px;
+      }
+      img{
+        width: 16px;
+        height: 16px;
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      input{
+        width: 100%;
+        height: 100%;
+        font-size: 14px;
+        border-radius: 20px;
+        padding-left: 36px;
+        background: #E5E5E5;
+        box-sizing: border-box;
+      }
+      .capsule-button{
+        height: 24px;
+        padding: 0 5px;
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        &.waiting{
+          pointer-events: none;
+          background: transparent;
+          color: $text-color-dark;
+        }
+      }
+    }
+
+    button{
+      height: 40px;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+    .cannot-login{
+      padding: 0 16px;
+      height: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: $green;
+      font-size: 14px;
+      margin-bottom: 33px;
+      user-select: none;
+      p{
+        cursor: pointer;
+      }
+    }
+    .other-login{
+      font-size: 14px;
+      color: #383838;
+      display: flex;
+      justify-content: space-between;
+      p{
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+      }
+      img{
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
+      }
+    }
+  }
+}
