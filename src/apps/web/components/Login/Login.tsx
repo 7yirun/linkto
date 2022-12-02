@@ -39,8 +39,10 @@ enum Waiting {
 const phoneNumRegExp = /^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-9])|(18[0-9])|166|198|199|191|(147))\d{8}$/;
 const Login = () => {
   const dispatch = useDispatch();
+  const state = useSelector((state: any) => state.loginState);
   const close = () => {
-    dispatch(setShowLogin(false))
+    dispatch(setShowLogin(false));
+    setErrInfo('')
   }
   const [phoneNum, setPhoneNum] = useState('');
   const [password, setPassWord] = useState('');
@@ -54,9 +56,6 @@ const Login = () => {
     setRestTime(60)
   }
   let timerId:TimeoutId;
-  useEffect(()=>{
-    setErrInfo('');
-  }, [codeLogin])
   useEffect(()=>{
     if(restTime === 60){
       timerId = setInterval(()=>{
@@ -76,12 +75,11 @@ const Login = () => {
   }, [])
   useEffect(()=>{
     setErrInfo("");
-  }, [phoneNum, password, ])
+  }, [phoneNum, password, verifyCode, codeLogin])
   const backToPwdLogin = () => {
     setCodeLogin(false);
   }
   const login = (e:any) => {
-
     e.preventDefault()
     //账号密码登录
     if (!codeLogin) {
@@ -117,7 +115,6 @@ const Login = () => {
         err && setErrInfo(err.msg)
       })
     }
-
   }
 
   //登录成功后
@@ -146,115 +143,121 @@ const Login = () => {
   }
 
   return (
-    <PopPanel
-      close={close}
-      className={'login'}
-      title={'用户登录'}
-      warning={errInfo}
-      returnTo={codeLogin ? '返回账号密码登录' : undefined}
-      handleReturn={codeLogin ? backToPwdLogin : undefined}
-    >
-      <form>
-        {
-          !codeLogin ?
-            formData.filter(item => item.pwdLogin).map((item, index) => {
-              return (
-                <div key={'pwd' + index} className="form-item">
-                  <img src={item.icon} alt=""/>
-                  <input type={item.type === "password" ? "password" : "text"}
-                         placeholder={item.placeholder}
-                         value={((formData as any)[item.type])}
-                         onChange={(e) => {
-                           if (item.type === "password") {
-                             setPassWord(e.target.value)
-                           } else if (item.type === "phoneNum") {
-                             setPhoneNum(e.target.value)
-                           }
-                         }}
-                  />
-                  {
-                    item.type === "verifyCode"
-                    &&
-										<CapsuleButton className={codeWaiting === Waiting.Waiting ? 'waiting' : ''}
-										               onClick={handleQueryVerifyCode}>
+    <>
+      {
+        !state.isLogin && state.showLogin &&
+        <PopPanel
+          close={close}
+          className={'login'}
+          title={'用户登录'}
+          warning={errInfo}
+          returnTo={codeLogin}
+          handleReturn={codeLogin ? backToPwdLogin : undefined}
+          open={!state.isLogin && state.showLogin}
+        >
+          <form>
+            {
+              !codeLogin ?
+                formData.filter(item => item.pwdLogin).map((item, index) => {
+                  return (
+                    <div key={'pwd' + index} className="form-item">
+                      <img src={item.icon} alt=""/>
+                      <input type={item.type === "password" ? "password" : "text"}
+                             placeholder={item.placeholder}
+                             value={((formData as any)[item.type])}
+                             onChange={(e) => {
+                               if (item.type === "password") {
+                                 setPassWord(e.target.value)
+                               } else if (item.type === "phoneNum") {
+                                 setPhoneNum(e.target.value)
+                               }
+                             }}
+                      />
                       {
-                        codeWaiting === Waiting.Start ? "获取验证码" : (codeWaiting === Waiting.Waiting ? `${restTime}秒后可重发` : "重新获取验证码")
+                        item.type === "verifyCode"
+                        &&
+									      <CapsuleButton className={codeWaiting === Waiting.Waiting ? 'waiting' : ''}
+									                     onClick={handleQueryVerifyCode}>
+                          {
+                            codeWaiting === Waiting.Start ? "获取验证码" : (codeWaiting === Waiting.Waiting ? `${restTime}秒后可重发` : "重新获取验证码")
+                          }
+									      </CapsuleButton>
                       }
-										</CapsuleButton>
-                  }
-                </div>
-              )
-            })
-            :
-            formData.filter(item => item.codeLogin == true).map((item, index) => {
-              return (
-                <div key={'code' + index} data-key={'code' + index} className="form-item">
-                  <img src={item.icon} alt=""/>
-                  <input type={item.type === "password" ? "password" : "text"}
-                         placeholder={item.placeholder}
-                         value={((formData as any)[item.type])}
-                         onChange={(e) => {
-                           if (item.type === "phoneNum") {
-                             setPhoneNum(e.target.value)
-                           } else if (item.type === "verifyCode") {
-                             setVerifyCode(e.target.value)
-                           }
-                         }}
-                  />
-                  {
-                    item.type === "verifyCode"
-                    &&
-                    <CapsuleButton className={codeWaiting === Waiting.Waiting ? 'waiting' : ''}
-                                   onClick={handleQueryVerifyCode}>
+                    </div>
+                  )
+                })
+                :
+                formData.filter(item => item.codeLogin == true).map((item, index) => {
+                  return (
+                    <div key={'code' + index} data-key={'code' + index} className="form-item">
+                      <img src={item.icon} alt=""/>
+                      <input type={item.type === "password" ? "password" : "text"}
+                             placeholder={item.placeholder}
+                             value={((formData as any)[item.type])}
+                             onChange={(e) => {
+                               if (item.type === "phoneNum") {
+                                 setPhoneNum(e.target.value)
+                               } else if (item.type === "verifyCode") {
+                                 setVerifyCode(e.target.value)
+                               }
+                             }}
+                      />
                       {
-                        codeWaiting === Waiting.Start ? "获取验证码" : (codeWaiting === Waiting.Waiting ? `${restTime}秒后可重发` : "重新获取验证码")
+                        item.type === "verifyCode"
+                        &&
+									      <CapsuleButton className={codeWaiting === Waiting.Waiting ? 'waiting' : ''}
+									                     onClick={handleQueryVerifyCode}>
+                          {
+                            codeWaiting === Waiting.Start ? "获取验证码" : (codeWaiting === Waiting.Waiting ? `${restTime}秒后可重发` : "重新获取验证码")
+                          }
+									      </CapsuleButton>
                       }
-                    </CapsuleButton>
-                  }
-                </div>
-              )
-            })
+                    </div>
+                  )
+                })
 
-        }
-        <CapsuleButton onClick={login}>登录</CapsuleButton>
-        {
-          !codeLogin &&
-					<>
-						<div className={'cannot-login'}>
-							<p onClick={() => {
-                dispatch(setShowRegister(true))
-                dispatch(setShowLogin(false))
-              }}>立即注册</p>
-							<p onClick={() => {
-                setCodeLogin(true);
-                setPhoneNum("");
-                setErrInfo("");
-              }}>忘记密码</p>
-						</div>
-						<div className={'other-login'}>
-							<p className={'wechat'}
-                onClick={()=>{
-                  setErrInfo('该功能暂未开通')
-                }}
-              >
-								<img src={Icons.wechat} alt=""/>
-								<span>微信扫码登录</span>
-							</p>
-							<p className={'varify-code'}
-							   onClick={()=>{
-                   setCodeLogin(true);
-                   setPhoneNum("");
-                   setErrInfo("");
-                 }}
-              >
-								<img src={Icons.varify} alt=""/>
-								<span>手机验证码登录</span>
-							</p>
-						</div>
-					</>
-        }
-      </form>
-    </PopPanel>
+            }
+            <CapsuleButton onClick={login}>登录</CapsuleButton>
+            {
+              !codeLogin &&
+				      <>
+					      <div className={'cannot-login'}>
+						      <p onClick={() => {
+                    dispatch(setShowRegister(true))
+                    dispatch(setShowLogin(false))
+                  }}>立即注册</p>
+						      <p onClick={() => {
+                    setCodeLogin(true);
+                    setPhoneNum("");
+                    setErrInfo("");
+                  }}>忘记密码</p>
+					      </div>
+					      <div className={'other-login'}>
+						      <p className={'wechat'}
+						         onClick={()=>{
+                       setErrInfo('该功能暂未开通')
+                     }}
+						      >
+							      <img src={Icons.wechat} alt=""/>
+							      <span>微信扫码登录</span>
+						      </p>
+						      <p className={'varify-code'}
+						         onClick={()=>{
+                       setCodeLogin(true);
+                       setPhoneNum("");
+                       setErrInfo("");
+                     }}
+						      >
+							      <img src={Icons.varify} alt=""/>
+							      <span>手机验证码登录</span>
+						      </p>
+					      </div>
+				      </>
+            }
+          </form>
+        </PopPanel>
+      }
+    </>
   );
 };
 

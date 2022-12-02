@@ -45,12 +45,11 @@ function App(props:any) {
         <Route exact path={'/'} component={Home}/>
       </Switch>
       {/*<Redirect to={'/home'}/>*/}
-      {
-        !state.isLogin && state.showLogin && <Login></Login>
-      }
-      {
-        state.showRegister && <Register></Register>
-      }
+      {/*{
+        !state.isLogin && state.showLogin &&
+      }*/}
+      <Login></Login>
+      <Register></Register>
       {
         state.showEditUser && <EditUser></EditUser>
       }

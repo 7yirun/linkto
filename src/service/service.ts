@@ -50,17 +50,29 @@ export const queryVerifyCode = (bindPhone: string, success?: any): void => {
   sendGet(command.GET_VERIFY_CODE, {bindPhone: bindPhone}, success);
 }
 
+interface IRequestVerifyCode{
+  bindPhone: string,
+  verifyCode: string,
+  accountName: string
+}
+//验证注册时 手机and验证码 有效性
+export const verifyCode = (request: IRequestVerifyCode, success?:any, err?:any)=>{
+  sendGet(command.VERIFY_CODE, request, success, err)
+}
+
 //注册
 interface IRequestRegister {
   accountName: string
+  age: number      //0  1  2  3
   bindPhone: string,
+  interestId: number
   password: string,
-  verifyCode: string
+  sex: number    //0男 1女
+}
+export const register = (request: IRequestRegister, success?: any, err?: any) => {
+  sendPost(command.REGISTER, request, success, err);
 }
 
-export const register = (request: IRequestRegister, success?: any, err?: any) => {
-  sendGet(command.REGISTER, request, success, err);
-}
 
 //手机号+密码登录
 interface IRequestLogin {

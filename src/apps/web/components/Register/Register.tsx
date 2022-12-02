@@ -5,8 +5,9 @@ import CapsuleButton from "../CapsuleButton/CapsuleButton";
 import Icons from "lib/icons"
 import {useDispatch, useSelector} from "react-redux";
 import {setShowRegister, setShowLogin} from "../../store/store";
-import {queryVerifyCode, register} from "service/service"
+import {queryVerifyCode, register, verifyCode} from "service/service"
 import {TimeoutId} from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
+import {Steps} from 'antd'
 import md5 from 'js-md5'
 
 const formData = [{
@@ -30,27 +31,65 @@ const formData = [{
   placeholder: '请确认密码',
   icon: Icons.pwd
 }]
+
+const steps = [{title: ''}, {title: ''}, {title: ''}, {title: ''}];
+
 const phoneNumRegExp = /^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-9])|(18[0-9])|166|198|199|191|(147))\d{8}$/;
-let timerId:TimeoutId;
+let timerId: TimeoutId;
+
+
 const Register = () => {
   const dispatch = useDispatch();
-  const [formState, setFormState] = useState<any>({
+  const state = useSelector((state: any) => state.loginState);
+
+  interface IFormState {
+    nickname: string,
+    phoneNum: string,
+    verifyCode: string,
+    password: string,
+    repeatPassword: string,
+    sex: number,
+    age: number,
+    interestId: number
+  }
+
+  const initialState = {
     nickname: '',
     phoneNum: '',
     verifyCode: '',
     password: '',
-    repeatPassword: ''
-  });
+    repeatPassword: '',
+    sex: 0,
+    age: 0,
+    interestId: 0
+  }
+  const [formState, setFormState] = useState<IFormState>(initialState);
 
-  //表单数据合法性校验
-  const [formDataCheck, setFormDataCheck] = useState({
-    nickname: false,
-    phoneNum: false,  //目前没用到
-    verifyCode: false,
-    password: false,  //目前没用到
-    repeatPassword: false,//目前没用到
-    agree: false //是否同意协议
-  })
+  useEffect(() => {
+    setErrInfo("");
+    setSuccessInfo("");
+  }, [formState])
+
+  //控制当前步骤
+  const [current, setCurrent] = useState(0);
+
+  const [registerTitle, setRegisterTitle] = useState<string>('欢迎注册')
+  useEffect(() => {
+    switch (current) {
+      case 0:
+        setRegisterTitle('欢迎注册')
+        break;
+      case 1:
+        setRegisterTitle('请问您的性别')
+        break;
+      case 2:
+        setRegisterTitle('请问您的年龄')
+        break;
+      case 3:
+        setRegisterTitle('告诉我们您的兴趣所在')
+        break;
+    }
+  }, [current])
 
   enum Waiting {
     Start,
@@ -64,9 +103,13 @@ const Register = () => {
   const close = () => {
     dispatch(setShowRegister(false));
   }
-
+  //每次打开/关闭时重置填写状态
+  useEffect(()=>{
+    setFormState(initialState);
+    setCurrent(0);
+  }, [state.showRegister])
   //请求发送验证码
-  const handleQueryVerifyCode = (e:any) => {
+  const handleQueryVerifyCode = (e: any) => {
     e.preventDefault()
     //如果手机号合法才请求
     if (phoneNumRegExp.test(formState.phoneNum)) {
@@ -83,120 +126,246 @@ const Register = () => {
   const startWaiting = () => {
     setRestTime(60)
   }
-  useEffect(()=>{
-    if(restTime === 60){
-      timerId = setInterval(()=>{
-        setRestTime(time=>--time)
+  useEffect(() => {
+    if (restTime === 60) {
+      timerId = setInterval(() => {
+        setRestTime(time => --time)
       }, 1000)
-    } else if(restTime === 0){
+    } else if (restTime === 0) {
       setCodeWaiting(Waiting.End);
       clearInterval(timerId);
     }
   }, [restTime])
-  useEffect(()=>{
+  useEffect(() => {
     //这里不确定是否需要clear timer, 因为它可能是闭包 下次组件创建时是有值的
     timerId && clearInterval(timerId);
-    return ()=>{
+    return () => {
       clearInterval(timerId);
     }
   }, [])
 
-  //返回登录
-  const backToLogin = ()=>{
-    close();
-    dispatch(setShowLogin(true))
+  const handleReturn = () => {
+    setCurrent(current - 1);
+  }
+  //检测数据合法性
+  const handleCheck = (e: MouseEvent): boolean => {
+    e.preventDefault();
+    //如果当前表单存在空值
+    if (!formState.phoneNum || !formState.password || !formState.repeatPassword || !formState.nickname || !formState.verifyCode) {
+      setErrInfo('请填写完整！')
+      return false
+    }
+    if (!phoneNumRegExp.test(formState.phoneNum)) {
+      setErrInfo('请输入正确的手机号！')
+      return false
+    }
+    if (formState.password !== formState.repeatPassword) {
+      setErrInfo('两次输入密码不一致！')
+      return false
+    }
+    return true
   }
 
   //提交注册表单
-  const handleSubmit = (e:any) => {
-    e.preventDefault();
-    let flag = true;
-    for (let key in formState) {
-      flag = flag && formState[key];
-    }
-    //如果当前表单存在空值
-    if(!flag){
-      setErrInfo('请填写完整！')
-      return
-    }
-    if(!phoneNumRegExp.test(formState.phoneNum)){
-      setErrInfo('请输入正确的手机号！')
-      return
-    }
-    if(!formDataCheck.agree){
-      setErrInfo('请阅读并接受用户协议！')
-      return
-    }
-    if(formState.password !== formState.repeatPassword){
-      setErrInfo('两次输入密码不一致！')
-      return
-    }
+  const handleSubmit = (e: any) => {
     register({
-      accountName: formState.nickname,
       bindPhone: formState.phoneNum,
+      accountName: formState.nickname,
+      age: formState.age,
+      sex: formState.sex,
       password: md5(md5(formState.password)),
-      verifyCode: formState.verifyCode
-    }, (res: any) => {
-      //如果注册成功 则返回到登录页面
+      interestId: 0
+    }, ()=>{
       setSuccessInfo("注册成功！")
       setTimeout(()=>{
-        dispatch(setShowRegister(false));
+        dispatch(setShowRegister(false))
         dispatch(setShowLogin(true));
       }, 1000)
-    }, (err:any)=>{
-      err && setErrInfo(err.msg);
     })
   }
+
   return (
     <PopPanel
       warning={errInfo}
       success={successInfo}
-      close={close}
+      open={state.showRegister}
       className={'register'}
-      returnTo={'返回登录'}
-      handleReturn={backToLogin}
-      title={'注册'}
+      returnTo={current > 0}
+      handleReturn={handleReturn}
+      title={registerTitle}
     >
-      <form>
-        {
-          formData.map((item, index) => {
-            return (
-              <div key={index} className="form-item">
-                <img src={item.icon} alt=""/>
-                <input placeholder={item.placeholder}
-                       type={item.type === "password" || item.type === "repeatPassword" ? "password" : "text"}
-                       value={((formState as any)[item.type])}
-                       onChange={(e) => {
-                         setFormState({
-                           ...formState,
-                           [item.type]: (e.target as any).value
-                         })
-                       }}
-                />
+      {
+        <form>
+          {
+            current === 0 &&
+            formData.map((item, index) => {
+              return (
+                <div key={index} className="form-item">
+                  <img src={item.icon} alt=""/>
+                  <input placeholder={item.placeholder}
+                         type={item.type === "password" || item.type === "repeatPassword" ? "password" : "text"}
+                         value={((formState as any)[item.type])}
+                         onChange={(e) => {
+                           setFormState({
+                             ...formState,
+                             [item.type]: (e.target as any).value
+                           })
+                         }}
+                  />
+                  {
+                    item.type === "verifyCode"
+                    &&
+										<CapsuleButton className={codeWaiting === Waiting.Waiting ? 'waiting' : ''}
+										               onClick={handleQueryVerifyCode}>
+                      {
+                        codeWaiting === Waiting.Start ? "获取验证码" : (codeWaiting === Waiting.Waiting ? `${restTime}秒后可重发` : "重新获取验证码")
+                      }
+										</CapsuleButton>
+                  }
+                </div>
+              )
+            })
+          }
+          {
+            current === 1 &&
+						<div className={'sex'}>
+							<div className={`male ${formState.sex === 0 ? 'choosed' : ''}`}>
+								<div className="img">
+									<img src="" alt=""/>
+								</div>
+								<CapsuleButton
+									onClick={(e: MouseEvent) => {
+                    e.preventDefault();
+                    setFormState({
+                      ...formState,
+                      sex: 0
+                    })
+                  }}>男生</CapsuleButton>
+							</div>
+							<div className={`female ${formState.sex === 1 ? 'choosed' : ''}`}>
+								<div className="img">
+									<img src="" alt=""/>
+								</div>
+								<CapsuleButton
+									onClick={(e: MouseEvent) => {
+                    e.preventDefault()
+                    setFormState({
+                      ...formState,
+                      sex: 1
+                    })
+                  }}
+								>女生</CapsuleButton>
+							</div>
+						</div>
+          }
+          {
+            current === 2 &&
+						<div className="age">
+							<div className="img">
+								<img src="" alt=""/>
+							</div>
+							<ul>
                 {
-                  item.type === "verifyCode"
-                  &&
-		              <CapsuleButton className={codeWaiting === Waiting.Waiting ? 'waiting' : ''}
-		                             onClick={handleQueryVerifyCode}>
-                    {
-                      codeWaiting === Waiting.Start ? "获取验证码" : (codeWaiting === Waiting.Waiting ? `${restTime}秒后可重发` : "重新获取验证码")
-                    }
-		              </CapsuleButton>
+                  ['80后', '90后', '00后', '10后'].map((age: string, i) => (
+                    <li
+                      key={'age' + i}
+                      className={i === formState.age ? 'choosed' : ''}>
+                      <CapsuleButton
+                        onClick={(e: MouseEvent) => {
+                          e.preventDefault();
+                          setFormState({
+                            ...formState,
+                            age: i
+                          })
+                        }}
+                      >
+                        {age}
+                      </CapsuleButton>
+                    </li>
+                  ))
                 }
-              </div>
-            )
-          })
-        }
-        <p onClick={()=>{setFormDataCheck({
-          ...formDataCheck,
-          agree: true
-        })}}>
-          <img src={formDataCheck.agree ? Icons.checked : Icons.unchecked} alt=""/>
-          已经阅读并接受
-          <span>《灵图用户协议》</span>
-        </p>
-        <CapsuleButton onClick={handleSubmit}>确认</CapsuleButton>
-      </form>
+							</ul>
+						</div>
+          }
+          {
+            current === 3 &&
+						<div className="interest">
+              {/*使用请求回来的数据*/}
+							<ul>
+                {
+                  Array(15).fill({
+                    name: '动漫',
+                    id: Math.floor(Math.random()*1000)
+                  }).map((obj, i) =>
+                    (
+                      <li key={'interest' + i}>
+                        <CapsuleButton onClick={()=>{
+                         /* setFormState({
+                            ...formState,
+                            interestId: obj.id
+                          })*/
+                        }}>
+                          {obj.name}
+                        </CapsuleButton>
+                      </li>
+                    ))
+                }
+							</ul>
+						</div>
+          }
+          <Steps
+            current={current}
+            items={steps}
+          />
+          <div className="pannel-buttons">
+            <CapsuleButton
+              className={'cancel'}
+              onClick={close}
+            >
+              取消
+            </CapsuleButton>
+            <CapsuleButton
+              className={'confirm'}
+              onClick={(e: MouseEvent) => {
+                if (current < steps.length - 1) {
+                  if (current === 0) {
+                    if (handleCheck(e)) {
+                      //==============================================================================to do
+                      verifyCode({
+                        bindPhone: formState.phoneNum,
+                        verifyCode: formState.verifyCode,
+                        accountName: formState.nickname
+                      }, ()=>{
+                        setCurrent(current + 1)
+                      }, (err:any)=>{
+                        setErrInfo(err.msg)
+                      })
+                      // setCurrent(current + 1)
+                      //==============================================================================to do
+                    }
+                    return;
+                  }
+                  //选择性别
+                  if (current === 1) {
+
+                  }
+                  //选择年龄
+                  if (current === 2) {
+
+                  }
+                  setCurrent(current + 1)
+                } else {
+                  //提交所有数据 完成注册
+                  handleSubmit(e)
+                }
+              }}>
+              {
+                current < steps.length - 1 ? '继续' : '完成'
+              }
+            </CapsuleButton>
+          </div>
+        </form>
+      }
     </PopPanel>
   );
 };

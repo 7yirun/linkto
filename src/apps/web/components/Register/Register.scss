@@ -43,6 +43,34 @@
         }
       }
     }
+
+    /*sex, age, interst*/
+    .sex{
+      display: flex;
+      justify-content: space-between;
+
+
+    }
+    .age{
+    }
+    .interest{
+      ul{
+        display: flex;
+        flex-wrap: wrap;
+        li{
+          width: 30%;
+          .capsule-button{
+            width: 100%;
+          }
+        }
+      }
+
+    }
+
+    .steps-action{
+      display: flex;
+      justify-content: space-between;
+    }
     p{
       font-size: 12px;
       color: #000;
@@ -63,5 +91,19 @@
     button{
       height: 40px;
     }
+
+
+    /*统一设置按钮选中和非选中时的颜色*/
+    .age, .sex, .interest{
+      .capsule-button{
+        background: $grey;
+      }
+      .choosed{
+        .capsule-button{
+          background: $green;
+        }
+      }
+    }
+
   }
 }
