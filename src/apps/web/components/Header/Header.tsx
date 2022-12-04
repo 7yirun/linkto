@@ -1,7 +1,7 @@
 import "./Header.scss"
 import {useHistory, NavLink} from 'react-router-dom'
 import {useSelector, useDispatch} from 'react-redux'
-import {setShowLogin, setIsLogin} from 'apps/web/store/store'
+import {setShowLogin, setIsLogin, setShowRegister} from 'apps/web/store/store'
 import Icons from 'lib/icons'
 import {useEffect, useState, useRef} from "react";
 import CapsuleButton from "../CapsuleButton/CapsuleButton";
@@ -9,12 +9,8 @@ import {logout} from "service/service";
 import {getStore} from "utils/utils"
 
 const items = [
-  {name: '首页', path: '/'},
   {name: '创作', path: '/create'},
   {name: '图库', path: '/pictures'},
-  // {name: '我的画夹', path: '/bookmark/sub-mycreate'},
-  {name: '我的画夹', path: '/bookmark'},
-  {name: '教程', path: '/tutorial'}
 ];
 
 const Header = () => {
@@ -57,34 +53,52 @@ const Header = () => {
       <div className="header-in">
         <div className="logo">
           <img src={Icons.logo} alt=""/>
-          <span>LinkTo</span>
-        </div>
-        <ul className='nav'>
           {
-            items.map((item, index) => {
-              return (
-                <li key={item.name} className={'nav-item'}>
-                  <NavLink exact={index === 0} className={'nav-btn'} key={item.name} to={item.path}>
-                    {
-                      item.name
-                    }
-                  </NavLink>
-                </li>
-              )
-            })
+            loginState.isLogin &&
+            <ul className='nav'>
+              {
+                items.map((item, index) => {
+                  return (
+                    <li key={item.name} className={'nav-item'}>
+                      <NavLink exact={index === 0} className={'nav-btn'} key={item.name} to={item.path}>
+                        {
+                          item.name
+                        }
+                      </NavLink>
+                    </li>
+                  )
+                })
+              }
+            </ul>
           }
-        </ul>
+        </div>
         {
           !loginState.isLogin ?
-            <CapsuleButton
-              onClick={(e: any) => {
-                e.preventDefault();
-                dispatch(setShowLogin(true))
-              }}
-              className={'login'}
-            >
-              登录
-            </CapsuleButton> :
+            <div className={'login-register'}>
+              <span>
+                关于灵图
+              </span>
+              <CapsuleButton
+                onClick={(e: any) => {
+                  e.preventDefault();
+                  dispatch(setShowRegister(true))
+                }}
+                className={'register'}
+              >
+                注册
+              </CapsuleButton>
+              <CapsuleButton
+                onClick={(e: any) => {
+                  e.preventDefault();
+                  dispatch(setShowLogin(true))
+                }}
+                className={'login'}
+              >
+                登录
+              </CapsuleButton>
+            </div>
+
+            :
             <div className={'logined'}>
               <img
                 ref={userRef}

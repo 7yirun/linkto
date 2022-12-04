@@ -217,6 +217,7 @@ const Login = () => {
                 })
 
             }
+            <CapsuleButton onClick={close}>取消</CapsuleButton>
             <CapsuleButton onClick={login}>登录</CapsuleButton>
             {
               !codeLogin &&

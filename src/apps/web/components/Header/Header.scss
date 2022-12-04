@@ -1,28 +1,28 @@
 @import "../../../../style/variable.scss";
 .header{
-  background: #1f1f1f;
+  //background: #1f1f1f;
+  margin: 0 auto;
   .header-in{
-    width: 1334px;
-    height: 80px;
     margin: 0 auto;
+    max-width: 1824/1920vw;
+    padding: 0 48px;
+    height: 80px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     .logo{
-      font-family: OPPOSans;
       display: flex;
       align-items: center;
       img{
         width: 32px;
         height: 32px;
-        margin-right: 4px;
       }
     }
     .nav{
       display: flex;
       justify-content: space-between;
       .nav-item{
-        padding: 0 24px;
+        padding-left: 16px;
         display: flex;
         .nav-btn{
           height: 22px;
@@ -54,16 +54,21 @@
         }
       }
     }
-    .login{
-      font-size: 14px;
-      width: 72px;
-      height: 36px;
-      color: #fff;
+    .login-register{
+      font-size: 12px;
+      font-weight: bold;
       display: flex;
-      justify-content: center;
       align-items: center;
-      border: none;
-      cursor: pointer;
+      .capsule-button{
+        width: 72px;
+        height: 32px;
+        color: #202020;
+        cursor: pointer;
+        border: none;
+      }
+      .register{
+        background: #E5E5E5;
+      }
     }
     .logined{
       position: relative;

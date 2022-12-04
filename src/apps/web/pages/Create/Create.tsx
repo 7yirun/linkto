@@ -32,8 +32,9 @@ const DIMESNION_OPTION = [
 
 const Create = (props: any) => {
   enum MODE {
-    Text,
-    Picture
+    junior,
+    senior,
+    superior
   }
    const dataRef = useRef<any>(null);
   //生成按钮可否点击
@@ -45,7 +46,7 @@ const Create = (props: any) => {
 
   const MAX_LENGTH = 200; //可输入的最大文字个数
   //创作模式,按文字或者图片创作
-  const [mode, setMode] = useState(MODE.Text);
+  const [mode, setMode] = useState(MODE.junior);
   //用户输入描述信息
   //@ts-ignore
   const str: string = qs.parse(props.location.search.replace('?', '')).search || getStore('description', false) || '';
@@ -239,7 +240,7 @@ const Create = (props: any) => {
         imgRefresh({taskId: taskId}, success)
       }, 1000)
     }
-    if (mode === MODE.Text) {
+    if (mode === MODE.junior) {
       if (!description && !keyword) {
         //生成按钮和换一批按钮不可点击
         return
@@ -262,7 +263,7 @@ const Create = (props: any) => {
         console.log('创作失败', err);
         return;
       })
-    } else if (mode === MODE.Picture && fileRef.current) {
+    } else if (mode === MODE.superior && fileRef.current) {
       if (fileRef.current.files && !fileRef.current.files[0]) {
         alert('请上传图片')
         return
@@ -304,11 +305,14 @@ const Create = (props: any) => {
         <div className="left">
           <div className="choose-mode">
             <CapsuleButton onClick={() => {
-              changeModeTo(MODE.Text)
-            }} className={mode == MODE.Text ? 'active' : ''}>文字模式</CapsuleButton>
+              changeModeTo(MODE.junior)
+            }} className={mode == MODE.junior ? 'active' : ''}>普通模式</CapsuleButton>
             <CapsuleButton onClick={() => {
-              changeModeTo(MODE.Picture)
-            }} className={mode == MODE.Picture ? 'active' : ''}>图文模式</CapsuleButton>
+              changeModeTo(MODE.senior)
+            }} className={mode == MODE.senior ? 'active' : ''}>进阶模式</CapsuleButton>
+            <CapsuleButton onClick={() => {
+              changeModeTo(MODE.superior)
+            }} className={mode == MODE.superior ? 'active' : ''}>高级模式</CapsuleButton>
             {
               creatable ?
                 <CapsuleButton onClick={createImg} className={'create'}>生成</CapsuleButton>
@@ -368,7 +372,7 @@ const Create = (props: any) => {
           </div>
           <div className="choose-style">
             {
-              mode === MODE.Picture &&
+              mode === MODE.superior &&
 							<div className="add-picture">
 								<input ref={fileRef}
 								       accept="image/jpeg, image/jpg, image/png, image/gif, image/bmp"
@@ -416,7 +420,7 @@ const Create = (props: any) => {
                   <div className="percentage">{`${relevance}%`}</div>
                 </div>
                 {
-                  mode === MODE.Picture &&
+                  mode === MODE.superior &&
 									<div className={'choose relevance'}>
 										<p>图片相关性</p>
 										<div onMouseDown={adjustRelevance2} className="slider">
@@ -487,7 +491,7 @@ const Create = (props: any) => {
                     })
                   }
                   {
-                    mode === MODE.Picture &&
+                    mode === MODE.superior &&
 										<div className={'upload-img'}>
 											图片预览区
 											<img src={previewUrl} alt=""/>
