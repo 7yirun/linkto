@@ -7,6 +7,7 @@ import 'react-app-polyfill/stable';
 import {HashRouter} from 'react-router-dom'
 import {Provider} from 'react-redux'
 import store from 'apps/web/store/store'
+import "../../assets/iconfont/iconfont.css"
 
 ReactDOM.render(
   <Provider store={store}>

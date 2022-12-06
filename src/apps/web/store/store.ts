@@ -32,11 +32,35 @@ const loginSlice = createSlice({
     },
   }
 })
+//搜索框相关
+const searchSlice = createSlice({
+  name: 'searchSlice',
+  initialState: {
+    description: '',
+    mapArr: [['']],
+    lanMap: {}    //英文转中文
+  },
+  reducers: {
+    //创作时或者搜索图库时自己输入的描述词
+    setDescription(state, action){
+      state.description = action.payload
+    },
+    //创作时选中的keyword
+    setMapArr(state, action){
+      state.mapArr = action.payload
+    },
+    setLanMap(state, action){
+      state.lanMap = action.payload
+    }
+  }
+})
 export const {setShowLogin, setShowRegister, setIsLogin, setShowEditUser, setAccountInfo,setEditUser} = loginSlice.actions
+export const {setDescription, setMapArr, setLanMap} = searchSlice.actions
 
 const store = configureStore({
   reducer: {
     loginState: loginSlice.reducer,
+    searchState: searchSlice.reducer
   }
 })
 export default store

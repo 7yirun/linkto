@@ -3,27 +3,37 @@ import {useHistory, NavLink} from 'react-router-dom'
 import {useSelector, useDispatch} from 'react-redux'
 import {setShowLogin, setIsLogin, setShowRegister} from 'apps/web/store/store'
 import Icons from 'lib/icons'
-import {useEffect, useState, useRef} from "react";
+import React, {useEffect, useState, useRef} from "react";
 import CapsuleButton from "../CapsuleButton/CapsuleButton";
 import {logout} from "service/service";
 import {getStore} from "utils/utils"
-
+import Search from "../Search/Search"
 const items = [
   {name: '创作', path: '/create'},
   {name: '图库', path: '/pictures'},
 ];
 
-const Header = () => {
+const Header = (props: any) => {
   const loginState = useSelector((state: any) => state.loginState);
-  const [activeIndex, setActiveIndex] = useState(0);
   const [showLoginRelevant, setShowLoginRelevant] = useState(false)
   const dispatch = useDispatch();
   const history = useHistory();
   const userRef = useRef(null);
-  const getLocalAccountInfo = ()=>{
+  const getLocalAccountInfo = () => {
     return JSON.parse(getStore('accountInfo', true) || '{}');
   }
 
+  //判断当前路由是否是首页
+  const [isHome, setIsHome] = useState<boolean>(true);
+  useEffect(() => {
+    setIsHome(history.location.pathname === '/')
+    const removeListen = history.listen((location: { pathname: string }) => {
+      setIsHome(location.pathname === '/')
+    })
+    return () => {
+      removeListen()
+    }
+  }, [history])
   const handleLogout = () => {
     logout(() => {
       dispatch(setIsLogin(false));
@@ -42,25 +52,23 @@ const Header = () => {
       document.body.removeEventListener('mouseup', handler);
     }
   }, [])
-  useEffect(() => {
-    let activeI = items.findIndex((item, index) => {
-      return history.location.pathname.includes(item.path)
-    });
-    setActiveIndex(activeI);
-  }, [activeIndex])
   return (
     <div className='header'>
       <div className="header-in">
-        <div className="logo">
-          <img src={Icons.logo} alt=""/>
+        <nav>
+          <NavLink className={'nav-btn'} to={'/'}>
+            <div className="logo">
+              <img src={Icons.logo} alt=""/>
+            </div>
+          </NavLink>
           {
-            loginState.isLogin &&
-            <ul className='nav'>
+            !isHome &&
+						<ul className='nav'>
               {
                 items.map((item, index) => {
                   return (
                     <li key={item.name} className={'nav-item'}>
-                      <NavLink exact={index === 0} className={'nav-btn'} key={item.name} to={item.path}>
+                      <NavLink className={'nav-btn'} key={item.name} to={item.path}>
                         {
                           item.name
                         }
@@ -69,9 +77,13 @@ const Header = () => {
                   )
                 })
               }
-            </ul>
+						</ul>
           }
-        </div>
+        </nav>
+        {
+          history.location.pathname !== '/' &&
+          <Search></Search>
+        }
         {
           !loginState.isLogin ?
             <div className={'login-register'}>
@@ -97,7 +109,6 @@ const Header = () => {
                 登录
               </CapsuleButton>
             </div>
-
             :
             <div className={'logined'}>
               <img
@@ -106,8 +117,10 @@ const Header = () => {
                   setShowLoginRelevant(true);
                 }
                 }
-                className={'user-profile'} src={loginState.accountInfo.headPic || getLocalAccountInfo().headPic || Icons.default_profile} alt=""/>
-              <div className={'nickname'}>{loginState.accountInfo.accountName || getLocalAccountInfo().accountName}</div>
+                className={'user-profile'}
+                src={loginState.accountInfo.headPic || getLocalAccountInfo().headPic || Icons.default_profile} alt=""/>
+              <div
+                className={'nickname'}>{loginState.accountInfo.accountName || getLocalAccountInfo().accountName}</div>
               <ul className={`user-relevant ${showLoginRelevant ? 'show' : ''}`}>
                 <li onClick={() => {
                   history.push('/my-space')

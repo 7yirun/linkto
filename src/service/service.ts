@@ -8,9 +8,7 @@ const url = process.env.REACT_APP_API_URL;
 
 
 axios.interceptors.response.use((res) => {
-  //@ts-ignore
   if (res.data.code > 0) {
-    //@ts-ignore
     if(res.data.code == 401){
       (window as any).logout()
     }
@@ -18,6 +16,7 @@ axios.interceptors.response.use((res) => {
   }
   return res;
 }, (err)=>{
+  console.log(err);
   return Promise.reject(err)
 })
 

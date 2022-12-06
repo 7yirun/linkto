@@ -1,0 +1,112 @@
+@import "../../../../style/variable.scss";
+$black-bg: rgba(0,0,0,0.2);
+
+.textarea-wrapper {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(120000vw/1920);
+  height: 48px;
+  display: flex;
+  align-items: center;
+  border-radius: 24px;
+  background: $black-bg;
+  z-index: 2;
+  padding: 8px;
+  padding-left: 30px;
+  box-sizing: border-box;
+  :global{
+    .user-input-area {
+      width: 100%;
+      height: 24px;
+      border-radius: 20px;
+      box-sizing: border-box;
+      position: relative;
+      input[type=text] {
+        height: 100%;
+        color: #fff;
+        outline: none;
+        resize: none;
+        border: none;
+        font-size: 14px;
+        width: 100%;
+        background: transparent;
+        overflow: hidden;
+        padding-right: 88px;
+        box-sizing: border-box;
+      }
+      .text-limit{
+        position: absolute;
+        right: 40px;
+        bottom: 0;
+        color: rgba(255,255,255,0.3);
+        font-size: 12px;
+        user-select: none;
+      }
+    }
+    .small-tags {
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      right: 0;
+      transform: translateY(100%);
+      align-items: center;
+      flex-wrap: wrap;
+      border-radius: 8px;
+      padding: 16px 16px;
+      padding-bottom: 8px;
+      padding-right: 8px;
+      background: #202020;
+      box-shadow: 0px 4px 6px 0px #0000003F;
+      display: flex;
+      &.small-tags-enter{
+        opacity: 0;
+        transform: translateY(80%);
+      }
+      &.small-tags-enter-active{
+        opacity: 1;
+        transition: all .5s;
+        transform: translateY(100%);
+      }
+      &.small-tags-exit-active{
+        opacity: 0;
+        transition: all .5s;
+        transform: translateY(80%);
+      }
+      .capsule-button {
+        height: 20px;
+        margin-bottom: 8px;
+        border: 1px solid #FFFFFF33;
+        box-sizing: border-box;
+        background: #383838;
+        margin-right: 8px;
+        color: $green;
+        padding-left: 8px;
+        padding-right: 4px;
+        justify-content: flex-start;
+        pointer-events: none;
+      }
+
+      i {
+        pointer-events: auto;
+        width: 16px;
+        height: 16px;
+
+        img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+    .toggle-tags{
+      width: 32px;
+      height: 32px;
+      background: $green;
+      position: absolute;
+      right: 8px;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+  }
+}
