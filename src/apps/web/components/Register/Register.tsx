@@ -55,11 +55,11 @@ const Register = () => {
   }
 
   const initialState = {
-    nickname: '11111',
-    phoneNum: '19111111111',
-    verifyCode: '123456',
-    password: '1',
-    repeatPassword: '1',
+    nickname: '',
+    phoneNum: '',
+    verifyCode: '',
+    password: '',
+    repeatPassword: '',
     sex: 0,
     age: 0,
     interestId: 0,
