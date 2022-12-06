@@ -21,7 +21,7 @@ const formData = [{
 }, {
   type: 'verifyCode',
   placeholder: '请输入验证码',
-  icon: Icons.pwd
+  icon: Icons.code
 }, {
   type: 'password',
   placeholder: '请设置密码',
@@ -50,21 +50,22 @@ const Register = () => {
     repeatPassword: string,
     sex: number,
     age: number,
-    interestId: number
+    interestId: number,
+    passwordError:number
   }
 
   const initialState = {
-    nickname: '',
-    phoneNum: '',
-    verifyCode: '',
-    password: '',
-    repeatPassword: '',
+    nickname: '11111',
+    phoneNum: '19111111111',
+    verifyCode: '123456',
+    password: '1',
+    repeatPassword: '1',
     sex: 0,
     age: 0,
-    interestId: 0
+    interestId: 0,
+    passwordError: 0
   }
   const [formState, setFormState] = useState<IFormState>(initialState);
-
   useEffect(() => {
     setErrInfo("");
     setSuccessInfo("");
@@ -102,6 +103,11 @@ const Register = () => {
   const [successInfo, setSuccessInfo] = useState('');
   const close = () => {
     dispatch(setShowRegister(false));
+    setFormState({
+      ...formState,
+      passwordError: 0
+    })
+
   }
   //每次打开/关闭时重置填写状态
   useEffect(()=>{
@@ -160,7 +166,12 @@ const Register = () => {
       return false
     }
     if (formState.password !== formState.repeatPassword) {
-      setErrInfo('两次输入密码不一致！')
+      setErrInfo('密码不一致！')
+      setFormState({
+        ...formState,
+        passwordError: 1
+      })
+      
       return false
     }
     return true
@@ -183,6 +194,15 @@ const Register = () => {
       }, 1000)
     })
   }
+  const resetPasswordError = () => {
+    if(!formState.password && !formState.repeatPassword){
+        setFormState({
+          ...formState,
+          passwordError: 0
+        })
+    }
+    console.log("formState===",formState)
+  }
 
   return (
     <PopPanel
@@ -201,10 +221,17 @@ const Register = () => {
             formData.map((item, index) => {
               return (
                 <div key={index} className="form-item">
-                  <img src={item.icon} alt=""/>
+                  {
+                     ( item.type === "password" || item.type === "repeatPassword") && formState.passwordError ? 
+                     <img src={Icons.unchecked} alt=""/>
+                     : 
+                     <img src={item.icon} alt=""/>
+                  }
+                  
                   <input placeholder={item.placeholder}
                          type={item.type === "password" || item.type === "repeatPassword" ? "password" : "text"}
                          value={((formState as any)[item.type])}
+                         className={ ( item.type === "password" || item.type === "repeatPassword") && formState.passwordError ? `password-error` : ''}
                          onChange={(e) => {
                            setFormState({
                              ...formState,
@@ -218,9 +245,23 @@ const Register = () => {
 										<CapsuleButton className={codeWaiting === Waiting.Waiting ? 'waiting' : ''}
 										               onClick={handleQueryVerifyCode}>
                       {
-                        codeWaiting === Waiting.Start ? "获取验证码" : (codeWaiting === Waiting.Waiting ? `${restTime}秒后可重发` : "重新获取验证码")
+                        codeWaiting === Waiting.Start ? "获取验证码" : (codeWaiting === Waiting.Waiting ? `${restTime}s` : "重新获取验证码")
                       }
 										</CapsuleButton>
+                  }
+                  {
+                 ( item.type === "password" || item.type === "repeatPassword") && formState.passwordError === 1  &&
+                  <img src={Icons.close1} alt="" className="clear"
+                      onClick={(e) => {
+                        setFormState({
+                          ...formState,
+                          [item.type]: ''
+                        })
+                        resetPasswordError()
+                        console.log("formState===",formState)
+                        e.stopPropagation();
+                      }}
+									/>
                   }
                 </div>
               )
@@ -231,7 +272,7 @@ const Register = () => {
 						<div className={'sex'}>
 							<div className={`male ${formState.sex === 0 ? 'choosed' : ''}`}>
 								<div className="img">
-									<img src="" alt=""/>
+									<img src={Icons.man} alt="" />
 								</div>
 								<CapsuleButton
 									onClick={(e: MouseEvent) => {
@@ -244,7 +285,7 @@ const Register = () => {
 							</div>
 							<div className={`female ${formState.sex === 1 ? 'choosed' : ''}`}>
 								<div className="img">
-									<img src="" alt=""/>
+                   <img src={Icons.woman} alt="" />
 								</div>
 								<CapsuleButton
 									onClick={(e: MouseEvent) => {
@@ -262,7 +303,12 @@ const Register = () => {
             current === 2 &&
 						<div className="age">
 							<div className="img">
-								<img src="" alt=""/>
+              {
+                formState.sex === 0 ? 
+                <img src={Icons.man} alt="" />
+                : 
+                <img src={Icons.woman} alt="" />
+              }
 							</div>
 							<ul>
                 {
@@ -317,7 +363,10 @@ const Register = () => {
             current={current}
             items={steps}
           />
-          <div className="pannel-buttons">
+         
+        </form>
+      }
+       <div className="pannel-buttons">
             <CapsuleButton
               className={'cancel'}
               onClick={close}
@@ -341,6 +390,7 @@ const Register = () => {
                         setErrInfo(err.msg)
                       })
                       // setCurrent(current + 1)
+                      
                       //==============================================================================to do
                     }
                     return;
@@ -364,8 +414,6 @@ const Register = () => {
               }
             </CapsuleButton>
           </div>
-        </form>
-      }
     </PopPanel>
   );
 };

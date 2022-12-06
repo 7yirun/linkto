@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {Modal} from 'antd'
+import Icons from "lib/icons"
 import './PopPanel.scss'
 
 type PropType = {
@@ -23,6 +24,7 @@ const PopPanel:React.FC<PropType> = (props) => {
     setIsModalOpen(false);
   };
   return (
+    <div>
     <Modal
       open={props.open}
       className={props.className ? `${props.className} pannel` : 'pannel'}
@@ -34,16 +36,20 @@ const PopPanel:React.FC<PropType> = (props) => {
       destroyOnClose
     >
       <p className={'pannel-head'}>
-        {
+        {/* {
           props.returnTo &&
           <span
             className={'returnTo'}
             onClick={props.handleReturn}
           >
-            previous
+           <img src={Icons.back} alt="" className="back" />
           </span>
+        } */}
+        {
+          props.returnTo &&
+           <img src={Icons.back} alt="" className={'returnTo'}  onClick={props.handleReturn}/>
         }
-        <span className={'panel-title'}>{props.title}</span>
+        <span className={ !props.returnTo ? `panel-title` : ''}>{props.title}</span>
         {
           props.success && <span className={"pannel-success"}>{props.success}</span>
         }
@@ -51,12 +57,16 @@ const PopPanel:React.FC<PropType> = (props) => {
           !props.success && props.warning && <span className={"pannel-warning"}>{props.warning}</span>
         }
       </p>
+      
       <div className="pannel-content">
         {
           props.children
         }
       </div>
+     
     </Modal>
+    
+    </div>
   );
 };
 
