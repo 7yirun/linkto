@@ -11,7 +11,11 @@ export default {
   wechat: require("../assets/images/icons/login/icon_wechat.png"),
   varify: require("../assets/images/icons/login/icon_varify.png"),
   default_profile: require("../assets/images/icons/login/icon_default_profile.png"),
-
+  back: require("../assets/images/icons/login/icon_back.png"),
+  man:require("../assets/images/icons/login/man.png"),
+  woman:require("../assets/images/icons/login/woman.png"),
+  code:require("../assets/images/icons/login/icon_code.png"),
+  close1: require("../assets/images/icons/login/icon_close1.png"),
   //logo
   logo: require("../assets/images/icons/logo.png"),
   //home
@@ -31,4 +35,5 @@ export default {
   edit_account_name: require("../assets/images/icons/bookmark/icon_edit_account_name.png"),
   clear_text: require("../assets/images/icons/bookmark/icon_clear.png"),
   del_clip: require("../assets/images/icons/bookmark/icon_del_clip.png")
+
 }

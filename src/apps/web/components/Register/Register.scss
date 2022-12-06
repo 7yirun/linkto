@@ -4,16 +4,18 @@
     display: flex;
     flex-direction: column;
     width: 320px;
+    height: 370px;
+    position: relative;
     .form-item{
       position: relative;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
       height: 40px;
       &:last-of-type{
         margin-bottom: 25px;
       }
       img{
-        width: 16px;
-        height: 16px;
+        width: 24px;
+        height: 24px;
         position: absolute;
         left: 16px;
         top: 50%;
@@ -24,41 +26,95 @@
         height: 100%;
         font-size: 14px;
         border-radius: 20px;
-        padding-left: 36px;
-        background: #E5E5E5;
+        padding-left: 40px;
+        background: #f5f5f5;
         box-sizing: border-box;
+        font-weight: 400;
+        color: #202020;
+      }
+      input::placeholder{
+        color: #CCCCCC!important;
+      }
+      .password-error{
+        border: 1px solid #ff4e4e;
       }
       //发送验证码按钮
       .capsule-button{
         height: 24px;
         position: absolute;
-        padding: 0 5px;
+        padding: 0 9px;
         right: 8px;
         top: 50%;
         transform: translateY(-50%);
+        font-size: 12px;
         &.waiting{
           pointer-events: none;
-          background: transparent;
-          color: $text-color-dark;
+          border-radius: 20px;
+          background: rgba(204,204,204,1);
+          color: rgba(102,102,102,1);
+          font-size: 12px;
+          width: 80px;
         }
       }
+      .clear{
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 16px;
+        left: auto;
+        cursor: pointer;
+      }
     }
-
+   
     /*sex, age, interst*/
     .sex{
+      margin-top: 36px;
       display: flex;
       justify-content: space-between;
+      .img{
+        text-align: center;
+        img{
+          width: 120px;
+          height: 64px;
+          object-fit: cover;
+        }
+      }
 
 
     }
     .age{
+      margin-top: 20px;
+      .img{
+        text-align: center;
+        img{
+          width: 120px;
+          height: 64px;
+          object-fit: cover;
+        }
+      }
+      ul{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-top: 10px;
+        li{
+          
+        }
+      }
     }
     .interest{
       ul{
         display: flex;
         flex-wrap: wrap;
+        justify-content: space-between;
+        margin-top: 5px;
+        height: 280px;
+        overflow-y: scroll;
         li{
-          width: 30%;
+          width:30%;
+          // height: 40px;
           .capsule-button{
             width: 100%;
           }
@@ -96,14 +152,50 @@
     /*统一设置按钮选中和非选中时的颜色*/
     .age, .sex, .interest{
       .capsule-button{
+        margin-top: 16px;
         background: $grey;
+        border-radius: 20px;
+        width: 148px;
+        height: 40px;
+        font-size: 16px;
       }
       .choosed{
         .capsule-button{
           background: $green;
+          border-radius: 20px;
+          width: 148px;
+          height: 40px;
+          font-size: 16px;
         }
       }
     }
 
+  }
+  .ant-steps-item-icon{
+    background-color: $green!important;
+    border-color: $green!important;
+    width: 8px!important;
+    height: 8px!important;
+  }
+  :where(.css-dev-only-do-not-override-1s3dcof).ant-steps .ant-steps-item-wait .ant-steps-item-icon{
+    background: rgba(0,0,0,0.2)!important;
+    border-color: transparent!important;
+  }
+  :where(.css-dev-only-do-not-override-1s3dcof).ant-steps{
+    justify-content: center;
+    padding: 20px 0 15px 0;
+    position: absolute;
+    bottom: 20px;
+  }
+  .ant-steps-item{
+    padding-inline-start: 0px!important;
+    flex: none;
+  }
+  .ant-steps-item-content{
+    display: block!important;
+  }
+  .ant-steps-item-finish .ant-steps-item-icon{
+    background: rgba(0,0,0,0.2)!important;
+    border-color: transparent!important;
   }
 }

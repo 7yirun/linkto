@@ -13,13 +13,13 @@ import md5 from 'js-md5'
 const formData = [
   {
     type: 'phoneNum',
-    placeholder: '请输入手机号',
+    placeholder: '手机号',
     icon: Icons.phone,
     codeLogin: true,
     pwdLogin: true
   }, {
     type: 'password',
-    placeholder: '请输入密码',
+    placeholder: '密码',
     icon: Icons.pwd,
     pwdLogin: true
   }, {
@@ -42,6 +42,7 @@ const Login = () => {
   const state = useSelector((state: any) => state.loginState);
   const close = () => {
     dispatch(setShowLogin(false));
+    setVerifyError(0)
     setErrInfo('')
   }
   const [phoneNum, setPhoneNum] = useState('');
@@ -52,6 +53,7 @@ const Login = () => {
   const [codeLogin, setCodeLogin] = useState(false);
   const [codeWaiting, setCodeWaiting] = useState<Waiting>(Waiting.Start)
   const [restTime, setRestTime] = useState<number>(-1);
+  const [verifyError, setVerifyError] = useState<number>(0);
   const startWaiting = () => {
     setRestTime(60)
   }
@@ -96,6 +98,7 @@ const Login = () => {
         password: md5(md5(password))
       }, afterLogin, (err: any) => {
         err && setErrInfo(err.msg);
+        setVerifyError(1)
       })
     }
     //验证码登录
@@ -161,10 +164,18 @@ const Login = () => {
                 formData.filter(item => item.pwdLogin).map((item, index) => {
                   return (
                     <div key={'pwd' + index} className="form-item">
-                      <img src={item.icon} alt=""/>
+                      {/* <img src={item.icon} alt=""/>
+                      verifyError */}
+                       {
+                     ( item.type === "password" || item.type === "phoneNum") && verifyError ? 
+                        <img src={Icons.unchecked} alt=""/>
+                        : 
+                        <img src={item.icon} alt=""/>
+                      }
                       <input type={item.type === "password" ? "password" : "text"}
                              placeholder={item.placeholder}
                              value={((formData as any)[item.type])}
+                             className={ ( item.type === "password" || item.type === "phoneNum") && verifyError ? `password-error` : ''}
                              onChange={(e) => {
                                if (item.type === "password") {
                                  setPassWord(e.target.value)
@@ -190,7 +201,12 @@ const Login = () => {
                 formData.filter(item => item.codeLogin == true).map((item, index) => {
                   return (
                     <div key={'code' + index} data-key={'code' + index} className="form-item">
-                      <img src={item.icon} alt=""/>
+                      {
+                        ( item.type === "password" || item.type === "repeatPassword") ? 
+                        <img src={Icons.unchecked} alt=""/>
+                        : 
+                        <img src={item.icon} alt=""/>
+                      }
                       <input type={item.type === "password" ? "password" : "text"}
                              placeholder={item.placeholder}
                              value={((formData as any)[item.type])}
@@ -217,9 +233,11 @@ const Login = () => {
                 })
 
             }
-            <CapsuleButton onClick={close}>取消</CapsuleButton>
-            <CapsuleButton onClick={login}>登录</CapsuleButton>
-            {
+            <div className="pannel-buttons">
+              <CapsuleButton onClick={close} className={'cancel'}>取消</CapsuleButton>
+              <CapsuleButton onClick={login} className={'confirm'}>登录</CapsuleButton>
+            </div>
+            {/* {
               !codeLogin &&
 				      <>
 					      <div className={'cannot-login'}>
@@ -254,7 +272,7 @@ const Login = () => {
 						      </p>
 					      </div>
 				      </>
-            }
+            } */}
           </form>
         </PopPanel>
       }
