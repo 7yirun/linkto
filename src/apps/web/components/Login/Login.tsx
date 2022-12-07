@@ -14,18 +14,18 @@ const formData = [
   {
     type: 'phoneNum',
     placeholder: '手机号',
-    icon: Icons.phone,
+    icon: 'icon-14',
     codeLogin: true,
     pwdLogin: true
   }, {
     type: 'password',
     placeholder: '密码',
-    icon: Icons.pwd,
+    icon: 'icon-6',
     pwdLogin: true
   }, {
     type: 'verifyCode',
     placeholder: '请输入验证码',
-    icon: Icons.pwd,
+    icon: 'icon-18',
     codeLogin: true
   }
 ];
@@ -164,13 +164,12 @@ const Login = () => {
                 formData.filter(item => item.pwdLogin).map((item, index) => {
                   return (
                     <div key={'pwd' + index} className="form-item">
-                      {/* <img src={item.icon} alt=""/>
-                      verifyError */}
                        {
-                     ( item.type === "password" || item.type === "phoneNum") && verifyError ? 
-                        <img src={Icons.unchecked} alt=""/>
-                        : 
-                        <img src={item.icon} alt=""/>
+                    //  ( item.type === "password" || item.type === "phoneNum") && verifyError ? 
+                    //     <img src={Icons.unchecked} alt=""/>
+                    //     : 
+                    //     <img src={item.icon} alt=""/>
+                    <i className={`iconfont ${item.icon } ${( item.type === "password" || item.type === "phoneNum") &&verifyError ? 'pwd-error' : ''}`}></i>
                       }
                       <input type={item.type === "password" ? "password" : "text"}
                              placeholder={item.placeholder}

@@ -13,23 +13,23 @@ import md5 from 'js-md5'
 const formData = [{
   type: 'nickname',
   placeholder: '请设置昵称',
-  icon: Icons.nickname
+  icon: 'icon-21'
 }, {
   type: 'phoneNum',
   placeholder: '请输入手机号',
-  icon: Icons.phone
+  icon: 'icon-14'
 }, {
   type: 'verifyCode',
   placeholder: '请输入验证码',
-  icon: Icons.code
+  icon: 'icon-18'
 }, {
   type: 'password',
   placeholder: '请设置密码',
-  icon: Icons.pwd
+  icon: 'icon-6'
 }, {
   type: 'repeatPassword',
   placeholder: '请确认密码',
-  icon: Icons.pwd
+  icon: 'icon-6'
 }]
 
 const steps = [{title: ''}, {title: ''}, {title: ''}, {title: ''}];
@@ -222,10 +222,7 @@ const Register = () => {
               return (
                 <div key={index} className="form-item">
                   {
-                     ( item.type === "password" || item.type === "repeatPassword") && formState.passwordError ? 
-                     <img src={Icons.unchecked} alt=""/>
-                     : 
-                     <img src={item.icon} alt=""/>
+                     <i className={`iconfont ${item.icon } ${( item.type === "password" || item.type === "repeatPassword") &&formState.passwordError ? 'pwd-error' : ''}`}></i>
                   }
                   
                   <input placeholder={item.placeholder}

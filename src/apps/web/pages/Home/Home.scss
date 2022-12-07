@@ -9,7 +9,6 @@
     width: 1200px;
     display: flex;
     justify-content: space-between;
-    display: none;
     .left {
       h4 {
         font-weight: normal;
@@ -20,7 +19,7 @@
       p{
         font-size: 12px;
         margin-top: 24px;
-        padding-left: 16px;
+        // padding-left: 16px;
       }
       .welcome-small{
         margin-top: 44px;
@@ -160,7 +159,19 @@
         color: $text-color-dark;
       }
     }
-
+    .create-button{
+      width: 96px;
+      height: 32px;
+      color: #fff;
+      cursor: pointer;
+      border: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #43CF7C;
+      border-radius: 9999px;
+      box-sizing: border-box;
+    }
     .try {
       color: $text-color-dark;
       margin-bottom: 8px;

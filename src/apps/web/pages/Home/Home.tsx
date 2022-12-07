@@ -132,6 +132,14 @@ const Home = (props: any) => {
                      type="text" placeholder={'输入一句话, AI为您生成画作'}/>
               <span className='text-limit'>{`${searchVal.length}/200`}</span>
             </div>
+            <p>
+              <button className={'create-button'} onClick={(e) => {
+                    props.history.push('/create')
+                  }}
+              >
+                创作
+              </button>
+      </p>
             <p className='try'>试试下面这些句子?</p>
             {
               demos.length > 0 &&
