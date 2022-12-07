@@ -16,6 +16,7 @@ import {useDispatch, useSelector} from "react-redux"
 import {SearchStateType, StateType} from "../../components/Search/Search";
 import Slider from '@mui/material/Slider';
 import {message} from 'antd'
+import UpLoad from "apps/web/components/UpLoad/UpLoad";
 
 BScroll.use(ScrollBar);
 BScroll.use(MouseWheel);
@@ -75,7 +76,7 @@ const Create = (props: any) => {
   const [relevance2, setRelevance2] = useState(getStore('relevance2', false) ? Number(getStore('relevance2', false)) : 70); //默认相关性
 
   //高级创作模式下用于切换工作台和图片展示区
-  const [isWork, setIsWork] = useState<boolean>(true);
+  const [isWork, setIsWork] = useState<boolean>(false);
 
   //剩余的选择项(除去宽高+相关性以外的)
   // const [activeKeyWord, setActiveKeyWord] = useState([]);
@@ -263,6 +264,7 @@ const Create = (props: any) => {
             }} className={mode == MODE.senior ? 'active' : ''}>进阶模式</CapsuleButton>
             <CapsuleButton onClick={() => {
               changeModeTo(MODE.superior)
+              setIsWork(true);
             }} className={mode == MODE.superior ? 'active' : ''}>高级模式</CapsuleButton>
           </div>
           <div className="choose-style">
@@ -411,14 +413,18 @@ const Create = (props: any) => {
 							<CapsuleButton>返回创作区</CapsuleButton>
             }
           </div>
-
-
           {
             //高级创作的图片编辑工作区
             mode === MODE.superior && isWork &&
-						<div>
-              绘图区
-						</div>
+						<>
+              <div className={'choose-layer'}>
+                <span>图层</span>
+                <span className={'iconfont icon-a-1'}></span>
+              </div>
+							<div>
+								绘图区
+							</div>
+            </>
           }
           {/*创作好的图片展示区*/}
           {
@@ -428,16 +434,16 @@ const Create = (props: any) => {
                 {
                   [...Array(4)].map((val, index) => (
                     <div key={index} className="img-placeholder">
-                      <i className={'iconfont icon-queshengzhanwei'}></i>
+                      <i className={'iconfont icon-4'}></i>
                       {
                         createdImg[index] &&
 							          <>
 								          <img src={`${createdImg[index]}?time=${Date.now()}`} alt=""/>
 								          <p className={"hover-icons"}>
-									          <span className={'iconfont icon-shoucang'}></span>
-									          <span className={'iconfont icon-dianzan'}></span>
-									          <span className={'iconfont icon-ercichuangzuo'}></span>
-									          <span className={'iconfont icon-xiazai'}></span>
+									          <span className={'iconfont icon-12'}></span>
+									          <span className={'iconfont icon-9'}></span>
+									          <span className={'iconfont icon-13'}></span>
+									          <span className={'iconfont icon-16'}></span>
 								          </p>
 							          </>
                       }
