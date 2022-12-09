@@ -242,3 +242,9 @@ interface IEditUser{
 export const editUser = (request:IEditUser, success?:any, err?:any)=>{
   sendPost(command.EDIT_USER, request, success, err, {'Content-Type': 'multipart/form-data'})
 }
+
+// 获取兴趣/行业关键词
+//type 0 兴趣  1 行业
+export const getWords = (request: {type: number}, success?:any, err?:any)=>{
+  sendGet(command.GET_WORDS, request, success, err)
+}

@@ -64,7 +64,6 @@ const URLImage: React.FC<IProps> = ({imgUrl, maxWidth, maxHeight, isSelected, ..
       <Image
         ref={imgRef}
         image={img}
-        draggable={isSelected}
         {...imgProps}
         onDragEnd={(e) => {
           setImgProps({
@@ -89,7 +88,7 @@ const URLImage: React.FC<IProps> = ({imgUrl, maxWidth, maxHeight, isSelected, ..
           })
         }}
       />
-      {isSelected && (
+      {isSelected && props.draggable && (
         <Transformer
           ref={trRef}
         />

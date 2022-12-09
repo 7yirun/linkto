@@ -1,5 +1,5 @@
 import React, {useRef, useState, memo, useEffect, forwardRef, useImperativeHandle} from 'react';
-import {Stage, Layer, Line, Transformer} from 'react-konva';
+import {Stage, Layer, Line, Transformer, Group} from 'react-konva';
 import {Vector2d} from "konva/lib/types"
 import URLImage from "./URLImage"
 import styles from "./Konva.module.scss"
@@ -40,6 +40,7 @@ interface IProps {
 const SIZE_LIMIT = 10 * 1024 * 1024 //限制上传的最大图片大小为10MB
 const Konva = forwardRef((props:IProps, konvaRef) => {
 
+  const [eraseFill, setEraseFill] = useState<any>('destination-out');
   useImperativeHandle(konvaRef, ()=>({
     getFinishedPic
   }))
@@ -202,6 +203,14 @@ const Konva = forwardRef((props:IProps, konvaRef) => {
             还原
           </button>
         </li>
+        {/*<li>
+          <button onClick={()=>{
+            dispatch(setLoadedImages([]))
+            setEraseFill('source-over')
+          }}>
+            test
+          </button>
+        </li>*/}
       </ul>
       <div
         className="detail-operate"
@@ -223,7 +232,6 @@ const Konva = forwardRef((props:IProps, konvaRef) => {
           <input value={currentColor}  onChange={(e)=>{
             setCurrentColor(e.target.value)
           }} type="color" name="" id=""/>
-          {/*<span style={{background: currentColor}}></span>*/}
         </div>
       </div>
       <div
@@ -271,28 +279,47 @@ const Konva = forwardRef((props:IProps, konvaRef) => {
           onMouseUp={handleMouseUp}
         >
           <Layer>
-            {
-              pictureState.loadedImages.map((imgObj, i) => {
-                return (
-                  <URLImage
-                    key={imgObj.id}
-                    imgUrl={imgObj.src}
-                    maxWidth={canvasWidth}
-                    maxHeight={canvasHeight}
-                    draggable={mode === MODE.move}
-                    isSelected={pictureState.currentLayerId === imgObj.id && pictureState.currentLayerId !== '背景图层001'}
-                    onMouseEnter={() => {
-                      if (mode === MODE.move) {
-                        stageRef.current.container().style.cursor = 'move';
-                      }
-                    }}
-                    onMouseLeave={() => {
-                      stageRef.current.container().style.cursor = 'default';
-                    }}
-                  />
-                )
-              })
-            }
+            <Group
+              draggable={mode === MODE.move}
+            >
+              {
+                pictureState.loadedImages.map((imgObj, i) => {
+                  return (
+                    <URLImage
+                      key={imgObj.id}
+                      imgUrl={imgObj.src}
+                      maxWidth={canvasWidth}
+                      maxHeight={canvasHeight}
+                      isSelected={pictureState.currentLayerId === imgObj.id && pictureState.currentLayerId !== '背景图层001'}
+                      onMouseEnter={() => {
+                        if (mode === MODE.move) {
+                          stageRef.current.container().style.cursor = 'move';
+                        }
+                      }}
+                      onMouseLeave={() => {
+                        stageRef.current.container().style.cursor = 'default';
+                      }}
+                    />
+                  )
+                })
+              }
+              {
+                //擦除
+                history.slice(0, stepIndex+1).filter(historyObj => historyObj.eraseLines).map((lineHistory, i) => (
+                  <Line
+                    key={'eraseLine' + i}
+                    stroke={'#0f0'}
+                    strokeWidth={lineHistory.strokeWidth}
+                    lineJoin={'round'}
+                    points={lineHistory.eraseLines}
+                    lineCap={'round'}
+                    bezier={true}
+                    globalCompositeOperation={eraseFill}
+                  >
+                  </Line>
+                ))
+              }
+            </Group>
           </Layer>
           <Layer>
             {
@@ -310,22 +337,7 @@ const Konva = forwardRef((props:IProps, konvaRef) => {
                 </Line>
               ))
             }
-            {
-              //擦除
-              history.slice(0, stepIndex+1).filter(historyObj => historyObj.eraseLines).map((lineHistory, i) => (
-                <Line
-                  key={'eraseLine' + i}
-                  stroke={'#0f0'}
-                  strokeWidth={lineHistory.strokeWidth}
-                  lineJoin={'round'}
-                  points={lineHistory.eraseLines}
-                  lineCap={'round'}
-                  bezier={true}
-                  globalCompositeOperation={"destination-out"}
-                >
-                </Line>
-              ))
-            }
+
           </Layer>
 
         </Stage>
