@@ -108,7 +108,7 @@
 }
 .icon-21:before {
   content: "\e91a";
-  color: #fff;
+  color: #cecece;
 }
 .icon-7 .path1:before {
   content: "\e91b";
@@ -129,7 +129,7 @@
 }
 .icon-6:before {
   content: "\e91f";
-  color: #fff;
+  color: #cecece;
 }
 .icon-icon .path1:before {
   content: "\e920";
@@ -169,6 +169,7 @@
 }
 .icon-14:before {
   content: "\e929";
+  color: #cecece;
 }
 .icon-- .path1:before {
   content: "\e92a";
@@ -243,6 +244,7 @@
 }
 .icon-18:before {
   content: "\e93a";
+  color: #cecece;
 }
 .icon--11 .path1:before {
   content: "\e93b";
