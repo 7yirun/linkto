@@ -57,10 +57,36 @@ const searchSlice = createSlice({
 export const {setShowLogin, setShowRegister, setIsLogin, setShowEditUser, setAccountInfo,setEditUser} = loginSlice.actions
 export const {setDescription, setMapArr, setLanMap} = searchSlice.actions
 
+export interface ILoadedImg {
+  name: string,
+  id: string,
+  src: string
+}
+const loadedImages:ILoadedImg[] = [{name: '背景图层', id: '背景图层001', src: ''}]
+//高级创作
+const pictureSlice = createSlice({
+  name: 'pictureSlice',
+  initialState: {
+    loadedImages: loadedImages,
+    currentLayerId: '背景图层001'
+  },
+  reducers: {
+    setLoadedImages(state, action){
+      state.loadedImages = action.payload
+    },
+    setCurrentLayerId(state, action){
+      state.currentLayerId = action.payload
+      console.log(state.currentLayerId);
+    }
+  }
+})
+export const {setLoadedImages, setCurrentLayerId} = pictureSlice.actions
+
 const store = configureStore({
   reducer: {
     loginState: loginSlice.reducer,
-    searchState: searchSlice.reducer
+    searchState: searchSlice.reducer,
+    pictureState: pictureSlice.reducer
   }
 })
 export default store
