@@ -9,6 +9,12 @@ import {queryVerifyCode, register, verifyCode,getWords} from "service/service"
 import {TimeoutId} from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
 import {Steps} from 'antd'
 import md5 from 'js-md5'
+import BScroll from '@better-scroll/core'
+import ScrollBar from "@better-scroll/scroll-bar";
+import MouseWheel from "@better-scroll/mouse-wheel";
+
+BScroll.use(ScrollBar);
+BScroll.use(MouseWheel);
 
 const formData = [{
   type: 'nickname',
@@ -75,7 +81,12 @@ const Register = () => {
   const [current, setCurrent] = useState(0);
 
   const [registerTitle, setRegisterTitle] = useState<string>('欢迎注册')
+
+  const bsRef = useRef(null);
+  const bsDomRef = useRef(null);
+
   useEffect(() => {
+    (bsRef.current as any)?.refresh();
     switch (current) {
       case 0:
         setRegisterTitle('欢迎注册')
@@ -88,6 +99,15 @@ const Register = () => {
         break;
       case 3:
         setRegisterTitle('告诉我们您的兴趣所在')
+        bsRef.current = new BScroll(bsDomRef.current, {
+          scrollY: true,
+          disableMouse: true,
+          scrollbar: {
+            fade: false
+          },
+          bounce: false,
+          mouseWheel: {}
+        });
         break;
     }
   }, [current])
@@ -103,16 +123,15 @@ const Register = () => {
   const [successInfo, setSuccessInfo] = useState('');
   const close = () => {
     dispatch(setShowRegister(false));
-    setFormState({
-      ...formState,
-      passwordError: 0
-    })
-
   }
   //每次打开/关闭时重置填写状态
   useEffect(()=>{
     setFormState(initialState);
     setCurrent(0);
+    //验证码重置为可发送状态
+    setCodeWaiting(Waiting.Start);
+    //清空验证码restTime等待时间定时器
+    clearTimeout(timerId);
   }, [state.showRegister])
   //请求发送验证码
   const handleQueryVerifyCode = (e: any) => {
@@ -142,13 +161,6 @@ const Register = () => {
       clearInterval(timerId);
     }
   }, [restTime])
-  useEffect(() => {
-    //这里不确定是否需要clear timer, 因为它可能是闭包 下次组件创建时是有值的
-    timerId && clearInterval(timerId);
-    return () => {
-      clearInterval(timerId);
-    }
-  }, [])
 
   const handleReturn = () => {
     setCurrent(current - 1);
@@ -373,26 +385,27 @@ const Register = () => {
           }
           {
             current === 3 &&
-						<div className="interest">
-              {/*使用请求回来的数据*/}
-							<ul>
-                {
-                interestList.map((obj: any, i:number) =>
-                 (
-                      <li key={'interest' + i} 
-
-                      onClick={handleInterest(obj, i)}
-                      
-                      className={obj.checked ? 'choosed' : `${obj.checked}`}>
-                        
-                        <CapsuleButton>
-                          {obj.chinese}
-                         </CapsuleButton>
-                      </li>
-                    ))
-                }
-							</ul>
-						</div>
+						<div className="interest-wrapper">
+							<div className="interest" ref={bsDomRef}>
+                {/*使用请求回来的数据*/}
+								<ul>
+                  {
+                    interestList.map((obj: any, i:number) =>
+                      (
+                        <li
+                          key={'interest' + i}
+                          className={obj.checked ? 'choosed' : `${obj.checked}`}>
+                          <CapsuleButton
+                            onClick={handleInterest(obj, i)}
+                          >
+                            {obj.chinese}
+                          </CapsuleButton>
+                        </li>
+                      ))
+                  }
+								</ul>
+							</div>
+            </div>
           }
           <Steps
             current={current}
@@ -429,14 +442,6 @@ const Register = () => {
                       //==============================================================================to do
                     }
                     return;
-                  }
-                  //选择性别
-                  if (current === 1) {
-
-                  }
-                  //选择年龄
-                  if (current === 2) {
-
                   }
                   setCurrent(current + 1)
                 } else {

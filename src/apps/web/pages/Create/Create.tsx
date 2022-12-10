@@ -2,7 +2,7 @@ import './Create.scss'
 import CapsuleButton from 'apps/web/components/CapsuleButton/CapsuleButton'
 import React from 'react'
 import {useState, useRef, useEffect} from 'react'
-import BScroll, {createBScroll} from '@better-scroll/core'
+import BScroll from '@better-scroll/core'
 import ScrollBar from '@better-scroll/scroll-bar'
 import MouseWheel from '@better-scroll/mouse-wheel'
 import Icons from "lib/icons"
