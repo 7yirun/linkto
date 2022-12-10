@@ -64,7 +64,7 @@ interface IRequestRegister {
   accountName: string
   age: number      //0  1  2  3
   bindPhone: string,
-  interestId: number
+  interestIds: string,
   password: string,
   sex: number    //0男 1女
 }
@@ -261,4 +261,9 @@ interface IEditUser{
 }
 export const editUser = (request:IEditUser, success?:any, err?:any)=>{
   sendPost(command.EDIT_USER, request, success, err, {'Content-Type': 'multipart/form-data'})
+}
+
+//获取兴趣/行业
+export const getList = (request: {type:number}, success ?: any, err?: any)=>{
+  sendGet(command.GET_LIST, request, success, err);
 }

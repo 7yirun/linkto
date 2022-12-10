@@ -191,16 +191,37 @@
     width: 8px!important;
     height: 8px!important;
   }
-  :where(.css-dev-only-do-not-override-1s3dcof).ant-steps .ant-steps-item-wait .ant-steps-item-icon{
+ .ant-steps .ant-steps-item-wait .ant-steps-item-icon{
     background: rgba(0,0,0,0.2)!important;
     border-color: transparent!important;
+    height: 8px!important;
+    width: 8px!important;
+    margin-inline-end: 8px!important;
+    font-size: 14px!important;
+    line-height: 32px!important;
+    text-align: center!important;
+    border-radius: 32px!important;
+    border: 1px solid transparent!important;
+
   }
-  :where(.css-dev-only-do-not-override-1s3dcof).ant-steps{
-    justify-content: center;
-    padding: 20px 0 15px 0;
-    position: absolute;
-    bottom: 20px;
+
+ .ant-steps{
+    justify-content: center!important;
+    padding: 20px 0 15px 0!important;
+    position: absolute!important;
+    bottom: 20px!important;
+    box-sizing: border-box!important;
+    margin: 0!important;
+    color: rgba(0, 0, 0, 0.88)!important;
+    font-size: 0!important;
+    line-height: 1.5714285714285714!important;
+    list-style: none!important;
+    display: flex!important;
+    width: 100%!important;
+    text-align: initial!important;
+    align-items: center!important;
   }
+
   .ant-steps-item{
     padding-inline-start: 0px!important;
     flex: none;

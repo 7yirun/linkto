@@ -52,8 +52,9 @@ const Home = (props: any) => {
   }, [activeIndex])
   useEffect(() => {
     queryImg({pageNum: 1, pageSize: 20}, (res: any) => {
-      let list = (res.data as any).list;
+      let list1 = (res.data as any).list;
       setList(list);
+      console.log("list=111==",list)
       let demoText = list.map((item: any) => {
         return item.description
       });

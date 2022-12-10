@@ -5,7 +5,7 @@ import CapsuleButton from "../CapsuleButton/CapsuleButton";
 import Icons from "lib/icons"
 import {useDispatch, useSelector} from "react-redux";
 import {setShowRegister, setShowLogin} from "../../store/store";
-import {queryVerifyCode, register, verifyCode} from "service/service"
+import {queryVerifyCode, register, verifyCode,getList} from "service/service"
 import {TimeoutId} from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
 import {Steps} from 'antd'
 import md5 from 'js-md5'
@@ -50,8 +50,8 @@ const Register = () => {
     repeatPassword: string,
     sex: number,
     age: number,
-    interestId: number,
-    passwordError:number
+    interestIds: string,
+    passwordError: number
   }
 
   const initialState = {
@@ -62,7 +62,7 @@ const Register = () => {
     repeatPassword: '',
     sex: 0,
     age: 0,
-    interestId: 0,
+    interestIds: '',
     passwordError: 0
   }
   const [formState, setFormState] = useState<IFormState>(initialState);
@@ -179,13 +179,14 @@ const Register = () => {
 
   //提交注册表单
   const handleSubmit = (e: any) => {
+    console.log("注册表单",formState)
     register({
       bindPhone: formState.phoneNum,
       accountName: formState.nickname,
       age: formState.age,
       sex: formState.sex,
       password: md5(md5(formState.password)),
-      interestId: 0
+      interestIds:formState.interestIds
     }, ()=>{
       setSuccessInfo("注册成功！")
       setTimeout(()=>{
@@ -201,9 +202,49 @@ const Register = () => {
           passwordError: 0
         })
     }
-    console.log("formState===",formState)
   }
+  const [interestList, setinterestList] = useState<Array<any>>(
+    []
+  )
+  const [interestIdList, setinterestIdList] = useState<Array<any>>(
+    []
+  )
 
+  useEffect(() => {
+    getList({type: 0}, (res: any) => {
+      let list = res.data
+      list.forEach((item:any )=> {
+         item.checked = false
+      })
+      setinterestList(list);
+    })
+  }, [])
+
+  const handleInterest = (obj:any,index:number)=>{
+    return ()=>{
+      let isChecked = formState.interestIds.includes(obj.id)
+      let newListData
+      isChecked ? interestIdList.splice(interestIdList.findIndex(item => item === obj.id), 1) :interestIdList.push(obj.id)
+
+      newListData = interestList.map((list:any)=>{  
+        if(list.id == obj.id){
+          return {
+            ...list, 
+            checked: !obj.checked
+          }
+        }else {
+          return list;
+        }
+      })
+      setFormState({
+        ...formState,
+        interestIds: interestIdList.toString()
+      })
+      setinterestList(interestIdList);
+      setinterestList(newListData);
+   }
+  }
+  
   return (
     <PopPanel
       warning={errInfo}
@@ -336,20 +377,17 @@ const Register = () => {
               {/*使用请求回来的数据*/}
 							<ul>
                 {
-                  Array(15).fill({
-                    name: '动漫',
-                    id: Math.floor(Math.random()*1000)
-                  }).map((obj, i) =>
-                    (
-                      <li key={'interest' + i}>
-                        <CapsuleButton onClick={()=>{
-                         /* setFormState({
-                            ...formState,
-                            interestId: obj.id
-                          })*/
-                        }}>
-                          {obj.name}
-                        </CapsuleButton>
+                interestList.map((obj: any, i:number) =>
+                 (
+                      <li key={'interest' + i} 
+
+                      onClick={handleInterest(obj, i)}
+                      
+                      className={obj.checked ? 'choosed' : `${obj.checked}`}>
+                        
+                        <CapsuleButton>
+                          {obj.chinese}
+                         </CapsuleButton>
                       </li>
                     ))
                 }

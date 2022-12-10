@@ -23,5 +23,6 @@ export default {
   RENAME_CLIP: "/ai/draw/picture/clip/update",
   DELETE_CLIP: "/ai/draw/picture/clip/delete",
   EDIT_USER: "/ai/draw/account/update",
-  VERIFY_CODE: "/ai/draw/login/check/verify/code"
+  VERIFY_CODE: "/ai/draw/login/check/verify/code",
+  GET_LIST: "/ai/draw/dict/get/list"
 }
