@@ -190,9 +190,9 @@ const Create = (props: any) => {
     getWords({type: 1}, (res: { data: IWord[] }) => {
       setWords(res.data)
     })
-    /*if(mode !== MODE.superior){
-      setIsWork(true);
-    }*/
+    if(mode !== MODE.superior){
+      setIsWork(false);
+    }
   }, [mode])
 
   const fileRef = useRef<any>();
@@ -588,7 +588,7 @@ const Create = (props: any) => {
                             ></span>
 														<span className={'iconfont icon-16'}
                               onClick={()=>{
-                                downloadURI(`${createdImg[index]}?time=${Date.now()}`, 'picture'+(index+1));
+                                downloadURI(`${createdImg[index]}}`, 'picture'+(index+1));
                               }}
                             >
                             </span>

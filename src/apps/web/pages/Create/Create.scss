@@ -41,33 +41,6 @@ $subtag-margin-bottom: 8px;
         position: relative;
         border-bottom: 1px solid #333333;
         margin-right: 24px;
-        .create {
-          margin-top: 12px; //设计稿24
-          width: 120px; //160px
-          height: 32px;
-          margin-bottom: 16px; //设计稿32
-          font-size: 14px;
-          position: absolute;
-          right: -90px;
-          transform: translateX(100%);
-          background: $green !important;
-
-          &.disable {
-            background: #2A82E4 !important;
-            overflow: hidden;
-            border: none;
-            pointer-events: none;
-          }
-
-          .progress {
-            position: absolute;
-            width: 100%;
-            left: -1000px;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            transform: translateX(-100%);
-          }
-        }
 
         .capsule-button {
           width: 108px;
@@ -265,12 +238,30 @@ $subtag-margin-bottom: 8px;
         border-bottom: 1px solid #333;
         padding-top: 24px;
         box-sizing: border-box;
+        .create {
+          position: relative;
+          &.disable {
+            background: #2A82E4 !important;
+            overflow: hidden;
+            border: none;
+            pointer-events: none;
+            color: #fff;
+          }
+          .progress {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            transform: translateX(-100%);
+          }
+        }
+
         .capsule-button{
           white-space: nowrap;
           font-size: 14px;
           height: 32px;
           line-height: 32px;
-          width: calc(12000vw/1920);
+          width: calc(14200vw/1920);
         }
       }
       .choose-layer{
