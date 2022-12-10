@@ -6,17 +6,19 @@ import BScroll, {createBScroll} from '@better-scroll/core'
 import ScrollBar from '@better-scroll/scroll-bar'
 import MouseWheel from '@better-scroll/mouse-wheel'
 import Icons from "lib/icons"
-import {queryKeywords, text2img, img2img, imgRefresh} from "service/service";
+import {queryKeywords, text2img, img2img, imgRefresh, getWords} from "service/service";
 import AddToBookmark from "apps/web/components/AddToBookmark/AddToBookmark";
 import SeeBig from "apps/web/components/SeeBig/SeeBig";
 import qs from "qs";
-import {setStore, getStore} from "utils/utils"
-import {setMapArr, setLanMap} from "apps/web/store/store";
+import {setStore, getStore, downloadURI} from "utils/utils"
+import {setMapArr, setLanMap, setCurrentLayerId, setLoadedImages} from "apps/web/store/store";
 import {useDispatch, useSelector} from "react-redux"
 import {SearchStateType, StateType} from "../../components/Search/Search";
 import Slider from '@mui/material/Slider';
-import {message} from 'antd'
+import {message, Dropdown} from 'antd'
 import UpLoad from "apps/web/components/UpLoad/UpLoad";
+import Konva from "apps/web/components/Paint/Konva2"
+import type {MenuProps} from 'antd';
 
 BScroll.use(ScrollBar);
 BScroll.use(MouseWheel);
@@ -36,6 +38,17 @@ const DIMESNION_OPTION = [
   }
 ]
 
+export interface ILoadedImg {
+  name: string,
+  id: string,
+  src: string
+}
+
+export type pictureStateType = {
+  loadedImages: ILoadedImg[]
+  currentLayerId: string
+}
+
 const Create = (props: any) => {
   message.config({
     duration: 2,
@@ -50,8 +63,10 @@ const Create = (props: any) => {
 
   const dispatch = useDispatch();
   const searchState = useSelector<StateType, SearchStateType>(state => state.searchState)
-
+  const pictureState = useSelector<any, pictureStateType>(state => state.pictureState);
   const dataRef = useRef<any>(null);
+  const konvaRef = useRef<any>(null);
+
   //生成按钮可否点击
   const [creatable, setCreatable] = useState(true);
   const [progress, setProgress] = useState(0);
@@ -62,6 +77,7 @@ const Create = (props: any) => {
   const MAX_LENGTH = 200; //可输入的最大文字个数
   //创作模式,按文字或者图片创作
   const [mode, setMode] = useState(MODE.junior);
+
 
   //用户输入描述信息
   const description = searchState.description;
@@ -79,7 +95,7 @@ const Create = (props: any) => {
   const [isWork, setIsWork] = useState<boolean>(false);
 
   //剩余的选择项(除去宽高+相关性以外的)
-  // const [activeKeyWord, setActiveKeyWord] = useState([]);
+  // const [activeKeyWord, setActiveKeyWord] = useState([]f);
   // const activeWordIndex, setActiveWordIndex
 
   //输入框里的negtive keyword
@@ -99,6 +115,7 @@ const Create = (props: any) => {
     }
   }, [description, negInput, dimension, relevance, relevance2])
 
+  const wordRef = useRef(false);
 
   //切换文字创作 / 图片创作 模式
   const changeModeTo = (mode: MODE) => {
@@ -146,6 +163,7 @@ const Create = (props: any) => {
       }
     })
 
+
     return () => {
       setStore('description', dataRef.current.description, false)
       setStore('negInput', dataRef.current.negInput, false)
@@ -158,12 +176,41 @@ const Create = (props: any) => {
   //用户创作好的图片 初始只有4张
   const [createdImg, setCreatedImg] = useState([]);
 
+  //行业词汇
+  interface IWord {
+    chinese: string,
+    english: string,
+    id: number
+  }
+
+  const [words, setWords] = useState<IWord[]>([])
+  //选中的行业id
+  const [choosedWords, setChoosedWords] = useState<number[]>([]);
+  useEffect(() => {
+    getWords({type: 1}, (res: { data: IWord[] }) => {
+      setWords(res.data)
+    })
+    if(mode !== MODE.superior){
+      setIsWork(false);
+    }
+  }, [mode])
+
   const fileRef = useRef<any>();
   //创作图片
   const createImg = (e: any) => {
     e.preventDefault();
-
-    const keyword = searchState.mapArr.join().split(',').filter(str => str).join();
+    // const keyword = searchState.mapArr.join().split(',').filter(str => str).join();
+    let keywordArr = searchState.mapArr.join().split(',').filter(str => str);
+    //进阶 高级 创作要拼接行业词汇
+    if(mode === MODE.senior || mode === MODE.superior){
+      const tmp:string[] = [];
+      choosedWords.forEach(id=>{
+        tmp.push(words.find(item=>item.id == id)?.english || 'english')
+      })
+      keywordArr = tmp.concat(keywordArr);
+    }
+    const keyword = keywordArr.join();
+    console.log(keyword);
     let taskId: string;
     //要发给后端的关键词
     const success = (res: any) => {
@@ -180,7 +227,7 @@ const Create = (props: any) => {
         imgRefresh({taskId: taskId}, success)
       }, 1000)
     }
-    if (mode === MODE.junior) {
+    if (mode === MODE.junior || mode === MODE.senior) {
       if (!description && !keyword) {
         //生成按钮和换一批按钮不可点击
         message.warning('请输入或选择描述词')
@@ -206,21 +253,16 @@ const Create = (props: any) => {
           taskId: taskId
         }, success)
       }, (err: any) => {
-        console.log('创作失败', err);
-        //创作失败时 创作按钮恢复成初始状态, 不要卡在0%
-        //#TODO===========================================
         message.error(err.msg || '系统内部错误, 请稍后再试');
       })
-    } else if (mode === MODE.superior && fileRef.current) {
-      if (fileRef.current.files && !fileRef.current.files[0]) {
-        alert('请上传图片')
-        return
-      }
-      setCreatable(false);
+    } else if (mode === MODE.superior) {
+
+      console.log(konvaRef.current.getFinishedPic());
+      return;
       //@ts-ignore
       img2img({
         guidance: relevance * 15 / 100,
-        initImage: fileRef.current.files[0],
+        initImage: konvaRef.current.getFinishedPic(),
         width: DIMESNION_OPTION[dimension].width,
         height: DIMESNION_OPTION[dimension].height,
         numImages: 4,
@@ -229,6 +271,9 @@ const Create = (props: any) => {
         strength: relevance2 / 100,
         negativePrompt: negInput
       }, (res: any) => {
+        setCreatable(false);
+        // @ts-ignore
+        setIsWork(false);
         //生成的图片按照所选尺寸显示
         setDisplayDimension(dimension)
         //清空已生成图片 显示默认占位图
@@ -239,10 +284,13 @@ const Create = (props: any) => {
         imgRefresh({
           taskId: taskId
         }, success)
+      }, (err: any) => {
+        message.error(err.msg || '系统内部错误, 请稍后再试');
       })
     }
   }
-  const [imgSrc, setImgSrc] = useState<string>();
+
+
   const [imgToScale, setImgToScale] = useState(false);
   const [imgToAdd, setImgToAdd] = useState(false);
   const closeBig = () => {
@@ -251,6 +299,28 @@ const Create = (props: any) => {
   const cancelAdd = () => {
     setImgToAdd(false);
   }
+
+  //设置当前选中的是哪个图层
+  // const [currentLayerId, setCurrentLayerId] = useState<string>('');
+  const handleMenuClick: MenuProps['onClick'] = (e) => {
+    dispatch(setCurrentLayerId(e.key))
+  };
+  const items: MenuProps['items'] = pictureState.loadedImages.map((img: ILoadedImg, index: number) => {
+    return {
+      label: (
+        <p>
+          {
+            img.src ?
+              <img src={img.src} alt=""/>
+              : <span className="pure-color"></span>
+          }
+          <span>{img.name}</span>
+        </p>
+      ),
+      key: img.id
+    }
+  })
+
   return (
     <div className="create-page">
       <div className="create-page-content">
@@ -313,7 +383,35 @@ const Create = (props: any) => {
                     }
                   </div>
                 </div>
-                <>
+                {
+                  (mode === MODE.senior || mode === MODE.superior) &&
+                  <div className="choose choose-tags">
+                    <p>行业</p>
+                    <div className="tags-container">
+                      <div className="sub">
+                        {
+                          words.length > 0 && words.map((item: IWord) => {
+                            return (
+                              <CapsuleButton
+                                key={item.id}
+                                nobutton={1}
+                                data-checked={choosedWords.join().includes(item.id+'') ? 'checked' : 'unchecked'}
+                                onClick={() => {
+                                  choosedWords.join().includes(item.id+'') ?
+                                    setChoosedWords(choosedWords.filter(id => id !== item.id))
+                                    :
+                                    setChoosedWords([item.id, ...choosedWords])
+                                }}
+                              >
+                                {item.chinese}
+                              </CapsuleButton>
+                            )
+                          })
+                        }
+                      </div>
+                    </div>
+                  </div>
+                }
                   {
                     keyWords.map((val: any, index) => {
                       return (
@@ -366,14 +464,6 @@ const Create = (props: any) => {
                       )
                     })
                   }
-                  {
-                    mode === MODE.superior &&
-										<div className={'upload-img'}>
-											图片预览区
-											<img src={previewUrl} alt=""/>
-										</div>
-                  }
-                </>
                 <div style={{height: 0}}></div>
               </div>
             </div>
@@ -410,48 +500,106 @@ const Create = (props: any) => {
             }
             {
               mode === MODE.superior && !isWork &&
-							<CapsuleButton>返回创作区</CapsuleButton>
+							<CapsuleButton
+                onClick={()=>{
+                  setIsWork(true);
+                }}
+              >返回创作区</CapsuleButton>
             }
           </div>
           {
             //高级创作的图片编辑工作区
             mode === MODE.superior && isWork &&
 						<>
-              <div className={'choose-layer'}>
-                <span>图层</span>
-                <span className={'iconfont icon-a-1'}></span>
-              </div>
-							<div>
-								绘图区
+							<div className={'choose-layer'}>
+								<span>图层</span>
+								<Dropdown
+									menu={{items: items, onClick: handleMenuClick}}
+									trigger={['click']}
+								>
+                  {
+                    <div>
+                      <p>
+                        {
+                          pictureState.currentLayerId === '背景图层001' ?
+                            <span className={'pure-color'}></span> :
+                            <img src={pictureState.currentLayerId ?
+                              pictureState.loadedImages.find(obj => obj.id === pictureState.currentLayerId)?.src
+                              :
+                              pictureState.loadedImages[0].src} alt=""/>
+                        }
+                        <span>
+                            {
+                              pictureState.currentLayerId
+                                ?
+                                pictureState.loadedImages.find(obj => obj.id === pictureState.currentLayerId)?.name
+                                :
+                                pictureState.loadedImages[0].name}
+                          </span>
+                      </p>
+                      <span className="iconfont icon-down"></span>
+                    </div>
+                  }
+                  {/*    {
+                    pictureState.loadedImages.length > 0 ?
+
+                      :
+                      <div className="none">
+                        <p>暂无内容</p>
+                        <span className="iconfont icon-down"></span>
+                      </div>
+                  }*/}
+								</Dropdown>
+								<UpLoad></UpLoad>
+								<span className={'iconfont icon-a-1'}></span>
 							</div>
-            </>
+							<Konva
+								ref={konvaRef}
+							></Konva>
+						</>
           }
           {/*创作好的图片展示区*/}
           {
             !isWork &&
-            <div className="img-wrapper">
-              <div className={`dim${displayDimension + 1} img-center`}>
+						<div className="img-wrapper">
+							<div className={`dim${displayDimension + 1} img-center`}>
                 {
                   [...Array(4)].map((val, index) => (
                     <div key={index} className="img-placeholder">
                       <i className={'iconfont icon-4'}></i>
                       {
                         createdImg[index] &&
-							          <>
-								          <img src={`${createdImg[index]}?time=${Date.now()}`} alt=""/>
-								          <p className={"hover-icons"}>
-									          <span className={'iconfont icon-12'}></span>
-									          <span className={'iconfont icon-9'}></span>
-									          <span className={'iconfont icon-13'}></span>
-									          <span className={'iconfont icon-16'}></span>
-								          </p>
-							          </>
+												<>
+													<img src={`${createdImg[index]}?time=${Date.now()}`} alt=""/>
+													<p className={"hover-icons"}>
+														<span className={'iconfont icon-12'}></span>
+														<span className={'iconfont icon-9'}></span>
+														<span
+                              className={'iconfont icon-13'}
+                              onClick={()=>{
+                                setMode(MODE.superior);
+                                setIsWork(true);
+                                dispatch(setLoadedImages([...pictureState.loadedImages, {
+                                  name: `picture${index+1}`,
+                                  src: `${createdImg[index]}?time=${Date.now()}`,
+                                  id: `picture${index+1}${Date.now()}`
+                                }]))
+                              }}
+                            ></span>
+														<span className={'iconfont icon-16'}
+                              onClick={()=>{
+                                downloadURI(`${createdImg[index]}}`, 'picture'+(index+1));
+                              }}
+                            >
+                            </span>
+													</p>
+												</>
                       }
                     </div>
                   ))
                 }
-              </div>
-            </div>
+							</div>
+						</div>
           }
 
           {/*{

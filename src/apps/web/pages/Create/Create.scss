@@ -2,22 +2,6 @@
 $black-bg: rgba(0,0,0,0.2);
 $subtag-margin-bottom: 8px;
 
-
-
-
-$contentWidth3: calc(122400vh/1080);
-$contentHeight3: calc(82400vh/1080);
-
-$width1:calc(36000vh/1080);
-$height1:calc(36000vh/1080);
-
-$width2: calc(28000vh/1080);
-$height2: calc(42000vh/1080);
-
-$width3: calc(60000vh/1080);
-$height3: calc(40000vh/1080);
-$max-width3: calc(60000vw/1920);
-
 @mixin active {
   color: $green;
   background: #43CF7C33;
@@ -57,33 +41,6 @@ $max-width3: calc(60000vw/1920);
         position: relative;
         border-bottom: 1px solid #333333;
         margin-right: 24px;
-        .create {
-          margin-top: 12px; //设计稿24
-          width: 120px; //160px
-          height: 32px;
-          margin-bottom: 16px; //设计稿32
-          font-size: 14px;
-          position: absolute;
-          right: -90px;
-          transform: translateX(100%);
-          background: $green !important;
-
-          &.disable {
-            background: #2A82E4 !important;
-            overflow: hidden;
-            border: none;
-            pointer-events: none;
-          }
-
-          .progress {
-            position: absolute;
-            width: 100%;
-            left: -1000px;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            transform: translateX(-100%);
-          }
-        }
 
         .capsule-button {
           width: 108px;
@@ -281,15 +238,79 @@ $max-width3: calc(60000vw/1920);
         border-bottom: 1px solid #333;
         padding-top: 24px;
         box-sizing: border-box;
+        .create {
+          position: relative;
+          &.disable {
+            background: #2A82E4 !important;
+            overflow: hidden;
+            border: none;
+            pointer-events: none;
+            color: #fff;
+          }
+          .progress {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            transform: translateX(-100%);
+          }
+        }
+
         .capsule-button{
           white-space: nowrap;
           font-size: 14px;
           height: 32px;
           line-height: 32px;
-          width: calc(12000vw/1920);
+          width: calc(14200vw/1920);
         }
       }
-      .change {
+      .choose-layer{
+        display: flex;
+        align-items: center;
+        margin: 10px 0;
+        .ant-dropdown-trigger{
+          margin: 0 10px;
+          width: 320px;
+          height: 32px;
+          background: #303030;
+          border-radius: 16px;
+          display: flex;
+          align-items: center;
+          box-sizing: border-box;
+          padding-left: 12px;
+          padding-right: 10px;
+          justify-content: space-between;
+          cursor: pointer;
+          &.none{
+            color: #555;
+            pointer-events: none;
+          }
+          p{
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            .pure-color{
+              width: 24px;
+              height: 24px;
+              background: #202020;
+            }
+            span:nth-child(2){
+              margin-left: 8px;
+            }
+            img{
+              width: 24px;
+              height: 24px;
+              object-fit: contain;
+            }
+          }
+          .iconfont{
+            font-size: 24px;
+            color: #444;
+            font-weight: bold;
+          }
+        }
+      }
+     /* .change {
         height: 48px;
         color: $green;
         margin-bottom: 24px;
@@ -305,7 +326,7 @@ $max-width3: calc(60000vw/1920);
             margin-right: 2px;
           }
         }
-      }
+      }*/
 
       .img-wrapper {
         display: flex;
@@ -414,3 +435,32 @@ $max-width3: calc(60000vw/1920);
   }
 }
 
+.ant-dropdown-menu{
+  background: #303030 !important;
+  .ant-dropdown-menu-item{
+    color: #fff !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-radius: 0 !important;
+    height: 36px;
+    p{
+      display: flex;
+      align-items: center;
+      span:nth-child(2){
+        margin-left: 8px;
+      }
+      img {
+        width: 24px;
+        height: 24px;
+        object-fit: contain;
+      }
+      .pure-color{
+        width: 24px;
+        height: 24px;
+        background: #202002;
+      }
+    }
+    &:last-child{
+      border: none;
+    }
+  }
+}

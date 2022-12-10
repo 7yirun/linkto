@@ -91,15 +91,21 @@ const Search: React.FC = () => {
       </CSSTransition>
       {
         searchState.mapArr.join('').split(',').join('') &&
-				<div className="toggle-tags"
-				     onClick={() => {
-               setShowTags(!showTags);
-             }}
-				>
-          {
-            '+' + searchState.mapArr.join().split(',').filter(str => str).length
-          }
-				</div>
+				<>
+					<div
+						className="toggle-tags">
+            {
+              '+' + searchState.mapArr.join().split(',').filter(str => str).length
+            }
+					</div>
+          <div className={'drop-down'}
+               onClick={() => {
+                 setShowTags(!showTags);
+               }}
+          >
+	          <span className={'iconfont icon-down'}></span>
+          </div>
+        </>
       }
     </div>
   )

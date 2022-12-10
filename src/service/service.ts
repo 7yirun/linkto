@@ -167,28 +167,8 @@ interface IImgRequest {
   negativePrompt?:string
 }
 
-export const img2img = (request: IImgRequest, success?: any) => {
-  const sendPost = (command: string, request: any, success?: any, error?: any) => {
-    const token = localStorage.getItem('token');
-    const headers = {'Content-Type': 'multipart/form-data'}
-    if (token) {
-      //@ts-ignore
-      headers.token = token
-    }
-    const axiosInstance = axios.create({
-      headers: headers
-    });
-    axiosInstance.post(url + command, request).then((res: AxiosResponse) => {
-      let response = res.data;
-      let code = response && response.code;
-      if (code > 0) {
-        console.log('message error: ' + command + response.msg);
-        return error && error(response);
-      }
-      return success && success(response)
-    })
-  }
-  sendPost(command.IMG2IMG, request, success)
+export const img2img = (request: IImgRequest, success?: any, err?:any) => {
+  sendPost(command.IMG2IMG, request, success, err)
 }
 
 //收藏图片
@@ -263,7 +243,8 @@ export const editUser = (request:IEditUser, success?:any, err?:any)=>{
   sendPost(command.EDIT_USER, request, success, err, {'Content-Type': 'multipart/form-data'})
 }
 
-//获取兴趣/行业
-export const getList = (request: {type:number}, success ?: any, err?: any)=>{
-  sendGet(command.GET_LIST, request, success, err);
+// 获取兴趣/行业关键词
+//type 0 兴趣  1 行业
+export const getWords = (request: {type: number}, success?:any, err?:any)=>{
+  sendGet(command.GET_WORDS, request, success, err)
 }

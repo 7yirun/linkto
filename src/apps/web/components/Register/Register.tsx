@@ -5,7 +5,7 @@ import CapsuleButton from "../CapsuleButton/CapsuleButton";
 import Icons from "lib/icons"
 import {useDispatch, useSelector} from "react-redux";
 import {setShowRegister, setShowLogin} from "../../store/store";
-import {queryVerifyCode, register, verifyCode,getList} from "service/service"
+import {queryVerifyCode, register, verifyCode,getWords} from "service/service"
 import {TimeoutId} from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
 import {Steps} from 'antd'
 import md5 from 'js-md5'
@@ -211,7 +211,7 @@ const Register = () => {
   )
 
   useEffect(() => {
-    getList({type: 0}, (res: any) => {
+    getWords({type: 0}, (res: any) => {
       let list = res.data
       list.forEach((item:any )=> {
          item.checked = false

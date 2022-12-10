@@ -24,5 +24,5 @@ export default {
   DELETE_CLIP: "/ai/draw/picture/clip/delete",
   EDIT_USER: "/ai/draw/account/update",
   VERIFY_CODE: "/ai/draw/login/check/verify/code",
-  GET_LIST: "/ai/draw/dict/get/list"
+  GET_WORDS: "/ai/draw/dict/get/list"
 }

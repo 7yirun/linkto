@@ -1,12 +1,5 @@
 import React, {useEffect} from 'react';
 import {Route, Switch, Redirect, useHistory} from 'react-router-dom'
-import Home from 'apps/web/pages/Home/Home'
-import Create from 'apps/web/pages/Create/Create'
-import Pictures from 'apps/web/pages/Pictures/Pictures'
-import Bookmark from 'apps/web/pages/Bookmark/Bookmark'
-import Tutorial from 'apps/web/pages/Tutorial/Tutorial'
-import MySpace from "apps/web/pages/MySpace/MySpace";
-import SeeArtist from "apps/web/pages/SeeArtist/SeeArtist";
 import Header from "apps/web/components/Header/Header"
 import Login from "apps/web/components/Login/Login";
 import Register from "apps/web/components/Register/Register";
@@ -16,7 +9,15 @@ import './App.scss'
 import EditUser from "./components/EditUser/EditUser";
 import {getStore} from "utils/utils"
 
-function App(props:any) {
+const Home = React.lazy(() => import("apps/web/pages/Home/Home"));
+const Create = React.lazy(() => import("apps/web/pages/Create/Create"));
+const Pictures = React.lazy(() => import("apps/web/pages/Pictures/Pictures"));
+const Bookmark = React.lazy(() => import("apps/web/pages/Bookmark/Bookmark"));
+const Tutorial = React.lazy(() => import("apps/web/pages/Tutorial/Tutorial"));
+const MySpace = React.lazy(() => import("apps/web/pages/MySpace/MySpace"));
+const SeeArtist = React.lazy(() => import("apps/web/pages/SeeArtist/SeeArtist"));
+
+function App(props: any) {
   const state = useSelector((state: any) => state.loginState);
   const dispatch = useDispatch();
   const history = useHistory();
@@ -35,19 +36,17 @@ function App(props:any) {
   return (
     <div className="App">
       <Header></Header>
-      <Switch>
-        <Route path={'/see-artist'} component={SeeArtist}/>
-        <Route path={'/create'} component={Create}/>
-        <Route path={'/pictures'} component={Pictures}/>
-        <Route path={'/bookmark'} component={Bookmark}/>
-        <Route path={'/tutorial'} component={Tutorial}/>
-        <Route path={'/my-space'} component={MySpace}/>
-        <Route exact path={'/'} component={Home}/>
-      </Switch>
-      {/*<Redirect to={'/home'}/>*/}
-      {/*{
-        !state.isLogin && state.showLogin &&
-      }*/}
+      <React.Suspense fallback={<></>}>
+        <Switch>
+          <Route path={'/see-artist'} component={SeeArtist}/>
+          <Route path={'/create'} component={Create}/>
+          <Route path={'/pictures'} component={Pictures}/>
+          <Route path={'/bookmark'} component={Bookmark}/>
+          <Route path={'/tutorial'} component={Tutorial}/>
+          <Route path={'/my-space'} component={MySpace}/>
+          <Route exact path={'/'} component={Home}/>
+        </Switch>
+      </React.Suspense>
       <Login></Login>
       <Register></Register>
       {

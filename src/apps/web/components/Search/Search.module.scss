@@ -100,13 +100,31 @@ $black-bg: rgba(0,0,0,0.2);
       }
     }
     .toggle-tags{
+      width: 48px;
+      height: 32px;
+      background: #383838;
+      color: $green;
+      position: absolute;
+      border-radius: 16px;
+      display: flex;
+      right: 48px;
+      align-items: center;
+      justify-content: center;
+      padding: 0 20px;
+      box-sizing: border-box;
+    }
+    .drop-down{
       width: 32px;
       height: 32px;
-      background: $green;
-      position: absolute;
-      right: 8px;
-      cursor: pointer;
       border-radius: 50%;
+      position: absolute;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: $green;
+      background: #383838;
+      right: 8px;
     }
   }
 }
