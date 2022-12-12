@@ -309,24 +309,18 @@ $subtag-margin-bottom: 8px;
             font-weight: bold;
           }
         }
-      }
-     /* .change {
-        height: 48px;
-        color: $green;
-        margin-bottom: 24px;
-
-        span {
-          cursor: pointer;
-          display: inline-flex;
+        .delete-layer{
+          width: 32px;
+          height: 32px;
+          display: flex;
+          justify-content: center;
           align-items: center;
-
-          img {
-            width: 16px;
-            height: 16px;
-            margin-right: 2px;
-          }
+          font-size: 36px;
+          margin-left: 16px;
+          color: #FF4E4E;
+          cursor: pointer;
         }
-      }*/
+      }
 
       .img-wrapper {
         display: flex;

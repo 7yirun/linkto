@@ -24,9 +24,10 @@ const getLength = (input:number | string):number=>{
   }
 }
 
-
+//同源地址才能下载, 否则是打开显示大图片的新tab页
 export function downloadURI(uri:string, name:string) {
   const link:HTMLAnchorElement = document.createElement('a');
+  //非同源会显示大图, 避免从当前页直接跳转
   link.target="_blank"
   link.download = name;
   link.href = uri;

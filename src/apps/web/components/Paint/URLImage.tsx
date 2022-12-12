@@ -6,11 +6,10 @@ interface IProps {
   imgUrl: string
   maxWidth: number
   maxHeight: number
-  isSelected: boolean
   [key: string]: any
 }
 
-const URLImage: React.FC<IProps> = ({imgUrl, maxWidth, maxHeight, isSelected, ...props}) => {
+const URLImage: React.FC<IProps> = ({imgUrl, maxWidth, maxHeight, ...props}) => {
   const [img] = useImage(imgUrl);
   const imgRef = useRef<any>();
   const [imgProps, setImgProps] = useState<any>()
@@ -44,20 +43,22 @@ const URLImage: React.FC<IProps> = ({imgUrl, maxWidth, maxHeight, isSelected, ..
     /*如果图片尺寸太大, 需要给他缩小到canvas可见范围===============end*/
   }, [img])
 
-  const trRef = useRef<any>();
 
 
   /* useEffect(()=>{
      console.log('1111111111111');
    }, [pictureState.currentLayerId])*/
-  useEffect(() => {
+
+/*  useEffect(() => {
     if (isSelected) {
       imgRef.current.moveToTop();
       // we need to attach transformer manually
-      trRef.current.nodes([imgRef.current]);
+      /!*TODO*!/
+      // trRef.current.nodes([imgRef.current]);
+      /!*TODO*!/
       // trRef.current.getLayer().batchDraw();
     }
-  }, [isSelected]);
+  }, [isSelected]);*/
 
   return (
     <>
@@ -65,7 +66,8 @@ const URLImage: React.FC<IProps> = ({imgUrl, maxWidth, maxHeight, isSelected, ..
         ref={imgRef}
         image={img}
         {...imgProps}
-        onDragEnd={(e) => {
+        {...props}
+       /* onDragEnd={(e) => {
           setImgProps({
             ...imgProps,
             x: imgRef.current.x(),
@@ -86,13 +88,13 @@ const URLImage: React.FC<IProps> = ({imgUrl, maxWidth, maxHeight, isSelected, ..
             width: node.width() * scaleX,
             height: node.height() * scaleY,
           })
-        }}
+        }}*/
       />
-      {isSelected && props.draggable && (
+      {/*{isSelected && props.draggable && (
         <Transformer
           ref={trRef}
         />
-      )}
+      )}*/}
     </>
   );
 };

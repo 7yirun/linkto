@@ -12,7 +12,7 @@ import Slider from '@mui/material/Slider';
 enum MODE {
   none,
   move,
-  erase,
+  erase,  //橡皮擦
   paint,//自由画图
 }
 
@@ -24,35 +24,37 @@ type imgType = {
 
 interface historyObj {
   lines?: number[],       //画线
-  eraseLines?: number[],  //橡皮擦
+  eraseLines?: number[],  //橡皮擦(line和图片一起擦除)
   imageObj?: imgType     //存放图片  每张图片会形成单独的history
   strokeWidth?: number  //笔触半径
   lineColor?: string     //画笔颜色
+  id: string             //图层currentLayerId 记录是哪个图层产生的记录
 }
 
 
 interface IProps {
   imgUrl?: string
   getImages?: (props: string[]) => void
-  getFinishedPic?:(url: string)=>any
+  getFinishedPic?: (url: string) => any
 }
 
 const SIZE_LIMIT = 10 * 1024 * 1024 //限制上传的最大图片大小为10MB
-const Konva = forwardRef((props:IProps, konvaRef) => {
+const Konva = forwardRef((props: IProps, konvaRef) => {
 
+  //用户操作的时候是橡皮功能, 提交数据的时候将此路径变为颜色填充从而生成蒙版图片
   const [eraseFill, setEraseFill] = useState<any>('destination-out');
-  useImperativeHandle(konvaRef, ()=>({
+  useImperativeHandle(konvaRef, () => ({
     getFinishedPic
   }))
   const dispatch = useDispatch();
   const pictureState = useSelector<any, pictureStateType>(state => state.pictureState)
 
-  const getFinishedPic = ()=>{
+  const getFinishedPic = () => {
     return stageRef.current.toDataURL({
       pixelRatio: 1
     })
   }
-  const [history, setHistory] = useState<historyObj[]>([{}]);
+  const [history, setHistory] = useState<historyObj[]>([{id: '背景图层001'}]);
   const [stepIndex, setStepIndex] = useState(0);
   const [mode, setMode] = useState<MODE>(MODE.move);
   const [canvasWidth, setCanvasWidth] = useState<number>(0);
@@ -67,18 +69,18 @@ const Konva = forwardRef((props:IProps, konvaRef) => {
   const isPaint = useRef<boolean>(false);
 
   //画布最终生成的图片
-  const getImgSrc = ()=>{
+  const getImgSrc = () => {
     stageRef.current.toDataURL({
       pixelRatio: 1
     })
   }
 
   /*TODO 暂时不加入历史记录功能 太复杂......*/
-/*  //有新图片加载时 history要变化
-  useEffect(() => {
-    const oldHistory = [...history];
-    setHistory([...history,]);
-  }, [pictureState])*/
+  /*  //有新图片加载时 history要变化
+    useEffect(() => {
+      const oldHistory = [...history];
+      setHistory([...history,]);
+    }, [pictureState])*/
   /*TODO 暂时不加入历史记录功能 太复杂......*/
 
 
@@ -87,35 +89,52 @@ const Konva = forwardRef((props:IProps, konvaRef) => {
     setCanvasHeight(drawingAreaRef.current?.offsetHeight || 0)
     setCanvasWidth(drawingAreaRef.current?.offsetWidth || 0)
   }
-  useEffect(()=>{
+  useEffect(() => {
     updateCanvasArea()
-    window.addEventListener('resize',updateCanvasArea)
-    return ()=>{
+    window.addEventListener('resize', updateCanvasArea)
+    return () => {
       window.removeEventListener('resize', updateCanvasArea)
     }
   }, [])
 
+  // const [isSelected, setIsSelected] = useState<boolean>(false)
+  const groupRef = useRef<any>(null);
+  const trRef = useRef<any>();
+
+  // 当有新图加载/用户手动切换了图层/删除了图层 需要把当前图层显示在最顶层
+  useEffect(() => {
+    groupRef.current.moveToTop()
+  }, [pictureState.loadedImages, pictureState.currentLayerId])
+
+
   //画线  需要重新开启新的历史记录
   const handleMouseDown = (e: any) => {
     if (mode === MODE.paint || mode === MODE.erase) {
-      isPaint.current = true
-      const pos: Vector2d = e.currentTarget.getPointerPosition();
+      isPaint.current = true;
+      // const pos: Vector2d = e.currentTarget.getPointerPosition();
+      const pos: Vector2d = groupRef.current.getRelativePointerPosition();
       const oldHistory = history.slice(0, stepIndex + 1);
-      if (mode === MODE.paint) {
-        //画线
-        setHistory([...oldHistory, {
-          lines: [pos.x, pos.y],
-          strokeWidth: currentStrokeWidth,
-          lineColor: currentColor
-        }])
-        setStepIndex(oldHistory.length) //newHistoryObj === newHistory[stepIndex]
-      } else {
-        //橡皮擦
-        setHistory([...oldHistory, {
-          eraseLines: [pos.x, pos.y],
-          strokeWidth: currentStrokeWidth
-        }])
-        setStepIndex(oldHistory.length)
+      switch (mode) {
+        case MODE.paint:
+          //画线
+          setHistory([...oldHistory, {
+            id: pictureState.currentLayerId,
+            lines: [pos.x, pos.y],
+            strokeWidth: currentStrokeWidth,
+            lineColor: currentColor
+          }])
+          setStepIndex(oldHistory.length); //newHistoryObj === newHistory[stepIndex]
+          console.log(history);
+          break;
+        case MODE.erase:
+          //橡皮擦
+          setHistory([...oldHistory, {
+            id: pictureState.currentLayerId,
+            eraseLines: [pos.x, pos.y],
+            strokeWidth: currentStrokeWidth
+          }])
+          setStepIndex(oldHistory.length)
+          break;
       }
     }
   }
@@ -124,7 +143,9 @@ const Konva = forwardRef((props:IProps, konvaRef) => {
     if (!isPaint.current) {
       return
     }
-    const pos: Vector2d = e.currentTarget.getPointerPosition();
+    // const pos: Vector2d = e.currentTarget.getPointerPosition();
+    const pos: Vector2d = groupRef.current.getRelativePointerPosition();
+
     const currentHistoryObj: historyObj = history.slice(-1)[0];
 
     if (mode === MODE.paint) {
@@ -149,6 +170,7 @@ const Konva = forwardRef((props:IProps, konvaRef) => {
   const handleMouseUp = () => {
     isPaint.current = false;
   }
+
 
   return (
     <div className={styles.container}>
@@ -214,25 +236,28 @@ const Konva = forwardRef((props:IProps, konvaRef) => {
       </ul>
       <div
         className="detail-operate"
-        style={{visibility: (mode === MODE.paint || mode === MODE.erase)?'visible':'hidden'}}
+        style={{visibility: (mode === MODE.paint || mode === MODE.erase) ? 'visible' : 'hidden'}}
       >
         <div className="radius">
           <p>画笔大小</p>
           <Slider
             value={currentStrokeWidth}
-            onChange={(e, radius)=>{
+            onChange={(e, radius) => {
               setCurrentStrokeWidth(radius as number)
             }}
           >
           </Slider>
           <span className={'width'}>{currentStrokeWidth}</span>
         </div>
-        <div className="color">
-          <p>颜色</p>
-          <input value={currentColor}  onChange={(e)=>{
-            setCurrentColor(e.target.value)
-          }} type="color" name="" id=""/>
-        </div>
+        {
+          mode === MODE.paint &&
+					<div className="color">
+						<p>颜色</p>
+						<input value={currentColor} onChange={(e) => {
+              setCurrentColor(e.target.value)
+            }} type="color" name="" id=""/>
+					</div>
+        }
       </div>
       <div
         className={'drawing-area'}
@@ -257,11 +282,15 @@ const Konva = forwardRef((props:IProps, konvaRef) => {
           }
           fileReader.readAsDataURL(file);
           fileReader.onload = (e) => {
+            const id = file.name + Date.now()
+            console.log(id);
             dispatch(setLoadedImages([...pictureState.loadedImages, {
               src: fileReader.result,
               name: file.name,
-              id: file.name+Date.now()
+              id: id
             }]));
+            //每次上传新图片 将当前图层改变为新上传的图片的图层
+            dispatch(setCurrentLayerId(id));
           }
           e.stopPropagation(); //firefox中防止打开新窗口
         }}
@@ -279,67 +308,79 @@ const Konva = forwardRef((props:IProps, konvaRef) => {
           onMouseUp={handleMouseUp}
         >
           <Layer>
-            <Group
-              draggable={mode === MODE.move}
-            >
-              {
-                pictureState.loadedImages.map((imgObj, i) => {
-                  return (
-                    <URLImage
-                      key={imgObj.id}
-                      imgUrl={imgObj.src}
-                      maxWidth={canvasWidth}
-                      maxHeight={canvasHeight}
-                      isSelected={pictureState.currentLayerId === imgObj.id && pictureState.currentLayerId !== '背景图层001'}
-                      onMouseEnter={() => {
-                        if (mode === MODE.move) {
-                          stageRef.current.container().style.cursor = 'move';
-                        }
-                      }}
-                      onMouseLeave={() => {
-                        stageRef.current.container().style.cursor = 'default';
-                      }}
-                    />
-                  )
-                })
-              }
-              {
-                //擦除
-                history.slice(0, stepIndex+1).filter(historyObj => historyObj.eraseLines).map((lineHistory, i) => (
-                  <Line
-                    key={'eraseLine' + i}
-                    stroke={'#0f0'}
-                    strokeWidth={lineHistory.strokeWidth}
-                    lineJoin={'round'}
-                    points={lineHistory.eraseLines}
-                    lineCap={'round'}
-                    bezier={true}
-                    globalCompositeOperation={eraseFill}
-                  >
-                  </Line>
-                ))
-              }
-            </Group>
-          </Layer>
-          <Layer>
             {
-              //画线
-              history.slice(0, stepIndex+1).filter(historyObj => historyObj.lines).map((lineHistory, i) => (
-                <Line
-                  key={'line' + i}
-                  stroke={lineHistory.lineColor}
-                  strokeWidth={lineHistory.strokeWidth}
-                  lineJoin={'round'}
-                  points={lineHistory.lines}
-                  lineCap={'round'}
-                  bezier={true}
-                >
-                </Line>
-              ))
+              pictureState.loadedImages.map((imgObj, i) => {
+                return (
+                  <React.Fragment key={imgObj.id}>
+                    <Group
+                      ref={imgObj.id === pictureState.currentLayerId  ? groupRef : null}
+                      // draggable={mode === MODE.move && imgObj.id === pictureState.currentLayerId}
+                      draggable={mode === MODE.move && imgObj.id !== '背景图层001'}
+                      onDragEnd={(e)=>{
+                      }}
+                    >
+                      <URLImage
+                        imgUrl={imgObj.src}
+                        maxWidth={canvasWidth}
+                        maxHeight={canvasHeight}
+                        onMouseEnter={() => {
+                          console.log('mouseenter');
+                          if (mode === MODE.move) {
+                            stageRef.current.container().style.cursor = 'move';
+                          }
+                        }}
+                        onMouseLeave={() => {
+                          stageRef.current.container().style.cursor = 'default';
+                        }}
+                      />
+                      {
+                        //画线
+                        history.slice(0, stepIndex + 1)
+                          .filter(historyObj => historyObj.lines && historyObj.id === imgObj.id)
+                          .map((lineHistory, i) => {
+                            return (
+                              <Line
+                                key={'line' + i}
+                                stroke={lineHistory.lineColor}
+                                strokeWidth={lineHistory.strokeWidth}
+                                lineJoin={'round'}
+                                points={lineHistory.lines}
+                                lineCap={'round'}
+                                bezier={true}
+                              >
+                              </Line>
+                            )
+                          })
+                      }
+                      {
+                        //擦除
+                        history.slice(0, stepIndex + 1)
+                          .filter(historyObj => historyObj.eraseLines && historyObj.id === imgObj.id)
+                          .map((lineHistory, i) => (
+                          <Line
+                            key={'eraseLine' + i}
+                            stroke={'#0f0'}
+                            strokeWidth={lineHistory.strokeWidth}
+                            lineJoin={'round'}
+                            points={lineHistory.eraseLines}
+                            lineCap={'round'}
+                            bezier={true}
+                            globalCompositeOperation={eraseFill}
+                          >
+                          </Line>
+                        ))
+                      }
+                    </Group>
+                   {/* {
+                      <Transformer
+                        ref={trRef}
+                      />
+                    }*/}
+                  </React.Fragment>
+                )
+              })
             }
-
           </Layer>
-
         </Stage>
       </div>
     </div>

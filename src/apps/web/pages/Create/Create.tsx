@@ -301,7 +301,6 @@ const Create = (props: any) => {
   }
 
   //设置当前选中的是哪个图层
-  // const [currentLayerId, setCurrentLayerId] = useState<string>('');
   const handleMenuClick: MenuProps['onClick'] = (e) => {
     dispatch(setCurrentLayerId(e.key))
   };
@@ -552,6 +551,12 @@ const Create = (props: any) => {
 								</Dropdown>
 								<UpLoad></UpLoad>
 								<span className={'iconfont icon-a-1'}></span>
+                <span
+                  className={'delete-layer iconfont icon-24'}
+                  onClick={()=>{
+
+                  }}
+                ></span>
 							</div>
 							<Konva
 								ref={konvaRef}
@@ -588,7 +593,7 @@ const Create = (props: any) => {
                             ></span>
 														<span className={'iconfont icon-16'}
                               onClick={()=>{
-                                downloadURI(`${createdImg[index]}}`, 'picture'+(index+1));
+                                downloadURI(`${createdImg[index]}`, 'picture'+(index+1));
                               }}
                             >
                             </span>

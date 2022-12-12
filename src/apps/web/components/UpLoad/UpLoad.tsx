@@ -2,7 +2,7 @@ import React, {ReactNode} from 'react';
 import styles from "./UpLoad.module.scss"
 import {message} from 'antd'
 
-import {setLoadedImages} from "apps/web/store/store";
+import {setCurrentLayerId, setLoadedImages} from "apps/web/store/store";
 import {useDispatch, useSelector} from "react-redux"
 
 interface IProps {
@@ -46,11 +46,14 @@ const UpLoad: React.FC<IProps> = (props) => {
           fileReader.readAsDataURL(file);
           fileReader.onload = () => {
             props.setFileName && props.setFileName(file.name);
+            const id = file.name + Date.now()
             dispatch(setLoadedImages([...pictureState.loadedImages, {
               name: file.name,
               src: fileReader.result as string,
-              id: file.name + Date.now()
+              id: id
             }]))
+            //每次上传新图片 将当前图层改变为新上传的图片的图层
+            dispatch(setCurrentLayerId(id));
           }
           //value值要重置, 否则第二次上传相同文件时onchange不触发
           e.target.value = '';
