@@ -2,6 +2,7 @@ import './Home.scss'
 import Swiper from 'swiper/js/swiper.js';
 import 'swiper/css/swiper.min.css'
 import {useEffect, useLayoutEffect, useRef, useState} from "react";
+import CapsuleButton from "apps/web/components/CapsuleButton/CapsuleButton"
 import Icons from "lib/icons"
 import {getStore} from "utils/utils"
 import {useSelector, useDispatch} from 'react-redux'
@@ -134,7 +135,7 @@ const Home = (props: any) => {
           <div className="img-display-wrapper">
             <ul className={'img-display'}>
               {
-                [...Array(5)].map((v, i)=>{
+                [...Array(5)].map((v, i) => {
                   return (
                     <li
                       key={i}
@@ -165,7 +166,14 @@ const Home = (props: any) => {
           </div>
           <span className="swipe-down iconfont icon-down"></span>
         </section>
-        <section className={'swiper-slide full-page'}>1</section>
+        <section className={'swiper-slide full-page'}>
+          <CapsuleButton className={'create-button'} onClick={() => {
+            props.history.push('/create')
+          }}
+          >
+            创作
+          </CapsuleButton>
+        </section>
         <section className={'swiper-slide full-page'}>2</section>
         <section className={'swiper-slide full-page'}>3</section>
         <section className={'swiper-slide full-page'}>4</section>

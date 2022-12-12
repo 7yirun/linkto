@@ -19,6 +19,7 @@ import {message, Dropdown} from 'antd'
 import UpLoad from "apps/web/components/UpLoad/UpLoad";
 import Konva from "apps/web/components/Paint/Konva2"
 import type {MenuProps} from 'antd';
+import Header from "apps/web/components/Header/Header"
 
 BScroll.use(ScrollBar);
 BScroll.use(MouseWheel);
@@ -321,96 +322,98 @@ const Create = (props: any) => {
   })
 
   return (
-    <div className="create-page">
-      <div className="create-page-content">
-        <div className="left">
-          <div className="choose-mode">
-            <CapsuleButton onClick={() => {
-              changeModeTo(MODE.junior)
-            }} className={mode == MODE.junior ? 'active' : ''}>普通模式</CapsuleButton>
-            <CapsuleButton onClick={() => {
-              changeModeTo(MODE.senior)
-            }} className={mode == MODE.senior ? 'active' : ''}>进阶模式</CapsuleButton>
-            <CapsuleButton onClick={() => {
-              changeModeTo(MODE.superior)
-              setIsWork(true);
-            }} className={mode == MODE.superior ? 'active' : ''}>高级模式</CapsuleButton>
-          </div>
-          <div className="choose-style">
-            <div className="choose-style-limit">
-              <div className="choose-style-content">
-                <div className={'choose relevance'}>
-                  <p>文字相关性</p>
-                  <Slider
-                    value={relevance}
-                    onChange={(e, newRelevance) => {
-                      setRelevance(newRelevance as number)
-                    }}
-                  />
-                  <div className="percentage">{`${relevance}%`}</div>
-                </div>
-                {
-                  mode === MODE.superior &&
-									<div className={'choose relevance'}>
-										<p>图片相关性</p>
-										<Slider
-											value={relevance2}
-											onChange={(e, newRelevance) => {
-                        setRelevance2(newRelevance as number)
+    <>
+      <Header></Header>
+      <div className="create-page">
+        <div className="create-page-content">
+          <div className="left">
+            <div className="choose-mode">
+              <CapsuleButton onClick={() => {
+                changeModeTo(MODE.junior)
+              }} className={mode == MODE.junior ? 'active' : ''}>普通模式</CapsuleButton>
+              <CapsuleButton onClick={() => {
+                changeModeTo(MODE.senior)
+              }} className={mode == MODE.senior ? 'active' : ''}>进阶模式</CapsuleButton>
+              <CapsuleButton onClick={() => {
+                changeModeTo(MODE.superior)
+                setIsWork(true);
+              }} className={mode == MODE.superior ? 'active' : ''}>高级模式</CapsuleButton>
+            </div>
+            <div className="choose-style">
+              <div className="choose-style-limit">
+                <div className="choose-style-content">
+                  <div className={'choose relevance'}>
+                    <p>文字相关性</p>
+                    <Slider
+                      value={relevance}
+                      onChange={(e, newRelevance) => {
+                        setRelevance(newRelevance as number)
                       }}
-										></Slider>
-										<div className="percentage">{`${relevance2}%`}</div>
-									</div>
-                }
-                <div className={'choose dimension'}>
-                  <p>尺寸</p>
-                  <div className='dimension-options'>
-                    {
-                      DIMESNION_OPTION.map((item, index) => {
-                        return (
-                          <CapsuleButton nobutton={1}
-                                         key={index}
-                                         data-checked={dimension === index ? "checked" : "unchecked"}
-                                         onClick={() => {
-                                           setDimension(index)
-                                         }}
-                          >
-                            {`${item.width}*${item.height}`}
-                          </CapsuleButton>
-                        )
-                      })
-                    }
+                    />
+                    <div className="percentage">{`${relevance}%`}</div>
                   </div>
-                </div>
-                {
-                  (mode === MODE.senior || mode === MODE.superior) &&
-                  <div className="choose choose-tags">
-                    <p>行业</p>
-                    <div className="tags-container">
-                      <div className="sub">
-                        {
-                          words.length > 0 && words.map((item: IWord) => {
-                            return (
-                              <CapsuleButton
-                                key={item.id}
-                                nobutton={1}
-                                data-checked={choosedWords.join().includes(item.id+'') ? 'checked' : 'unchecked'}
-                                onClick={() => {
-                                  choosedWords.join().includes(item.id+'') ?
-                                    setChoosedWords(choosedWords.filter(id => id !== item.id))
-                                    :
-                                    setChoosedWords([item.id, ...choosedWords])
-                                }}
-                              >
-                                {item.chinese}
-                              </CapsuleButton>
-                            )
-                          })
-                        }
-                      </div>
+                  {
+                    mode === MODE.superior &&
+								    <div className={'choose relevance'}>
+									    <p>图片相关性</p>
+									    <Slider
+										    value={relevance2}
+										    onChange={(e, newRelevance) => {
+                          setRelevance2(newRelevance as number)
+                        }}
+									    ></Slider>
+									    <div className="percentage">{`${relevance2}%`}</div>
+								    </div>
+                  }
+                  <div className={'choose dimension'}>
+                    <p>尺寸</p>
+                    <div className='dimension-options'>
+                      {
+                        DIMESNION_OPTION.map((item, index) => {
+                          return (
+                            <CapsuleButton nobutton={1}
+                                           key={index}
+                                           data-checked={dimension === index ? "checked" : "unchecked"}
+                                           onClick={() => {
+                                             setDimension(index)
+                                           }}
+                            >
+                              {`${item.width}*${item.height}`}
+                            </CapsuleButton>
+                          )
+                        })
+                      }
                     </div>
                   </div>
-                }
+                  {
+                    (mode === MODE.senior || mode === MODE.superior) &&
+								    <div className="choose choose-tags">
+									    <p>行业</p>
+									    <div className="tags-container">
+										    <div className="sub">
+                          {
+                            words.length > 0 && words.map((item: IWord) => {
+                              return (
+                                <CapsuleButton
+                                  key={item.id}
+                                  nobutton={1}
+                                  data-checked={choosedWords.join().includes(item.id+'') ? 'checked' : 'unchecked'}
+                                  onClick={() => {
+                                    choosedWords.join().includes(item.id+'') ?
+                                      setChoosedWords(choosedWords.filter(id => id !== item.id))
+                                      :
+                                      setChoosedWords([item.id, ...choosedWords])
+                                  }}
+                                >
+                                  {item.chinese}
+                                </CapsuleButton>
+                              )
+                            })
+                          }
+										    </div>
+									    </div>
+								    </div>
+                  }
                   {
                     keyWords.map((val: any, index) => {
                       return (
@@ -463,12 +466,12 @@ const Create = (props: any) => {
                       )
                     })
                   }
-                <div style={{height: 0}}></div>
+                  <div style={{height: 0}}></div>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="negative-prompt">
-            <div className="input-negative">
+            <div className="negative-prompt">
+              <div className="input-negative">
               <textarea
                 value={negInput}
                 className={'neg-prompt'}
@@ -481,53 +484,53 @@ const Create = (props: any) => {
                 }}
               >
               </textarea>
-              <div className="text-limit">{negInput.length + '/100'}</div>
+                <div className="text-limit">{negInput.length + '/100'}</div>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="right">
-          {/*开始创作按钮 高级创作切换工作台和展示区的按钮*/}
-          <div className="operate-buttons">
+          <div className="right">
+            {/*开始创作按钮 高级创作切换工作台和展示区的按钮*/}
+            <div className="operate-buttons">
+              {
+                creatable ?
+                  <CapsuleButton onClick={createImg} className={'create'}>开始创作</CapsuleButton>
+                  :
+                  <CapsuleButton nobutton={1} className={'create disable'}>
+                    <span className={'text'}>{`创作中(${progress}%)`}</span>
+                    <span style={{transform: `translateX(${progress - 100}%)`, left: 0}} className={'progress'}/>
+                  </CapsuleButton>
+              }
+              {
+                mode === MODE.superior && !isWork &&
+						    <CapsuleButton
+							    onClick={()=>{
+                    setIsWork(true);
+                  }}
+						    >返回创作区</CapsuleButton>
+              }
+            </div>
             {
-              creatable ?
-                <CapsuleButton onClick={createImg} className={'create'}>开始创作</CapsuleButton>
-                :
-                <CapsuleButton nobutton={1} className={'create disable'}>
-                  <span className={'text'}>{`创作中(${progress}%)`}</span>
-                  <span style={{transform: `translateX(${progress - 100}%)`, left: 0}} className={'progress'}/>
-                </CapsuleButton>
-            }
-            {
-              mode === MODE.superior && !isWork &&
-							<CapsuleButton
-                onClick={()=>{
-                  setIsWork(true);
-                }}
-              >返回创作区</CapsuleButton>
-            }
-          </div>
-          {
-            //高级创作的图片编辑工作区
-            mode === MODE.superior && isWork &&
-						<>
-							<div className={'choose-layer'}>
-								<span>图层</span>
-								<Dropdown
-									menu={{items: items, onClick: handleMenuClick}}
-									trigger={['click']}
-								>
-                  {
-                    <div>
-                      <p>
-                        {
-                          pictureState.currentLayerId === '背景图层001' ?
-                            <span className={'pure-color'}></span> :
-                            <img src={pictureState.currentLayerId ?
-                              pictureState.loadedImages.find(obj => obj.id === pictureState.currentLayerId)?.src
-                              :
-                              pictureState.loadedImages[0].src} alt=""/>
-                        }
-                        <span>
+              //高级创作的图片编辑工作区
+              mode === MODE.superior && isWork &&
+					    <>
+						    <div className={'choose-layer'}>
+							    <span>图层</span>
+							    <Dropdown
+								    menu={{items: items, onClick: handleMenuClick}}
+								    trigger={['click']}
+							    >
+                    {
+                      <div>
+                        <p>
+                          {
+                            pictureState.currentLayerId === '背景图层001' ?
+                              <span className={'pure-color'}></span> :
+                              <img src={pictureState.currentLayerId ?
+                                pictureState.loadedImages.find(obj => obj.id === pictureState.currentLayerId)?.src
+                                :
+                                pictureState.loadedImages[0].src} alt=""/>
+                          }
+                          <span>
                             {
                               pictureState.currentLayerId
                                 ?
@@ -535,11 +538,11 @@ const Create = (props: any) => {
                                 :
                                 pictureState.loadedImages[0].name}
                           </span>
-                      </p>
-                      <span className="iconfont icon-down"></span>
-                    </div>
-                  }
-                  {/*    {
+                        </p>
+                        <span className="iconfont icon-down"></span>
+                      </div>
+                    }
+                    {/*    {
                     pictureState.loadedImages.length > 0 ?
 
                       :
@@ -548,75 +551,76 @@ const Create = (props: any) => {
                         <span className="iconfont icon-down"></span>
                       </div>
                   }*/}
-								</Dropdown>
-								<UpLoad></UpLoad>
-								<span className={'iconfont icon-a-1'}></span>
-                <span
-                  className={'delete-layer iconfont icon-24'}
-                  onClick={()=>{
+							    </Dropdown>
+							    <UpLoad></UpLoad>
+							    <span className={'iconfont icon-a-1'}></span>
+							    <span
+								    className={'delete-layer iconfont icon-24'}
+								    onClick={()=>{
 
-                  }}
-                ></span>
-							</div>
-							<Konva
-								ref={konvaRef}
-							></Konva>
-						</>
-          }
-          {/*创作好的图片展示区*/}
-          {
-            !isWork &&
-						<div className="img-wrapper">
-							<div className={`dim${displayDimension + 1} img-center`}>
-                {
-                  [...Array(4)].map((val, index) => (
-                    <div key={index} className="img-placeholder">
-                      <i className={'iconfont icon-4'}></i>
-                      {
-                        createdImg[index] &&
-												<>
-													<img src={`${createdImg[index]}?time=${Date.now()}`} alt=""/>
-													<p className={"hover-icons"}>
-														<span className={'iconfont icon-12'}></span>
-														<span className={'iconfont icon-9'}></span>
-														<span
-                              className={'iconfont icon-13'}
-                              onClick={()=>{
-                                setMode(MODE.superior);
-                                setIsWork(true);
-                                dispatch(setLoadedImages([...pictureState.loadedImages, {
-                                  name: `picture${index+1}`,
-                                  src: `${createdImg[index]}?time=${Date.now()}`,
-                                  id: `picture${index+1}${Date.now()}`
-                                }]))
-                              }}
-                            ></span>
-														<span className={'iconfont icon-16'}
-                              onClick={()=>{
-                                downloadURI(`${createdImg[index]}`, 'picture'+(index+1));
-                              }}
-                            >
+                    }}
+							    ></span>
+						    </div>
+						    <Konva
+							    ref={konvaRef}
+						    ></Konva>
+					    </>
+            }
+            {/*创作好的图片展示区*/}
+            {
+              !isWork &&
+					    <div className="img-wrapper">
+						    <div className={`dim${displayDimension + 1} img-center`}>
+                  {
+                    [...Array(4)].map((val, index) => (
+                      <div key={index} className="img-placeholder">
+                        <i className={'iconfont icon-4'}></i>
+                        {
+                          createdImg[index] &&
+											    <>
+												    <img src={`${createdImg[index]}?time=${Date.now()}`} alt=""/>
+												    <p className={"hover-icons"}>
+													    <span className={'iconfont icon-12'}></span>
+													    <span className={'iconfont icon-9'}></span>
+													    <span
+														    className={'iconfont icon-13'}
+														    onClick={()=>{
+                                  setMode(MODE.superior);
+                                  setIsWork(true);
+                                  dispatch(setLoadedImages([...pictureState.loadedImages, {
+                                    name: `picture${index+1}`,
+                                    src: `${createdImg[index]}?time=${Date.now()}`,
+                                    id: `picture${index+1}${Date.now()}`
+                                  }]))
+                                }}
+													    ></span>
+													    <span className={'iconfont icon-16'}
+													          onClick={()=>{
+                                      downloadURI(`${createdImg[index]}`, 'picture'+(index+1));
+                                    }}
+													    >
                             </span>
-													</p>
-												</>
-                      }
-                    </div>
-                  ))
-                }
-							</div>
-						</div>
-          }
+												    </p>
+											    </>
+                        }
+                      </div>
+                    ))
+                  }
+						    </div>
+					    </div>
+            }
 
-          {/*{
+            {/*{
             imgToAdd && <AddToBookmark type={0} onCancle={cancelAdd} url={imgSrc}></AddToBookmark>
           }*/}
+          </div>
         </div>
-      </div>
-      {/*{
+        {/*{
         imgToScale &&
 				<SeeBig close={closeBig} url={imgSrc}/>
       }*/}
-    </div>
+      </div>
+    </>
   );
 };
 
