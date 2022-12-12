@@ -1,9 +1,41 @@
 @import "../../../../style/variable.scss";
 
 .homepage {
-  height: calc(100vh - 160px);
-  display: flex;
-  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  .full-page{
+    width: 100%;
+    position: relative;
+    //第一页
+    &:nth-child(1){
+      .swipe-down{
+        position: absolute;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        font-size: 48px;
+        bottom: 96px;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: float 2s infinite;
+        background: $green;
+        cursor: pointer;
+      }
+      .bottom-bar{
+        height: 80px;
+        background: $green;
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        left: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  }
+
+/*
   .homepage-content {
     margin: 0 auto 0;
     width: 1200px;
@@ -224,7 +256,7 @@
       color: $green;
       text-shadow: 2px 2px 30px;
     }
-  }
+  }*/
 }
 @keyframes fadeInOut {
   0%{
@@ -242,5 +274,16 @@
     opacity: 0;
     pointer-events: none;
   }
+}
 
+@keyframes float {
+  0%{
+    transform: translate(-50%, 0);
+  }
+  50%{
+    transform: translate(-50%, -20px);
+  }
+  100%{
+    transform: translate(-50%, 0);
+  }
 }

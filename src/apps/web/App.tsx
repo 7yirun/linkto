@@ -35,7 +35,7 @@ function App(props: any) {
   }, []);
   return (
     <div className="App">
-      <Header></Header>
+      {/*<Header></Header>*/}
       <React.Suspense fallback={<></>}>
         <Switch>
           <Route path={'/see-artist'} component={SeeArtist}/>

@@ -8,6 +8,7 @@ import {useSelector, useDispatch} from 'react-redux'
 import {queryImg, welcome} from "service/service"
 import {setShowRegister, setShowLogin, setIsLogin} from 'apps/web/store/store'
 import qs from "qs";
+import Header from "apps/web/components/Header/Header"
 
 /*const demos = [
   '一望无际的森林隐约浮现着灯塔的光芒',
@@ -36,7 +37,8 @@ const Home = (props: any) => {
   const [demos, setDemos] = useState([''])
   const [activeIndex, setActiveIndex] = useState(0);
   const timer = useRef<any>();
-  useEffect(() => {
+
+  /*useEffect(() => {
     if (timer.current) {
       return
     }
@@ -49,12 +51,12 @@ const Home = (props: any) => {
         return index;
       })
     }, 3000)
-  }, [activeIndex])
+  }, [activeIndex])*/
   useEffect(() => {
     queryImg({pageNum: 1, pageSize: 20}, (res: any) => {
       let list = (res.data as any).list;
       setList(list);
-      console.log("list=111==",list)
+      console.log("list=111==", list)
       let demoText = list.map((item: any) => {
         return item.description
       });
@@ -84,9 +86,9 @@ const Home = (props: any) => {
       clearTimeout(timer.current);
     }
   }, [])
-  useEffect(() => {
+  /*useEffect(() => {
     swiperRef.current && (swiperRef.current as any).update()
-  }, [list]);
+  }, [list]);*/
   const firstRender = useRef(true);
   useEffect(() => {
     if (firstRender.current) {
@@ -114,10 +116,32 @@ const Home = (props: any) => {
       }
     }
   }
-  // @ts-ignore
+  /*lingtu 1.2============================================== start*/
+  const homeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    new Swiper(homeRef.current, {
+      direction: "vertical",
+      mousewheel: true,
+      speed: 600,
+    });
+  }, [])
   return (
-    <div className={'homepage'}>
-      <div className="homepage-content">
+    <div ref={homeRef} className={'swiper homepage'}>
+      <div className="swiper-wrapper">
+        <section className={'swiper-slide full-page'}>
+          <Header></Header>
+          <div className="bottom-bar">
+            <span>了解如何使用</span>
+          </div>
+          <span className="swipe-down iconfont icon-down"></span>
+        </section>
+        <section className={'swiper-slide full-page'}>1</section>
+        <section className={'swiper-slide full-page'}>2</section>
+        <section className={'swiper-slide full-page'}>3</section>
+        <section className={'swiper-slide full-page'}>4</section>
+      </div>
+      {/*<div className="homepage-content">
         <div className="left">
           <h4>AI艺术与创意平台</h4>
           <div className='search-area'>
@@ -182,7 +206,7 @@ const Home = (props: any) => {
                 list.map((pic: IPicture, index) => {
                   return (
                     <div key={pic.id} className="swiper-slide" onClick={scaleImage(pic.url)}>
-                      {/*<div>{pic.description}</div>*/}
+                      <div>{pic.description}</div>
                       <img src={pic.url} alt=""/>
                     </div>
                   )
@@ -216,7 +240,7 @@ const Home = (props: any) => {
 						位创作者
 					</p>
 				</div>
-      }
+      }*/}
     </div>
   )
 }
