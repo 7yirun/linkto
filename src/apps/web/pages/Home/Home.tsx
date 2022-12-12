@@ -131,6 +131,35 @@ const Home = (props: any) => {
       <div className="swiper-wrapper">
         <section className={'swiper-slide full-page'}>
           <Header></Header>
+          <div className="img-display-wrapper">
+            <ul className={'img-display'}>
+              {
+                [...Array(5)].map((v, i)=>{
+                  return (
+                    <li
+                      key={i}
+                      className={'img'}>
+                      <div className="img-box">
+                        <img src="" alt=""/>
+                      </div>
+                      <div className="img-box">
+                        <img src="" alt=""/>
+                      </div>
+                      <div className="img-box">
+                        <img src="" alt=""/>
+                      </div>
+                      <div className="img-box">
+                        <img src="" alt=""/>
+                      </div>
+                      <div className="img-box">
+                        <img src="" alt=""/>
+                      </div>
+                    </li>
+                  )
+                })
+              }
+            </ul>
+          </div>
           <div className="bottom-bar">
             <span>了解如何使用</span>
           </div>
