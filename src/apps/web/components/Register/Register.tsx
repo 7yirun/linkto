@@ -44,7 +44,7 @@ const phoneNumRegExp = /^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-9])|(18[0-
 let timerId: TimeoutId;
 
 
-const Register = () => {
+const Register = ({mask=true,getContainer=document.body||false, ...props}) => {
   const dispatch = useDispatch();
   const state = useSelector((state: any) => state.loginState);
 
@@ -261,11 +261,13 @@ const Register = () => {
     <PopPanel
       warning={errInfo}
       success={successInfo}
-      open={state.showRegister}
+      open={props.open || state.showRegister}
       className={'register'}
       returnTo={current > 0}
       handleReturn={handleReturn}
       title={registerTitle}
+      mask={mask}
+      getContainer={getContainer}
     >
       {
         <form>
@@ -279,6 +281,7 @@ const Register = () => {
                   }
                   
                   <input placeholder={item.placeholder}
+                         autoComplete={'off'}
                          type={item.type === "password" || item.type === "repeatPassword" ? "password" : "text"}
                          value={((formState as any)[item.type])}
                          className={ ( item.type === "password" || item.type === "repeatPassword") && formState.passwordError ? `password-error` : ''}
