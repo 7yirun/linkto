@@ -1,69 +1,247 @@
 @import "../../../../style/variable.scss";
-.see-big{
+
+.see-big {
   width: 100%;
   height: 100%;
   position: fixed;
   left: 0;
   top: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   z-index: 9;
-  .content{
+
+  .content {
     border-radius: 16px 16px 0 0;
-    height: 80%;
+    //height: calc(92000vh / 1080);
+    height: calc(95000vh / 1080);
     width: 100%;
     background: #fff;
     position: absolute;
     bottom: 0;
-    .title{
-      margin-top: 3.3vh;
-      width: 100%;
-      height: 3.1vh;
+    //padding-top: calc(4000vh / 1080);
+    padding-top: calc(2800vh / 1080);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+
+    .content-in {
+      flex-shrink: 0;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      h5{
-        font-size: 16px;
-        color: #383838;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin: 0 auto;
+      height: calc(63600vh / 1080); //72 + 564
+      &.size1 {
+        //width: calc(56720vh / 1080); //320 + 564
+        .img-wrapper {
+          .img{
+            width: calc(56400vh / 1080);
+          }
+        }
       }
-      .close{
-        position: absolute;
-        width: 32px;
-        height: 32px;
-        right: 24px;
-        top: 24px;
-        cursor: pointer;
-        img{
-          width: 100%;
+      &.size2 {
+        //width: calc(37920vh / 1080); //320 + 376
+        .img-wrapper{
+          .img{
+            width: calc(37600vh / 1080);
+          }
+        }
+      }
+      &.size3 {
+        //width: calc(116920vh / 1080); //320 + 846
+        .img-wrapper{
+          .img{
+            width: calc(84600vh / 1080);
+          }
+        }
+      }
+      .title {
+        height: calc(4800vh / 1080);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .user-info {
           height: 100%;
+          display: flex;
+
+          img {
+            height: 100%;
+            border-radius: 50%;
+            margin-right: 8px;
+          }
+
+          .text-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            p {
+              font-size: 16px;
+              font-weight: bold;
+              height: 24px;
+              line-height: 24px;
+              color: #202020;
+            }
+
+            ul {
+              display: flex;
+              font-size: 12px;
+
+              li {
+                margin-right: 8px;
+                color: #666;
+              }
+            }
+          }
+        }
+
+        h5 {
+          font-size: 16px;
+          color: #383838;
+        }
+
+        .close {
+          position: absolute;
+          width: 32px;
+          height: 32px;
+          right: 24px;
+          top: -8px;
+          transform: translateY(-100%);
+          cursor: pointer;
+          display: flex;
+          align-content: center;
+          align-items: center;
+          color: $green;
+          font-size: 28px;
+          img {
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
+
+      .img-wrapper {
+        width: 100%;
+        height: calc(56400vh / 1080);
+        display: flex;
+        justify-content: space-between;
+        background: #F5F5F5;
+        border-radius: 20px;
+        overflow: hidden;
+        .img {
+          height: 100%;
+          img{
+            width: 100%;
+            height: 100%;
+          }
+        }
+        .text-pannel {
+          width: 320px;
+          flex-shrink: 0;
+          height: 100%;
+          padding: 16px;
+
+          .head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+
+            .icons {
+              display: flex;
+            }
+
+            .iconfont {
+              display: flex;
+              cursor: pointer;
+              align-items: center;
+              justify-content: center;
+              font-size: 32px;
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              background: rgba(0, 0, 0, 0.4);
+              margin-right: 16px;
+            }
+
+            .capsule-button {
+              width: 96px;
+              height: 40px;
+              font-size: 16px;
+              font-weight: bold;
+              color: #202020;
+            }
+          }
+
+          .body {
+            background: #fff;
+            width: 100%;
+            height: calc(100% - 88px);
+            border-radius: 8px;
+            color: #666;
+            font-size: 14px;
+            line-height: 22px;
+            padding: 16px;
+            box-sizing: border-box;
+          }
+        }
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 32px;
+
+        .capsule-button {
+          background: #E5E5E5;
+          width: 148px;
+          height: 4.4vh;
+          color: #383838;
+          margin: 0 6px;
+
+          &.add {
+            background: $green;
+            color: #fff;
+          }
         }
       }
     }
-    .img-wrapper{
-      width: 50%;
-      height: 60vh;
-      margin: 10px auto 0;
-      display: flex;
-      justify-content: center;
-      img{
-        height: 100%;
-        object-fit: contain;
-        border-radius: 20px;
+
+    .recommend {
+      &::before{
+        content: "相关推荐";
+        position: absolute;
+        padding: 0 32px;
+        height: 24px;
+        line-height: 24px;
+        color: #202020;
+        font-size: 16px;
+        background-color: #fff;
+        left: 50%;
+        top: 0;
+        transform: translate(-50%, -50%);
       }
-    }
-    .buttons{
+      position: relative;
+      //margin: 54px 48px 0;  设计稿尺寸
+      //padding-top: 42px;
+      margin: 24px 48px 0;
+      padding-top: 20px;
+      border-top: 1px solid rgba(0,0,0,0.1);
+      flex-grow: 1;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 32px;
-      .capsule-button{
-        background: #E5E5E5;
-        width: 148px;
-        height: 4.4vh;
-        color: #383838;
-        margin: 0 6px;
-        &.add{
-          background: $green;
-          color: #fff;
+      justify-content: space-between;
+      .recommend-img{
+        width: calc(22000vh/1080);
+        height: calc(22000vh/1080);
+        vertical-align: top;
+        cursor: pointer;
+        img{
+          border-radius: 20px;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
         }
       }
     }
