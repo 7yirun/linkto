@@ -81,7 +81,7 @@ const AddToBookmark = (props:any) => {
             <img src={Icons.close} alt=""/>
           </i>
           <div className="search">
-            <input type="text" value={searchVal} onChange={search} placeholder={"搜索或创建画夹"}/>
+            <input type="text" value={searchVal} onChange={search} placeholder={"搜索画夹"}/>
             <img src={Icons.search} alt=""/>
           </div>
           <div ref={wrapperRef} className="scroll-wrapper">
@@ -90,8 +90,11 @@ const AddToBookmark = (props:any) => {
                 filteredList.length > 0 &&
                   filteredList.map((val: any, i) => {
                     return (
-                      <li key={val.id} className={'pic-folder'}>
-                        <p>{val.name}</p>
+                      <li key={val.id} className={'pic-folder'} >
+                        <p className='pic-info'>
+                          <img className='logo' src={props.url} alt=""/>
+                          <span> {val.name}</span>
+                        </p>
                         <p className={'info'}>
                           <span>{val.picNum}</span>
                           <CapsuleButton onClick={()=>{
@@ -111,7 +114,7 @@ const AddToBookmark = (props:any) => {
                                 })
                               })
                             });
-                          }}>收录</CapsuleButton>
+                          }}>收藏</CapsuleButton>
                         </p>
                       </li>
                     )
