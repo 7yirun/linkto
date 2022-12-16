@@ -11,9 +11,8 @@ import AddToBookmark from "apps/web/components/AddToBookmark/AddToBookmark";
 import SeeBig from "apps/web/components/SeeBig/SeeBig";
 import qs from "qs";
 import {setStore, getStore, downloadURI} from "utils/utils"
-import {setMapArr, setLanMap, setCurrentLayerId, setLoadedImages} from "apps/web/store/store";
+import {setMapArr, setLanMap, setCurrentLayerId, setLoadedImages,SearchStateType, StateType} from "apps/web/store/store";
 import {useDispatch, useSelector} from "react-redux"
-import {SearchStateType, StateType} from "../../components/Search/Search";
 import Slider from '@mui/material/Slider';
 import {message, Dropdown} from 'antd'
 import UpLoad from "apps/web/components/UpLoad/UpLoad";
@@ -294,9 +293,6 @@ const Create = (props: any) => {
 
   const [imgToScale, setImgToScale] = useState(false);
   const [imgToAdd, setImgToAdd] = useState(false);
-  const closeBig = () => {
-    setImgToScale(false);
-  }
   const cancelAdd = () => {
     setImgToAdd(false);
   }

@@ -37,6 +37,7 @@ const searchSlice = createSlice({
   name: 'searchSlice',
   initialState: {
     description: '',
+    confirmSearch: false,  //用户在图库搜索框按下回车时变为true, description变化时变回false. 按下enter不触发onchange事件
     mapArr: [['']],
     lanMap: {}    //英文转中文
   },
@@ -44,6 +45,9 @@ const searchSlice = createSlice({
     //创作时或者搜索图库时自己输入的描述词
     setDescription(state, action){
       state.description = action.payload
+    },
+    setConfirmSearch(state, action){
+      state.confirmSearch = action.payload
     },
     //创作时选中的keyword
     setMapArr(state, action){
@@ -55,7 +59,7 @@ const searchSlice = createSlice({
   }
 })
 export const {setShowLogin, setShowRegister, setIsLogin, setShowEditUser, setAccountInfo,setEditUser} = loginSlice.actions
-export const {setDescription, setMapArr, setLanMap} = searchSlice.actions
+export const {setDescription, setMapArr, setLanMap, setConfirmSearch} = searchSlice.actions
 
 export interface ILoadedImg {
   name: string,
@@ -90,3 +94,14 @@ const store = configureStore({
   }
 })
 export default store
+
+export type StateType = {
+  searchState: SearchStateType
+}
+export type SearchStateType = {
+  description: string,
+  confirmSearch: boolean,
+  mapArr: string[][],
+  lanMap: any
+}
+

@@ -2,23 +2,16 @@ import React, {useEffect, useRef, useState} from "react";
 import CapsuleButton from "../CapsuleButton/CapsuleButton";
 import Icons from "../../../../lib/icons";
 import {useSelector, useDispatch} from 'react-redux'
-import {setDescription, setMapArr} from "apps/web/store/store";
+import {setDescription, setMapArr, StateType, SearchStateType} from "apps/web/store/store";
 import styles from "./Search.module.scss"
 // import gasp from "gsap"
 import {CSSTransition} from 'react-transition-group'
 
-export type StateType = {
-  searchState: SearchStateType
-}
-export type SearchStateType = {
-  description: string,
-  mapArr: string[][],
-  lanMap: any
-}
+
 const Search: React.FC = () => {
   const dispatch = useDispatch();
   const searchState = useSelector<StateType, SearchStateType>(state => state.searchState)
-  const [text, setText] = useState(searchState.description);
+  // const [text, setText] = useState(searchState.description);
   const [showTags, setShowTags] = useState<boolean>(false);
   const smallTagsRef = useRef<HTMLDivElement>(null);
   //当所有标签都未选中时 隐藏small-tag
@@ -30,20 +23,20 @@ const Search: React.FC = () => {
 
   return (
     <div className={styles["textarea-wrapper"]}>
+      <span style={{display: 'none'}} className={'iconfont icon-search'}></span>
       <div className="user-input-area">
         <input
           type="text"
-          value={text}
+          value={searchState.description}
           placeholder={'在此输入描述词:'}
           onChange={(e) => {
             if (e.target.value.length > 200) {
               return;
             }
-            setText(e.target.value);
-            dispatch(setDescription(e.target.value))
+            dispatch(setDescription(e.target.value));
           }}
         />
-        <div className="text-limit">{text.length + '/200'}</div>
+        <div className="text-limit">{searchState.description.length + '/200'}</div>
       </div>
       <CSSTransition
         classNames={'small-tags'}

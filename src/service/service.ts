@@ -38,9 +38,7 @@ export const sendPost = (command: string, request: any, success?: any, error?: a
     success && success(response)
     console.log(command);
   }).catch((err) => {
-    console.log(command);
-    error(err);
-    console.log(err);
+    error && error(err);
   })
 }
 
@@ -96,12 +94,17 @@ export const phoneLogin = (request: IRequestPhoneLogin, success?: any, err?:any)
 interface IRequestImg {
   pageSize: number; //每页几张图
   pageNum: number; //几页图
-  name?: string
+  description?: string
+  withOutPicId?:number //根据图片id获取相关推荐图片
 }
-
 export const queryImg = (request: IRequestImg, success?: any) => {
   sendPost(command.QUERY_IMG, request, success)
 }
+
+export const getImgDetail = (request: {id: number}, success?: any, err?:any)=>{
+  sendGet(command.GET_IMG_DETAIL, request, success);
+}
+
 
 interface IRequestBookmarkList {
   accountId?: string|number
@@ -248,3 +251,10 @@ export const editUser = (request:IEditUser, success?:any, err?:any)=>{
 export const getWords = (request: {type: number}, success?:any, err?:any)=>{
   sendGet(command.GET_WORDS, request, success, err)
 }
+
+//图库搜索下方推荐关键词
+export const getKeywords = (success?:any, err?:any)=>{
+  sendGet(command.GET_KEYWORDS,{}, success, err);
+}
+
+//图库搜索功能
