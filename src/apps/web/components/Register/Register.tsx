@@ -311,7 +311,6 @@ const Register = ({mask=true,getContainer=document.body||false, ...props}) => {
                           [item.type]: ''
                         })
                         resetPasswordError()
-                        console.log("formState===",formState)
                         e.stopPropagation();
                       }}
 									/>

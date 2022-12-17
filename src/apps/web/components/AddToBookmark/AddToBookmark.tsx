@@ -24,6 +24,10 @@ const AddToBookmark = (props:any) => {
   const [filteredList, setFilteredList] = useState([])
   const wrapperRef = useRef<any>()
   const bsRef = useRef(null);
+  const [createVal, setCreateVal] = useState('');
+  const [isHover, setIsHover] = useState(0);
+  const [isCreate, setIsCreate] = useState(0);
+  
   useEffect(()=>{
     bsRef.current = new BScroll(wrapperRef.current, {
       scrollY: true,
@@ -38,8 +42,19 @@ const AddToBookmark = (props:any) => {
     queryBookmarkList({type: props.type}, (res:any)=>{
       if(!unmountRef.current){
         // console.log(bsRef.current);
-        setList(res.data);
-        setFilteredList((res.data));
+        let newListData
+        newListData = res.data.map((list:any)=>{  
+            return {
+              ...list, 
+              ishover: 0
+            }
+        })
+        setList(newListData);
+        setFilteredList((newListData));
+
+        console.log("newListData====",newListData)
+        // setList(res.data);
+        // setFilteredList((res.data));
         requestAnimationFrame(() => {
           (bsRef.current as any).refresh();
         })
@@ -67,6 +82,14 @@ const AddToBookmark = (props:any) => {
       })
     })
   }
+  const create = (e:any)=>{
+    setCreateVal(e.target.value);
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        (bsRef.current as any).refresh()
+      })
+    })
+  }
   return createPortal(
     <div className={'add-to-bookmark-wrapper'}>
       <div className="add-to-bookmark">
@@ -77,8 +100,7 @@ const AddToBookmark = (props:any) => {
         </div>
         <div className="right">
           <h6>收录到画夹</h6>
-          <i className={'close'} onClick={onCancle}>
-            <img src={Icons.close} alt=""/>
+          <i className={'close iconfont icon-7'} onClick={onCancle}>
           </i>
           <div className="search">
             <input type="text" value={searchVal} onChange={search} placeholder={"搜索画夹"}/>
@@ -90,14 +112,30 @@ const AddToBookmark = (props:any) => {
                 filteredList.length > 0 &&
                   filteredList.map((val: any, i) => {
                     return (
-                      <li key={val.id} className={'pic-folder'} >
+                      <li key={val.id} className={'pic-folder'} 
+                        onMouseEnter={()=>{
+                            const c = list.concat();
+                            const t = list[i];
+                            // @ts-ignore
+                            t.ishover = 1;
+                            c[i] = t;
+                            setList(c);
+                        }}
+                        onMouseLeave={()=>{
+                            const c = list.concat();
+                            const t = list[i];
+                            // @ts-ignore
+                            t.ishover = 0;
+                            c[i] = t;
+                            setList(c);
+                        }}>
                         <p className='pic-info'>
-                          <img className='logo' src={props.url} alt=""/>
+                          <i className={'logo iconfont icon-icon'}></i>
                           <span> {val.name}</span>
                         </p>
                         <p className={'info'}>
-                          <span>{val.picNum}</span>
-                          <CapsuleButton onClick={()=>{
+                          { val.ishover==0 && <span>{val.picNum}</span>}
+                          { val.ishover==1 && <CapsuleButton onClick={()=>{
                             addToBookMark({
                               picClipId: val.id,
                               myPictureDto: {
@@ -105,7 +143,14 @@ const AddToBookmark = (props:any) => {
                               }
                             }, ()=>{
                               queryBookmarkList({type:props.type}, (res:any)=>{
-                                setList(res.data)
+                                let newListData
+                                newListData = res.data.map((list:any)=>{  
+                                    return {
+                                      ...list, 
+                                      ishover: 0
+                                    }
+                                })
+                                setList(newListData);
                                 setSearchVal('');
                                 requestAnimationFrame(()=>{
                                   requestAnimationFrame(()=>{
@@ -115,21 +160,29 @@ const AddToBookmark = (props:any) => {
                               })
                             });
                           }}>收藏</CapsuleButton>
+                          }
                         </p>
                       </li>
                     )
                   })
               }
-              {
+              {/* {
                 searchVal !==  '' &&
                 <li className="add">
                   <CapsuleButton onClick={()=>{
                     addNewBookmark({
-                      clipName: searchVal,
+                      clipName: createVal,
                       type: props.type
                     }, ()=>{
                       queryBookmarkList({type:props.type}, (res:any)=>{
-                        setList(res.data)
+                        let newListData
+                        newListData = res.data.map((list:any)=>{  
+                            return {
+                              ...list, 
+                              ishover: 0
+                            }
+                        })
+                        setList(newListData);
                         setSearchVal('');
                         requestAnimationFrame(() => {
                           requestAnimationFrame(()=>{
@@ -141,9 +194,60 @@ const AddToBookmark = (props:any) => {
                   }}>创建画夹</CapsuleButton>
                   <p>{searchVal}</p>
                 </li>
-              }
+              } */}
             </ul>
           </div>
+          {
+            isCreate === 0  &&
+            <div className="create">
+              <div className='establish' onClick={()=>{
+                  setIsCreate(1);       
+              }}>创建画夹</div> 
+            </div>
+          }
+          {
+            isCreate === 1  &&
+            <div className="create">
+              <div className='content'>
+                <input type="text" value={createVal}  onChange={create} placeholder={"请输入画夹名称"}/>
+                <span>10/20</span>
+              </div>
+              <div className='btns'>
+              <CapsuleButton  onClick={()=>{
+                            setIsCreate(0);     
+                            setCreateVal('');
+                        }} className={'cancel'}>取消</CapsuleButton>
+               <CapsuleButton onClick={()=>{
+                    if(createVal == ''){
+                      return
+                    }
+                    addNewBookmark({
+                      clipName: createVal,
+                      type: props.type
+                    }, ()=>{
+                      queryBookmarkList({type:props.type}, (res:any)=>{
+                        let newListData
+                        newListData = res.data.map((list:any)=>{  
+                            return {
+                              ...list, 
+                              ishover: 0
+                            }
+                        })
+                        setList(newListData);
+                        setIsCreate(0); 
+                        setCreateVal('');
+                        requestAnimationFrame(() => {
+                          requestAnimationFrame(()=>{
+                            (bsRef.current as any).refresh();
+                          })
+                        })
+                      })
+                    })
+                  }}>创建</CapsuleButton>
+              </div>
+            </div>
+          }
+       
         </div>
       </div>
     </div>
