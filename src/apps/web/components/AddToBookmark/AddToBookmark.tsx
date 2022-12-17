@@ -27,7 +27,7 @@ const AddToBookmark = (props:any) => {
   const [createVal, setCreateVal] = useState('');
   const [isHover, setIsHover] = useState(0);
   const [isCreate, setIsCreate] = useState(0);
-  
+  const [createLen, setCreateLen] = useState(0);
   useEffect(()=>{
     bsRef.current = new BScroll(wrapperRef.current, {
       scrollY: true,
@@ -51,10 +51,6 @@ const AddToBookmark = (props:any) => {
         })
         setList(newListData);
         setFilteredList((newListData));
-
-        console.log("newListData====",newListData)
-        // setList(res.data);
-        // setFilteredList((res.data));
         requestAnimationFrame(() => {
           (bsRef.current as any).refresh();
         })
@@ -76,6 +72,7 @@ const AddToBookmark = (props:any) => {
   }
   const search = (e:any)=>{
     setSearchVal(e.target.value);
+    
     requestAnimationFrame(()=>{
       requestAnimationFrame(()=>{
         (bsRef.current as any).refresh()
@@ -83,6 +80,9 @@ const AddToBookmark = (props:any) => {
     })
   }
   const create = (e:any)=>{
+    let len = e.target.value.length
+    if(len > 16) return
+    setCreateLen(e.target.value.length)
     setCreateVal(e.target.value);
     requestAnimationFrame(()=>{
       requestAnimationFrame(()=>{
@@ -100,11 +100,12 @@ const AddToBookmark = (props:any) => {
         </div>
         <div className="right">
           <h6>收录到画夹</h6>
-          <i className={'close iconfont icon-7'} onClick={onCancle}>
-          </i>
+          <span className={'close '} onClick={onCancle}>
+            <i className={'iconfont icon-close'}></i>
+          </span>
           <div className="search">
             <input type="text" value={searchVal} onChange={search} placeholder={"搜索画夹"}/>
-            <img src={Icons.search} alt=""/>
+            <i className={'iconfont icon-search'}></i>
           </div>
           <div ref={wrapperRef} className="scroll-wrapper">
             <ul>
@@ -130,7 +131,11 @@ const AddToBookmark = (props:any) => {
                             setList(c);
                         }}>
                         <p className='pic-info'>
-                          <i className={'logo iconfont icon-icon'}></i>
+                          <i className={'logo iconfont icon-icon'}>
+                            <span className={'path1'}></span>
+                            <span className={'path2'}></span>
+                            <span className={'path3'}></span>
+                          </i>
                           <span> {val.name}</span>
                         </p>
                         <p className={'info'}>
@@ -210,7 +215,7 @@ const AddToBookmark = (props:any) => {
             <div className="create">
               <div className='content'>
                 <input type="text" value={createVal}  onChange={create} placeholder={"请输入画夹名称"}/>
-                <span>10/20</span>
+                <span>{createLen}/16</span>
               </div>
               <div className='btns'>
               <CapsuleButton  onClick={()=>{
