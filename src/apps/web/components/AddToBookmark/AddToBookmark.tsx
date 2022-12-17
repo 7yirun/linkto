@@ -150,11 +150,13 @@ const AddToBookmark = (props:IProps) => {
                             setList(c);
                         }}>
                         <p className='pic-info'>
-                          <i className={'logo iconfont icon-icon'}>
-                            <span className={'path1'}></span>
-                            <span className={'path2'}></span>
-                            <span className={'path3'}></span>
-                          </i>
+                         { val.coverPic && <img src={val.coverPic} alt=""/>}
+                         { !val.coverPic && <i className={'logo iconfont icon-icon'}>
+                              <span className={'path1'}></span>
+                              <span className={'path2'}></span>
+                              <span className={'path3'}></span>
+                            </i>
+                          }
                           <span> {val.name}</span>
                         </p>
                         <p className={'info'}>
