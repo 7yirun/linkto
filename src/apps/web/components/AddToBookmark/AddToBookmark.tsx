@@ -94,9 +94,9 @@ const AddToBookmark = (props:any) => {
     <div className={'add-to-bookmark-wrapper'}>
       <div className="add-to-bookmark">
         <div className="left">
-          <div className="img-wrapper">
+          {/* <div className="img-wrapper"> */}
             <img src={props.url} alt=""/>
-          </div>
+          {/* </div> */}
         </div>
         <div className="right">
           <h6>收录到画夹</h6>
@@ -131,11 +131,13 @@ const AddToBookmark = (props:any) => {
                             setList(c);
                         }}>
                         <p className='pic-info'>
-                          <i className={'logo iconfont icon-icon'}>
-                            <span className={'path1'}></span>
-                            <span className={'path2'}></span>
-                            <span className={'path3'}></span>
-                          </i>
+                         { val.coverPic && <img src={val.coverPic} alt=""/>}
+                         { !val.coverPic && <i className={'logo iconfont icon-icon'}>
+                              <span className={'path1'}></span>
+                              <span className={'path2'}></span>
+                              <span className={'path3'}></span>
+                            </i>
+                          }
                           <span> {val.name}</span>
                         </p>
                         <p className={'info'}>
