@@ -14,7 +14,26 @@ BScroll.use(ScrollBar);
 BScroll.use(MouseWheel);
 const root = document.getElementById('confirm-root') as HTMLElement;
 
-const AddToBookmark = (props:any) => {
+interface IPictures extends Base{
+  type: 1
+  picId: number    //收藏他人图片用id
+  myPictureDto: {
+    url: string,   //仅用于展示 不传后台
+  }
+}
+
+interface ICreate extends Base{
+  type: 0
+  myPictureDto: {
+    url: string,   //收藏创作图片只用传url
+  }
+}
+interface Base{
+  onCancle: ()=>void
+}
+type IProps = IPictures | ICreate
+
+const AddToBookmark = (props:IProps) => {
   //画夹列表
   const [list,setList] = useState([]);
   const [searchVal, setSearchVal] = useState('');
@@ -95,7 +114,7 @@ const AddToBookmark = (props:any) => {
       <div className="add-to-bookmark">
         <div className="left">
           <div className="img-wrapper">
-            <img src={props.url} alt=""/>
+            <img src={props.myPictureDto.url} alt=""/>
           </div>
         </div>
         <div className="right">
@@ -141,12 +160,19 @@ const AddToBookmark = (props:any) => {
                         <p className={'info'}>
                           { val.ishover==0 && <span>{val.picNum}</span>}
                           { val.ishover==1 && <CapsuleButton onClick={()=>{
-                            addToBookMark({
-                              picClipId: val.id,
-                              myPictureDto: {
-                                url: props.url,
-                              }
-                            }, ()=>{
+                            const req:any = {
+                              picClipId: val.id
+                            }
+
+                            //收藏创作图片 传url
+                            if(props.type === 0){
+                              req.myPictureDto = props.myPictureDto
+                            }
+                            //收藏图库图片 传id
+                            if(props.type === 1){
+                              req.picId = props.picId
+                            }
+                            addToBookMark(req, ()=>{
                               queryBookmarkList({type:props.type}, (res:any)=>{
                                 let newListData
                                 newListData = res.data.map((list:any)=>{  

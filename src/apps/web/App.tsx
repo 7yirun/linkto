@@ -11,7 +11,7 @@ import {getStore} from "utils/utils"
 
 const Home = React.lazy(() => import("apps/web/pages/Home/Home"));
 const Create = React.lazy(() => import("apps/web/pages/Create/Create"));
-const Pictures = React.lazy(() => import("apps/web/pages/Pictures/Pictures"));
+const Pictures = React.lazy(() => import("apps/web/pages/Pictures/Pictures2"));
 const Bookmark = React.lazy(() => import("apps/web/pages/Bookmark/Bookmark"));
 const Tutorial = React.lazy(() => import("apps/web/pages/Tutorial/Tutorial"));
 const MySpace = React.lazy(() => import("apps/web/pages/MySpace/MySpace"));

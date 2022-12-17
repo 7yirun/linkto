@@ -124,9 +124,9 @@ const SeeBig = (props:any) => {
           }
         </div>
       </div>
-      {
+      {/*{
         showAddTo && <AddToBookmark type={0} onCancle={cancelAdd} url={props.info.url}></AddToBookmark>
-      }
+      }*/}
     </div>
   );
 };

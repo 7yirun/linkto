@@ -1,7 +1,7 @@
 import Waterfall from "apps/web/components/WaterFall/Waterfall";
 import {useEffect, useState, useRef, SyntheticEvent} from "react";
 import Header from "apps/web/components/Header/Header"
-import {getKeywords} from "../../../../service/service";
+import {getSearchWords} from "../../../../service/service";
 import "./Picture.scss"
 import Icons from "lib/icons"
 import debounce from 'lodash/debounce.js'
@@ -14,6 +14,7 @@ const Pictures = () => {
   const dispatch = useDispatch();
   const searchState = useSelector<StateType, SearchStateType>(state => state.searchState)
   const clientWidth = useWindowResize();
+  debugger
   const [isLeft, setIsLeft] = useState<boolean>(false);
   /*  1.根据240的列宽 左右48的padding 24px的gap 算出需要多少列: cols*240+24*(cols-1) + 48*2 <= innerWidth
   *   cols <= (innerWidth -72)/264
@@ -31,8 +32,11 @@ const Pictures = () => {
   useEffect(() => {
     // 清空Header里的搜索栏
     dispatch(setDescription(''))
-    getKeywords((res:any)=>{
-      setKeywords(res.data)
+    getSearchWords({
+      topNum: 5,
+      word: ''
+    },({data}:{data: string[]})=>{
+      setKeywords(data)
     })
     return ()=>{
       // 清空Header里的搜索栏
@@ -43,7 +47,7 @@ const Pictures = () => {
     <div className={'pictures'}>
       <Header></Header>
       <div className="similar-words-wrapper">
-        <Dropdown
+        {/*<Dropdown
           className=""
           menu={{items: [{key: 1, label: <li>行业1</li>}, {key: 2, label: <li>行业3</li>},{key: 1, label: <li>行业3</li>}], onClick: ()=>{}}}
           trigger={['click']}
@@ -52,7 +56,7 @@ const Pictures = () => {
             <p>热门关键词</p>
             <span className={'iconfont icon-down'}></span>
           </div>
-        </Dropdown>
+        </Dropdown>*/}
         <ul className="similar-words">
           {
             keywords.map((word: string, i)=>{
@@ -69,12 +73,12 @@ const Pictures = () => {
           }
         </ul>
       </div>
-      {
+      {/*{
         layout.cols > 0 && layout.colWidth > 0 &&
 				<Waterfall
           layout={layout}
         ></Waterfall>
-      }
+      }*/}
     </div>
   )
 }

@@ -53,23 +53,6 @@ const Personal = (props: any) => {
 					></ArtistCard>
         }
       </div>
-      <ul className={'footer'}>
-        <li className={'phone-num'}>
-          <span className={'title'}>手机号</span>
-          {
-            loginState.accountInfo && (loginState.accountInfo as any).bindPhone &&
-						<span>{`${(loginState.accountInfo as any).bindPhone}`.replace(/^(\d{3})\d{4}(\d{4})$/, '$1****$2')}</span>}
-          <span className="edit" onClick={() => {
-            dispatch(setEditUser("phoneNum"))
-          }}>
-            <img src={Icons.edit_account_name} alt=""/>
-          </span>
-        </li>
-        <li className={'wechat'}>
-          <span className={'title'}>微信</span>
-          <span></span>
-        </li>
-      </ul>
     </div>
   );
 };

@@ -12,10 +12,11 @@ type Prop = {
   layout: {
     cols: number
     colWidth: number  //240}
-  }
+  },
+  heightArr: number[]
 }
-//每次请求回来的图片数量
-const Waterfall = ({layout}: Prop) => {
+//Waterfall只做排版, 不发请求
+const Waterfall = ({layout, heightArr}: Prop) => {
   const dispatch = useDispatch();
   const searchState = useSelector<StateType, SearchStateType>(state => state.searchState)
   const batchImgNum: number = 30;
@@ -99,6 +100,7 @@ const Waterfall = ({layout}: Prop) => {
           setImgList(imgList.concat(list));
         })
       } else {
+
         //如果已加载的图片足够 则停止后续loadImages
         isQuerying.current = Promise.reject();
       }
@@ -138,19 +140,19 @@ const Waterfall = ({layout}: Prop) => {
     setDynamicPosition(position);
   }
 
-
   //对页面重新布局, 如果图片不够还需要加载新图
   //第一次mount时不需要触发, 后续resize才触发
-  /*useEffect(() => {
+  useEffect(() => {
     if (!isMountedRef.current) {
       return
     }
     //mounted之后才检测是否需要load图片 resize会使父组件传过来的cols,colWidth变化
     loadImages();
-  }, [layout])*/
+    isQuerying.current = Promise.resolve();
+  }, [layout])
 
   useEffect(() => {
-    // isMountedRef.current = true;
+    isMountedRef.current = true;
     // window.addEventListener('scroll', scrollHandlerRef.current);
     // loadImages();
     return () => {
@@ -221,9 +223,9 @@ const Waterfall = ({layout}: Prop) => {
           )
         })
       }
-      {
+    {/*  {
         imgToAdd && <AddToBookmark type={1} onCancle={cancelAdd} url={imgInfo?.url}></AddToBookmark>
-      }
+      }*/}
       {
         imgToScale &&
 				<SeeBig close={closeBig}

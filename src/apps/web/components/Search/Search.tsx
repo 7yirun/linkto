@@ -8,12 +8,20 @@ import styles from "./Search.module.scss"
 import {CSSTransition} from 'react-transition-group'
 
 
-const Search: React.FC = () => {
+const Search: React.FC = (props) => {
   const dispatch = useDispatch();
   const searchState = useSelector<StateType, SearchStateType>(state => state.searchState)
   // const [text, setText] = useState(searchState.description);
   const [showTags, setShowTags] = useState<boolean>(false);
   const smallTagsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(()=>{
+    console.log(1111);
+    if(searchState.confirmSearch){
+      setShowTags(true);
+    }
+  }, [searchState.confirmSearch])
+
   //当所有标签都未选中时 隐藏small-tag
   useEffect(()=>{
     if(!searchState.mapArr.join('').split(',').join('')){

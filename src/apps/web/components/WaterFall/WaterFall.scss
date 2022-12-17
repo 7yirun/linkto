@@ -2,18 +2,25 @@
   margin: 0 auto;
   position: relative;
   width: 100%;
-  .images-wrapper{
+  .waterfall-item{
+    position: absolute;
+  }
+
+
+
+
+/*  .images-wrapper{
     position: absolute;
     box-sizing: border-box;
     .img{
       border-radius: 12px;
       overflow: hidden;
       position: relative;
-      &:hover{
+      :hover{
         .hover-icons{
           display: flex;
         }
-      }
+      }&
       .hover-icons{
         position: absolute;
         top: 0;
@@ -100,7 +107,7 @@
         }
       }
     }
-  }
+  }*/
   .big-pic{
     position: fixed;
     background-color: rgba(0,0,0,0.6);

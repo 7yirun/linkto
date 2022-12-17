@@ -1,6 +1,6 @@
 import Home from 'apps/web/pages/Home/Home'
 import Create from 'apps/web/pages/Create/Create'
-import Pictures from 'apps/web/pages/Pictures/Pictures'
+import Pictures from 'apps/web/pages/Pictures/Pictures2'
 import Bookmark from 'apps/web/pages/Bookmark/Bookmark'
 import Tutorial from 'apps/web/pages/Tutorial/Tutorial'
 export default[

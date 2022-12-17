@@ -179,7 +179,8 @@ interface IAddRequest {
   picClipId: number,
   picId?:number,
   myPictureDto?: {
-    url: string
+    url: string,
+    description: string
   }
 }
 
@@ -253,8 +254,8 @@ export const getWords = (request: {type: number}, success?:any, err?:any)=>{
 }
 
 //图库搜索下方推荐关键词
-export const getKeywords = (success?:any, err?:any)=>{
-  sendGet(command.GET_KEYWORDS,{}, success, err);
+export const getSearchWords = (request: {topNum:number, word: string},success?:any, err?:any)=>{
+  sendGet(command.GET_SEARCH_WORDS,request, success, err);
 }
 
 //图库搜索功能

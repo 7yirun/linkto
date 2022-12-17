@@ -34,21 +34,22 @@ const ArtistCard = (props:any) => {
       <div className={'personal-info'}>
         <h5 className="personal-name">
           <span>{props && props.accountName}</span>
-          {
-            props.canEditName &&
-				    <span className="edit" onClick={()=>{
-              dispatch(setEditUser('nickname'))
-            }}>
-                <img src={Icons.edit_account_name} alt=""/>
-            </span>
-          }
         </h5>
         <ul className={'other-info'}>
-          <li>{'粉丝'}·{props.fansNum}</li>
-          <li>{'画夹'}·{props.picClipNum}</li>
           <li>{'关注'}·{props.focusNum}</li>
+          <li>{'粉丝'}·{props.fansNum}</li>
+          <li>{'创作'}·{props.picClipNum}</li>
+          <li>{'画夹'}·{props.picClipNum}</li>
         </ul>
       </div>
+      {
+        props.canEditName &&
+		    <span className="edit" onClick={()=>{
+          dispatch(setEditUser('nickname'))
+        }}>
+          编辑个人资料
+            </span>
+      }
     </div>
   );
 };

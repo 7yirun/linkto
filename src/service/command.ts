@@ -25,6 +25,6 @@ export default {
   EDIT_USER: "/ai/draw/account/update",
   VERIFY_CODE: "/ai/draw/login/check/verify/code",
   GET_WORDS: "/ai/draw/dict/get/list",
-  GET_KEYWORDS: "/ai/draw/picture/get/often/keyword",
+  GET_SEARCH_WORDS: "/ai/draw/picture/get/search/word",
   GET_IMG_DETAIL: "/ai/draw/picture/detail"
 }

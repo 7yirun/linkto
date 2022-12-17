@@ -11,7 +11,14 @@ import AddToBookmark from "apps/web/components/AddToBookmark/AddToBookmark";
 import SeeBig from "apps/web/components/SeeBig/SeeBig";
 import qs from "qs";
 import {setStore, getStore, downloadURI} from "utils/utils"
-import {setMapArr, setLanMap, setCurrentLayerId, setLoadedImages,SearchStateType, StateType} from "apps/web/store/store";
+import {
+  setMapArr,
+  setLanMap,
+  setCurrentLayerId,
+  setLoadedImages,
+  SearchStateType,
+  StateType
+} from "apps/web/store/store";
 import {useDispatch, useSelector} from "react-redux"
 import Slider from '@mui/material/Slider';
 import {message, Dropdown} from 'antd'
@@ -104,6 +111,7 @@ const Create = (props: any) => {
   //后端获取的keywords
   const [keyWords, setKeyWords] = useState([]);
 
+
   //为了卸载前能保存用户输入的这两个值
   useEffect(() => {
     dataRef.current = {
@@ -115,7 +123,6 @@ const Create = (props: any) => {
     }
   }, [description, negInput, dimension, relevance, relevance2])
 
-  const wordRef = useRef(false);
 
   //切换文字创作 / 图片创作 模式
   const changeModeTo = (mode: MODE) => {
@@ -182,35 +189,34 @@ const Create = (props: any) => {
     english: string,
     id: number
   }
-
   const [words, setWords] = useState<IWord[]>([])
+
   //选中的行业id
   const [choosedWords, setChoosedWords] = useState<number[]>([]);
   useEffect(() => {
     getWords({type: 1}, (res: { data: IWord[] }) => {
       setWords(res.data)
     })
-    if(mode !== MODE.superior){
+    if (mode !== MODE.superior) {
       setIsWork(false);
     }
   }, [mode])
 
-  const fileRef = useRef<any>();
   //创作图片
   const createImg = (e: any) => {
     e.preventDefault();
-    // const keyword = searchState.mapArr.join().split(',').filter(str => str).join();
+    //英文关键词数组
     let keywordArr = searchState.mapArr.join().split(',').filter(str => str);
     //进阶 高级 创作要拼接行业词汇
-    if(mode === MODE.senior || mode === MODE.superior){
-      const tmp:string[] = [];
-      choosedWords.forEach(id=>{
-        tmp.push(words.find(item=>item.id == id)?.english || 'english')
+    if (mode === MODE.senior || mode === MODE.superior) {
+      const tmp: string[] = [];
+      choosedWords.forEach(id => {
+        //行业用中文
+        tmp.push(words.find(item => item.id == id)?.chinese || '')
       })
       keywordArr = tmp.concat(keywordArr);
     }
     const keyword = keywordArr.join();
-    console.log(keyword);
     let taskId: string;
     //要发给后端的关键词
     const success = (res: any) => {
@@ -290,9 +296,10 @@ const Create = (props: any) => {
     }
   }
 
-
   const [imgToScale, setImgToScale] = useState(false);
   const [imgToAdd, setImgToAdd] = useState(false);
+  const [imgSrc, setImgSrc] = useState<string>();
+
   const cancelAdd = () => {
     setImgToAdd(false);
   }
@@ -350,16 +357,16 @@ const Create = (props: any) => {
                   </div>
                   {
                     mode === MODE.superior &&
-								    <div className={'choose relevance'}>
-									    <p>图片相关性</p>
-									    <Slider
-										    value={relevance2}
-										    onChange={(e, newRelevance) => {
+										<div className={'choose relevance'}>
+											<p>图片相关性</p>
+											<Slider
+												value={relevance2}
+												onChange={(e, newRelevance) => {
                           setRelevance2(newRelevance as number)
                         }}
-									    ></Slider>
-									    <div className="percentage">{`${relevance2}%`}</div>
-								    </div>
+											></Slider>
+											<div className="percentage">{`${relevance2}%`}</div>
+										</div>
                   }
                   <div className={'choose dimension'}>
                     <p>尺寸</p>
@@ -383,19 +390,19 @@ const Create = (props: any) => {
                   </div>
                   {
                     (mode === MODE.senior || mode === MODE.superior) &&
-								    <div className="choose choose-tags">
-									    <p>行业</p>
-									    <div className="tags-container">
-										    <div className="sub">
+										<div className="choose choose-tags">
+											<p>行业</p>
+											<div className="tags-container">
+												<div className="sub">
                           {
                             words.length > 0 && words.map((item: IWord) => {
                               return (
                                 <CapsuleButton
                                   key={item.id}
                                   nobutton={1}
-                                  data-checked={choosedWords.join().includes(item.id+'') ? 'checked' : 'unchecked'}
+                                  data-checked={choosedWords.join().includes(item.id + '') ? 'checked' : 'unchecked'}
                                   onClick={() => {
-                                    choosedWords.join().includes(item.id+'') ?
+                                    choosedWords.join().includes(item.id + '') ?
                                       setChoosedWords(choosedWords.filter(id => id !== item.id))
                                       :
                                       setChoosedWords([item.id, ...choosedWords])
@@ -406,9 +413,9 @@ const Create = (props: any) => {
                               )
                             })
                           }
-										    </div>
-									    </div>
-								    </div>
+												</div>
+											</div>
+										</div>
                   }
                   {
                     keyWords.map((val: any, index) => {
@@ -498,23 +505,23 @@ const Create = (props: any) => {
               }
               {
                 mode === MODE.superior && !isWork &&
-						    <CapsuleButton
-							    onClick={()=>{
+								<CapsuleButton
+									onClick={() => {
                     setIsWork(true);
                   }}
-						    >返回创作区</CapsuleButton>
+								>返回创作区</CapsuleButton>
               }
             </div>
             {
               //高级创作的图片编辑工作区
               mode === MODE.superior && isWork &&
-					    <>
-						    <div className={'choose-layer'}>
-							    <span>图层</span>
-							    <Dropdown
-								    menu={{items: items, onClick: handleMenuClick}}
-								    trigger={['click']}
-							    >
+							<>
+								<div className={'choose-layer'}>
+									<span>图层</span>
+									<Dropdown
+										menu={{items: items, onClick: handleMenuClick}}
+										trigger={['click']}
+									>
                     {
                       <div>
                         <p>
@@ -547,74 +554,83 @@ const Create = (props: any) => {
                         <span className="iconfont icon-down"></span>
                       </div>
                   }*/}
-							    </Dropdown>
-							    <UpLoad></UpLoad>
-							    <span className={'iconfont icon-a-1'}></span>
-							    <span
-								    className={'delete-layer iconfont icon-24'}
-								    onClick={()=>{
+									</Dropdown>
+									<UpLoad></UpLoad>
+									<span className={'iconfont icon-a-1'}></span>
+									<span
+										className={'delete-layer iconfont icon-24'}
+										onClick={() => {
 
                     }}
-							    ></span>
-						    </div>
-						    <Konva
-							    ref={konvaRef}
-						    ></Konva>
-					    </>
+									></span>
+								</div>
+								<Konva
+									ref={konvaRef}
+								></Konva>
+							</>
             }
             {/*创作好的图片展示区*/}
             {
               !isWork &&
-					    <div className="img-wrapper">
-						    <div className={`dim${displayDimension + 1} img-center`}>
+							<div className="img-wrapper">
+								<div className={`dim${displayDimension + 1} img-center`}>
                   {
                     [...Array(4)].map((val, index) => (
                       <div key={index} className="img-placeholder">
                         <i className={'iconfont icon-4'}></i>
                         {
                           createdImg[index] &&
-											    <>
-												    <img src={`${createdImg[index]}?time=${Date.now()}`} alt=""/>
-												    <p className={"hover-icons"}>
-													    <span className={'iconfont icon-12'}></span>
-													    <span className={'iconfont icon-9'}></span>
+													<>
+														<img src={`${createdImg[index]}?time=${Date.now()}`} alt=""/>
+														<p className={"hover-icons"}>
 													    <span
-														    className={'iconfont icon-13'}
-														    onClick={()=>{
+														    className={'iconfont icon-12'}
+														    onClick={() => {
+                                  setImgToAdd(true);
+                                  setImgSrc(`${createdImg[index]}`);
+                                }}
+													    ></span>
+															<span className={'iconfont icon-9'}></span>
+															<span
+																className={'iconfont icon-13'}
+																onClick={() => {
+                                  //二次创作
                                   setMode(MODE.superior);
                                   setIsWork(true);
                                   dispatch(setLoadedImages([...pictureState.loadedImages, {
-                                    name: `picture${index+1}`,
+                                    name: `picture${index + 1}`,
                                     src: `${createdImg[index]}?time=${Date.now()}`,
-                                    id: `picture${index+1}${Date.now()}`
+                                    id: `picture${index + 1}${Date.now()}`
                                   }]))
                                 }}
-													    ></span>
-													    <span className={'iconfont icon-16'}
-													          onClick={()=>{
-                                      downloadURI(`${createdImg[index]}`, 'picture'+(index+1));
+															></span>
+															<span className={'iconfont icon-16'}
+															      onClick={() => {
+                                      downloadURI(`${createdImg[index]}`, 'picture' + (index + 1));
                                     }}
-													    >
+															>
                             </span>
-												    </p>
-											    </>
+														</p>
+													</>
                         }
                       </div>
                     ))
                   }
-						    </div>
-					    </div>
+								</div>
+							</div>
             }
-
-            {/*{
-            imgToAdd && <AddToBookmark type={0} onCancle={cancelAdd} url={imgSrc}></AddToBookmark>
-          }*/}
+            {
+              imgToAdd && imgSrc &&
+							<AddToBookmark
+								type={0}
+								onCancle={cancelAdd}
+								myPictureDto={{
+                  url: imgSrc
+                }}
+							/>
+            }
           </div>
         </div>
-        {/*{
-        imgToScale &&
-				<SeeBig close={closeBig} url={imgSrc}/>
-      }*/}
       </div>
     </>
   );
