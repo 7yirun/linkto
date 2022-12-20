@@ -5,7 +5,7 @@ import {useEffect, useRef, useState} from "react";
 import CapsuleButton from "apps/web/components/CapsuleButton/CapsuleButton"
 import {useSelector, useDispatch} from 'react-redux'
 import {queryImg, welcome} from "service/service"
-import {setShowRegister, setShowLogin, setIsLogin} from 'apps/web/store/store'
+import {setShowRegister, setShowLogin, setIsLogin, setConfirmSearch, setDescription} from 'apps/web/store/store'
 import qs from "qs";
 import Header from "apps/web/components/Header/Header"
 import Register from "apps/web/components/Register/Register"
@@ -53,19 +53,6 @@ const Home = (props: any) => {
       setImgToScale(url)
     }
   }
-  const handleSearch = (e?: any) => {
-    if (e.type == 'click' || e.key == 'Enter') {
-      //如果没登陆就要登录
-      if (!loginState.isLogin) {
-        dispatch(setShowLogin(true));
-      }
-      //如果登录了,则跳转到创作页面 把刚才的输入进去
-      else {
-        let str = qs.stringify({search: searchVal})
-        props.history.push('/create?' + str)
-      }
-    }
-  }
   /*lingtu 1.2============================================== start*/
   const homeRef = useRef<HTMLDivElement>(null);
   const swiperRef = useRef<any>(null);
@@ -104,6 +91,8 @@ const Home = (props: any) => {
                    required
                    onKeyDown={(e) => {
                      if (e.key === 'Enter') {
+                       dispatch(setConfirmSearch(true));
+                       dispatch(setDescription((e.target as HTMLInputElement).value));
                        props.history.push('/pictures')
                      }
                    }}
@@ -117,7 +106,6 @@ const Home = (props: any) => {
             <ul className={'img-display'}>
               {
                 [...Array(5)].map((u: undefined, i) => {
-                  console.log(list);
                   return (
                     <li
                       key={i}

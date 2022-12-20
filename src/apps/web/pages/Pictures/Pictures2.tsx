@@ -13,11 +13,13 @@ import SeeBig from "../../components/SeeBig/SeeBig";
 import AddToBookmark from "../../components/AddToBookmark/AddToBookmark";
 import ImageCard from "../../components/ImageCard";
 import {imgInfoType} from "../../components/ImageCard";
+import {useMounted} from "apps/web/hooks";
 
 const Pictures = () => {
   const dispatch = useDispatch();
   const searchState = useSelector<StateType, SearchStateType>(state => state.searchState)
 
+  const isMounted = useMounted();
   /*瀑布流相关----------------------------------------------------------start*/
   const clientWidth = useWindowResize();
   const currentCols = useRef(Math.floor((clientWidth - 72) / 264))
@@ -62,7 +64,8 @@ const Pictures = () => {
     let screenHeight = window.innerHeight;
     if (shortestHeight - SCROLL_GAP <= scrollTop + screenHeight && scrollTriggerFlag.current && !isLastPage.current) {
       scrollTriggerFlag.current = false;
-
+      console.log(searchState.confirmSearch);
+      console.log(searchState.description);
       queryImg(searchState.confirmSearch ? {pageSize: 30, pageNum: pageNumRef.current++, description: searchState.description}:{pageSize: 30, pageNum: pageNumRef.current++}, (res: any) => {
         if(res.data.pages < pageNumRef.current){
           isLastPage.current = true;
@@ -73,8 +76,8 @@ const Pictures = () => {
   }
 
   useEffect(()=>{
-    // 清空Header里的搜索栏
-    dispatch(setDescription(''))
+    console.log(searchState.confirmSearch, 'start====');
+
     //获取热门推荐词
     getSearchWords({
       topNum: 5,
@@ -91,10 +94,11 @@ const Pictures = () => {
       window.removeEventListener('scroll', handleScroll)
     }
   }, [imgList, scrollTriggerFlag.current, isLastPage.current])
+
   useEffect(()=>{
     scrollTriggerFlag.current = true
     //响应回来之前不可继续搜索
-    dispatch(setConfirmSearch(false));
+    isMounted && dispatch(setConfirmSearch(false));
   }, [imgList])
 
   useEffect(() => {

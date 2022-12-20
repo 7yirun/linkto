@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import debounce from "lodash/debounce.js"
 
 export const useWindowResize = ()=>{
@@ -15,4 +15,12 @@ export const useWindowResize = ()=>{
     }
   }, [])
   return width;
+}
+
+export const useMounted = ()=>{
+  const mountedRef = useRef<boolean>(false);
+  useEffect(()=>{
+    mountedRef.current = true
+  },[])
+  return mountedRef.current
 }
