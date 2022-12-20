@@ -5,12 +5,11 @@ import {useSelector, useDispatch} from 'react-redux'
 import {setDescription, setMapArr, StateType, SearchStateType, setConfirmSearch} from "apps/web/store/store";
 import {getSearchWords} from "service/service"
 import styles from "./Search.module.scss"
-// import gasp from "gsap"
 import {CSSTransition} from 'react-transition-group'
 import debounce from 'lodash/debounce.js'
 
 
-const Search: React.FC = (props) => {
+const Search: React.FC<{isPictures: boolean}> = (props) => {
   const dispatch = useDispatch();
   const searchState = useSelector<StateType, SearchStateType>(state => state.searchState)
   const [showTags, setShowTags] = useState<boolean>(false);
@@ -47,7 +46,9 @@ const Search: React.FC = (props) => {
           value={searchState.description}
           placeholder={'在此输入描述词:'}
           onFocus={() => {
-            setShowTags(true);
+            if(props.isPictures){
+              setShowTags(true);
+            }
           }}
           onBlur={() => {
             setShowTags(false);
@@ -57,6 +58,12 @@ const Search: React.FC = (props) => {
               return;
             }
             dispatch(setDescription(e.target.value));
+          }}
+          onKeyDown={(e)=>{
+            //监听enter 仅在图库搜索中有用
+            if(props.isPictures && e.key === 'Enter'){
+              dispatch(setConfirmSearch(true));
+            }
           }}
         />
         <div className="text-limit">{searchState.description.length + '/200'}</div>
@@ -105,7 +112,7 @@ const Search: React.FC = (props) => {
             })
           }
           {
-            //搜索推荐词
+            props.isPictures &&
             <div className="recommend-wrapper">
               <p>推荐关键词</p>
               <ul className={'recommend-words'}>

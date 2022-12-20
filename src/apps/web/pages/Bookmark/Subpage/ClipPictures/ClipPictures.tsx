@@ -68,6 +68,7 @@ const ClipPictures = (props:any) => {
       clipPictures({
         id: props.id
       }, (res: any) => {
+
         setList(res.data.pictureList.map((item:any)=>{
           item.inBookmark=true
           return item
@@ -77,6 +78,8 @@ const ClipPictures = (props:any) => {
   }, [])
   return (
           <div className={style["content"]}>
+            <div className="clip-name">
+            </div>
             {
               list.map((val: any, index) => {
                 return (

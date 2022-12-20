@@ -102,7 +102,7 @@ export const queryImg = (request: IRequestImg, success?: any) => {
 }
 
 export const getImgDetail = (request: {id: number}, success?: any, err?:any)=>{
-  sendGet(command.GET_IMG_DETAIL, request, success);
+  sendGet(command.GET_IMG_DETAIL, request, success, err);
 }
 
 
@@ -213,12 +213,12 @@ export const welcome = (success?:any)=>{
 }
 
 //关注用户
-export const focus = (request: {focusedAccountId: number}, success?:any)=>{
-  sendGet(command.FOCUS, request, success)
+export const focus = (request: {focusedAccountId: number}, success?:any, err?:any)=>{
+  sendGet(command.FOCUS, request, success, err)
 }
 //取关
-export const unFocus = (request: {focusedAccountId: number}, success?:any)=>{
-  sendGet(command.UN_FOCUS, request, success)
+export const unFocus = (request: {focusedAccountId: number}, success?:any, err?:any)=>{
+  sendGet(command.UN_FOCUS, request, success, err)
 }
 
 //关注列表
@@ -258,4 +258,24 @@ export const getSearchWords = (request: {topNum:number, word: string},success?:a
   sendGet(command.GET_SEARCH_WORDS,request, success, err);
 }
 
-//图库搜索功能
+//设置画夹私密/公开  0公開  1私密
+export const setClipPrivateStaus = (reqest: {id:number, isPrivate: number}, success?:any, err?:any)=>{
+  sendGet(command.SET_CLIP_PRIVATE_STATUS, reqest, success, err)
+}
+
+//点赞
+export const setLike = (request: {picId: number}, success?:any, err?:any)=>{
+  sendGet(command.SET_LIKE, request, success, err);
+}
+
+//取消点赞
+export const cancelLike = (request: {picId: number}, success?:any, err?:any)=>{
+  sendGet(command.SET_LIKE, request, success, err);
+}
+
+
+
+
+
+
+

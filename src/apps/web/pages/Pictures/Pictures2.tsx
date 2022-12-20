@@ -11,6 +11,8 @@ import {useSelector, useDispatch} from 'react-redux'
 import {queryImg} from "service/service"
 import SeeBig from "../../components/SeeBig/SeeBig";
 import AddToBookmark from "../../components/AddToBookmark/AddToBookmark";
+import ImageCard from "../../components/ImageCard";
+import {imgInfoType} from "../../components/ImageCard";
 
 const Pictures = () => {
   const dispatch = useDispatch();
@@ -50,7 +52,7 @@ const Pictures = () => {
         return (val >= Math.min(...heightArrRef.current) - delta) && (val <= Math.min(...heightArrRef.current) + delta)
       })
       //图片宽度不一定等于列宽, 所以要对高度缩放
-      heightArrRef.current[colIndex] += (imgList[i].high / imgList[i].width * currentWidth + 58);
+      heightArrRef.current[colIndex] += (imgList[i].high / imgList[i].width * currentWidth + 42);
     }
     // 最终排列好后最短列的高度
     let shortestHeight = Math.min(...heightArrRef.current);
@@ -66,7 +68,6 @@ const Pictures = () => {
           isLastPage.current = true;
         }
         setImgList([...imgList, ...res.data.list])
-
       })
     }
   }
@@ -102,19 +103,6 @@ const Pictures = () => {
   }, [imgList, clientWidth])
   /*瀑布流相关----------------------------------------------------------end*/
 
-  type imgInfoType = {
-    id: number,
-    width: number,
-    high: number,
-    description: string
-    url: string
-    smallUrl: string,
-    accountId: number,
-    accountName: string
-    headPic: string
-    collectCount: number
-    starCount: number
-  }
   //当前点击的图片信息 用于收藏 / 查看大图
   const [imgInfo, setImgInfo] = useState<imgInfoType>();
   /*收藏相关--------------------------------start*/
@@ -171,57 +159,21 @@ const Pictures = () => {
         {
           imgList.map(imgInfo=>{
             return (
-              <div
-                className={'images-wrapper'}
+              <ImageCard
                 key={imgInfo.id}
-              >
-                <div className='img'>
-                  <img src={imgInfo.smallUrl} alt=""/>
-                  <div
-                    className="hover-icons"
-                    onClick={() => {
-                      setImgToScale(true)
-                      setImgInfo(imgInfo)
-                    }}
-                  >
-                  <span
-                    className={'iconfont icon-12'}
-                    onClick={(e) => {
-                      //收藏
-                      setShowAddTo(true)
-                      setImgInfo(imgInfo)
-                      e.stopPropagation();
-                    }}
-                  ></span>
-                    <span className={'iconfont icon-9'}></span>
-                    <span className={'iconfont icon-13'}></span>
-                  </div>
-                </div>
-                <div className="artist">
-                  <ul>
-                    <li>
-                      <span className={'iconfont icon-12'}></span>
-                      <p>1234</p>
-                    </li>
-                    <li>
-                      <span className={'iconfont icon-9'}></span>
-                      <p>1234</p>
-                    </li>
-                    <li>
-                      <span className={'iconfont icon-Show'}></span>
-                      <p>11234</p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
+                imgInfo={imgInfo}
+                setImgInfo={setImgInfo}
+                setImgToScale={setImgToScale}
+                setShowAddTo={setShowAddTo}
+              />
             )
           })
         }
       </Waterfall>
       {
-        imgToScale &&
+        imgToScale && imgInfo &&
 		    <SeeBig close={closeBig}
-		            info={imgInfo}
+		            id={imgInfo.id}
 		    />
       }
       {
