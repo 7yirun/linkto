@@ -11,5 +11,6 @@ export default[
   {path:'/bookmark/sub-bookmark', name: 'SubBookmark', component: Bookmark, auth:true},
   {path:'/bookmark/sub-myfollow', name: 'SubMyFollow', component: Bookmark, auth:true},
   {path:'/bookmark/sub-myhistory', name: 'SubMyHistory', component: Bookmark, auth:true},
-  {path:'/tutorial', name: 'Bookmark', component: Tutorial, auth:true}
+  {path:'/bookmark/sub-personalinfo', name: 'SubPersonalInfo', component: Bookmark, auth:true},
+  {path:'/tutorial', name: 'Bookmark', component: Tutorial, auth:true},
 ]

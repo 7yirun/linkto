@@ -4,14 +4,17 @@ import {Route, Switch, Redirect} from 'react-router-dom'
 import SubCreate from "./Subpage/SubCreate/SubCreate";
 import SubBookmark from "./Subpage/SubBookmark/SubBookmark";
 import SubMyFollow from "./Subpage/SubMyfollow/SubMyfollow";
+import SubMyHistory from "./Subpage/SubMyhistory/SubMyhistory";
+import SubPersonalInfo from "./Subpage/SubPersonalinfo/SubPersonalinfo";
 import {NavLink} from "react-router-dom"
 
 const Bookmark = (props: any) => {
   const nav = [
+    {name: '个人信息', path: '/sub-personalinfo', component: SubPersonalInfo},
     {name: '我的创作', path: '/sub-mycreate', component: SubCreate},
     {name: '我的收藏', path: '/sub-bookmark', component: SubBookmark},
     {name: '我的关注', path: '/sub-myfollow', component: SubMyFollow},
-    // {name: '我的点赞', path: '/sub-myhistory', component: SubMyHistory}
+    {name: '我的点赞', path: '/sub-myhistory', component: SubMyHistory}
   ];
 
   const [activePage, setActivePage] = useState(0);
@@ -26,6 +29,15 @@ const Bookmark = (props: any) => {
     <div className={'bookmark'}>
       <div className="left">
         <ul className={'left-nav'}>
+        <li>
+            <NavLink
+              className={'sub-nav'}
+              exact
+              to={others ? "/see-artist/sub-personalinfo/id=" + accountId : "/bookmark/sub-personalinfo"}
+            >
+              {!others?'个人信息':'11'}
+            </NavLink>
+          </li>
           <li>
             <NavLink
               className={'sub-nav'}
@@ -53,7 +65,7 @@ const Bookmark = (props: any) => {
               {!others?'我的关注':'他的关注'}
             </NavLink>
           </li>
-          {/*{
+          {/* {
             nav.map((item, index) => {
               return (
                 <li key={item.name}
@@ -74,7 +86,7 @@ const Bookmark = (props: any) => {
                 </li>
               )
             })
-          }*/}
+          } */}
         </ul>
       </div>
       <div className="right">

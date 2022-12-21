@@ -1,0 +1,205 @@
+@import "../../../../../../style/variable.scss";
+.personal-info{
+  color: #383838;
+  :global{
+    .sub-title-wrapper{
+      display: flex;
+      border-bottom: 1px solid #e5e5e5;
+      width: 100%;
+      .sub-title{
+        display: flex;
+        flex: 1;
+        height: 40px;
+        justify-content: center;
+        cursor: pointer;
+        span{
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        &.active{
+          color: $green;
+          span{
+            height: 100%;
+            border-bottom: 2px solid $green;
+          }
+        }
+      }
+    }
+
+    .info{
+      width: 800px;
+      background: pink;
+      .column-content{
+        display: flex;
+        align-items: center;
+      }
+      .column-left{
+        color: #FFFFFF;
+        font-weight: 500;
+        font-size: 12px;
+        width: 60px;
+      }
+      .column-right{
+        
+      }
+      .profile{
+        height: 120px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        margin-top: 20px;
+        margin-bottom: 12px;
+        p{
+          line-height: 120px;
+          color: $green;
+          margin-left: 12px;
+          color: #43CF7C;
+          font-weight: 500;
+          font-size: 12px;
+        }
+        img{
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          object-fit: cover;
+        }
+        [type=file]{
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          background-color: pink;
+          left: 0;
+          top: 0;
+          opacity: 0;
+          cursor: pointer;
+        }
+      }
+      .input-frame{
+        width: 305px;
+        height: 40px;
+        margin: 15px 0;
+        position: relative;
+        &.code{
+          margin-top: 16px;
+        }
+        .capsule-button{
+          width: 80px;
+          height: 24px;
+          position: absolute;
+          right: 8px;
+          top: 50%;
+          transform: translateY(-50%);
+          &.waiting{
+            pointer-events: none;
+            background: transparent;
+            color: $text-color-dark;
+          }
+        }
+        input,select{
+          height: 100%;
+          width: 100%;
+          background: #E5E5E5;
+          border-radius: 20px;
+          padding-left: 15px;
+          color: #202020;
+          font-weight: 500;
+          font-size: 14px;
+          border:none;
+        }
+        select{
+          padding-right: 15px;
+          outline: none;
+          appearance:none;  
+          -moz-appearance:none;
+          -webkit-appearance:none;
+          width: 320px;
+        }
+        &.original-pwd{
+          margin-top: 32px;
+        }
+        &.pwd{
+          margin-top: 16px;
+        }
+        .nickname-icon{
+          position: absolute;
+          left: 16px;
+          width: 16px;
+          height: 16px;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+        .clear-text{
+          cursor: pointer;
+          position: absolute;
+          right: 16px;
+          width: 16px;
+          height: 16px;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+      }
+      .original-password{
+
+      }
+      .tip{
+        color: #ccc;
+        margin-top: 32px;
+        margin-bottom: 16px;
+      }
+    }
+
+    .interest-title{
+      align-self: flex-start;
+      margin-top: 10px;
+    }
+    .interest-wrapper{
+      ul{
+        width: 684px;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        li{
+          width: 148px;
+          height: 40px;
+          border-radius: 20px;
+          background: #383838;
+          text-align: center;
+          line-height: 40px;
+          color: #43CF7C;
+          font-size: 16px;
+          margin-bottom: 16px;
+          cursor: pointer;
+        }
+        
+      }
+      span{
+        color: #666666;
+        font-weight: 500;
+        font-size: 12px;
+      }
+      .add-btn{
+        color: #FFF;
+        font-size: 22px;
+      }
+    }
+    .confirm-buttons{
+      display: flex;
+      margin-left: 48px;
+      // justify-content: space-between;
+      .capsule-button{
+        //margin-top: 32px;
+        height: 40px;
+        width: 148px;
+        margin: 32px 12px 0;
+        &.cancel{
+          background: #e5e5e5;
+          color: #808080;
+        }
+        &.confirm{
+        }
+      }
+    }
+  }
+}
