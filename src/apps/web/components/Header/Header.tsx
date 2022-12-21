@@ -62,7 +62,7 @@ const Header = (props: any) => {
             </div>
           </NavLink>
           {
-            !isHome &&
+            history.location.pathname !== '/' && (history.location.pathname.includes('pictures') || history.location.pathname.includes('create')) &&
 						<ul className='nav'>
               {
                 items.map((item, index) => {
@@ -81,15 +81,20 @@ const Header = (props: any) => {
           }
         </nav>
         {
-          history.location.pathname !== '/' &&
-          <Search></Search>
+          history.location.pathname !== '/' && (history.location.pathname.includes('pictures') || history.location.pathname.includes('create')) &&
+          <Search
+            isPictures={history.location.pathname.includes('pictures')}
+          ></Search>
         }
         {
           !loginState.isLogin ?
             <div className={'login-register'}>
-              <span>
+              {
+                history.location.pathname === '/' &&
+                <span>
                 关于灵图
               </span>
+              }
               <CapsuleButton
                 onClick={(e: any) => {
                   e.preventDefault();
@@ -125,10 +130,6 @@ const Header = (props: any) => {
                 <li onClick={() => {
                   history.push('/my-space')
                 }}>个人中心
-                </li>
-                <li onClick={() => {
-                  history.push('/bookmark')
-                }}>我的画夹
                 </li>
                 <li>用户指引</li>
                 <li onClick={handleLogout}>退出登录</li>

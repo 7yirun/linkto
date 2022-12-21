@@ -16,6 +16,8 @@ const Bookmark = React.lazy(() => import("apps/web/pages/Bookmark/Bookmark"));
 const Tutorial = React.lazy(() => import("apps/web/pages/Tutorial/Tutorial"));
 const MySpace = React.lazy(() => import("apps/web/pages/MySpace/MySpace"));
 const SeeArtist = React.lazy(() => import("apps/web/pages/SeeArtist/SeeArtist"));
+const ClipDetail = React.lazy(() => import("apps/web/pages/ClipDetail/ClipDetail"));
+
 
 function App(props: any) {
   const state = useSelector((state: any) => state.loginState);
@@ -44,6 +46,7 @@ function App(props: any) {
           <Route path={'/bookmark'} component={Bookmark}/>
           <Route path={'/tutorial'} component={Tutorial}/>
           <Route path={'/my-space'} component={MySpace}/>
+          <Route path={'/clip-detail'} component={ClipDetail}/>
           <Route exact path={'/'} component={Home}/>
         </Switch>
       </React.Suspense>

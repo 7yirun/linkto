@@ -1,7 +1,7 @@
 import {useEffect, useState, useRef} from 'react';
 import {createPortal} from "react-dom";
 import "./AddToBookmark.scss"
-import Icons from "lib/icons"
+import {message} from "antd";
 import {queryBookmarkList} from "service/service";
 import CapsuleButton from "../CapsuleButton/CapsuleButton";
 import {useDispatch} from "react-redux";
@@ -30,6 +30,7 @@ interface ICreate extends Base{
 }
 interface Base{
   onCancle: ()=>void
+  updateCallBack?: ()=>void //收藏成功后更新父组件状态
 }
 type IProps = IPictures | ICreate
 
@@ -56,11 +57,9 @@ const AddToBookmark = (props:IProps) => {
       bounce: false,
       mouseWheel: {}
     });
-    console.log(bsRef.current);
 
     queryBookmarkList({type: props.type}, (res:any)=>{
       if(!unmountRef.current){
-        // console.log(bsRef.current);
         let newListData
         newListData = res.data.map((list:any)=>{  
             return {
@@ -175,6 +174,7 @@ const AddToBookmark = (props:IProps) => {
                               req.picId = props.picId
                             }
                             addToBookMark(req, ()=>{
+                              message.success('收藏成功!')
                               queryBookmarkList({type:props.type}, (res:any)=>{
                                 let newListData
                                 newListData = res.data.map((list:any)=>{  
@@ -191,43 +191,16 @@ const AddToBookmark = (props:IProps) => {
                                   })
                                 })
                               })
+                              props.updateCallBack && props.updateCallBack()
                             });
-                          }}>收藏</CapsuleButton>
+                          }}
+                          >收藏</CapsuleButton>
                           }
                         </p>
                       </li>
                     )
                   })
               }
-              {/* {
-                searchVal !==  '' &&
-                <li className="add">
-                  <CapsuleButton onClick={()=>{
-                    addNewBookmark({
-                      clipName: createVal,
-                      type: props.type
-                    }, ()=>{
-                      queryBookmarkList({type:props.type}, (res:any)=>{
-                        let newListData
-                        newListData = res.data.map((list:any)=>{  
-                            return {
-                              ...list, 
-                              ishover: 0
-                            }
-                        })
-                        setList(newListData);
-                        setSearchVal('');
-                        requestAnimationFrame(() => {
-                          requestAnimationFrame(()=>{
-                            (bsRef.current as any).refresh();
-                          })
-                        })
-                      })
-                    })
-                  }}>创建画夹</CapsuleButton>
-                  <p>{searchVal}</p>
-                </li>
-              } */}
             </ul>
           </div>
           {

@@ -1,26 +1,118 @@
+@import "../../../../style/variable.scss";
+:global{
+  .my-space{
+    position: absolute;
+    width: 100%;
+    .header{
+      position: absolute;
+      width: 100%;
+    }
+  }
+}
 .tabs{
   display: flex;
-  background: orange;
-  padding: 0 48px;
+  margin: 0 48px;
+  justify-content: center;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
   :global{
-
+    .sub-tab{
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 0 8px;
+      &.active{
+        color: $green;
+        border-color: $green;
+      }
+    }
   }
 }
 
 .collect-list{
-  border-top: 1px solid #000;
   padding: 32px 48px 0 48px;
-  background: red;
   :global{
     ul{
+      display: flex;
+      flex-wrap: wrap;
+      margin-left: -24px;
       li{
         width: 240px;
+        margin-left: 24px;
         .img-wrapper{
           margin-bottom: 12px;
-
           height: 240px;
+          border-radius: 20px;
+          overflow: hidden;
+          cursor: pointer;
+          position: relative;
+          img{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+          .default-cover{
+            width: 100%;
+            height: 100%;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: $green;
+            .cover-pic{
+              font-size: 180px;
+              display: flex;
+              align-content: center;
+              justify-content: center;
+            }
+          }
+          &:hover{
+            .hover-icons{
+              display: flex;
+            }
+          }
+          .hover-icons{
+            display: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            .iconfont{
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              background: #000;
+              margin: 0 8px;
+              display: flex;
+              font-size: 36px;
+              &.locked{
+                background: #FF4E4E;
+              }
+              &.unlocked{
+                background: $green;
+              }
+            }
+          }
+          .private-flag{
+            display: flex;
+            position: absolute;
+            align-items: center;
+            justify-content: center;
+            top: 12px;
+            left: 12px;
+            color: $green;
+            font-size: 12px;
+            width: 64px;
+            height: 24px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.6);
+          }
         }
         p{
+          padding: 0 8px;
           height: 22px;
           display: flex;
           align-items: center;

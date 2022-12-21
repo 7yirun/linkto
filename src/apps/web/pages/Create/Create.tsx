@@ -17,7 +17,7 @@ import {
   setCurrentLayerId,
   setLoadedImages,
   SearchStateType,
-  StateType
+  StateType, setDescription
 } from "apps/web/store/store";
 import {useDispatch, useSelector} from "react-redux"
 import Slider from '@mui/material/Slider';
@@ -101,10 +101,6 @@ const Create = (props: any) => {
   //高级创作模式下用于切换工作台和图片展示区
   const [isWork, setIsWork] = useState<boolean>(false);
 
-  //剩余的选择项(除去宽高+相关性以外的)
-  // const [activeKeyWord, setActiveKeyWord] = useState([]f);
-  // const activeWordIndex, setActiveWordIndex
-
   //输入框里的negtive keyword
   const [negInput, setNegInput] = useState(getStore('negInput', false) || '');
 
@@ -169,10 +165,10 @@ const Create = (props: any) => {
         willUnmount = true;
       }
     })
-
-
+    // 清空Header里的搜索栏
+    dispatch(setDescription(''))
     return () => {
-      setStore('description', dataRef.current.description, false)
+      // setStore('description', dataRef.current.description, false)
       setStore('negInput', dataRef.current.negInput, false)
       setStore('dimension', dataRef.current.dimension, false)
       setStore('relevance', dataRef.current.relevance, false)

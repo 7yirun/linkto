@@ -1,7 +1,7 @@
 @import "../../../../style/variable.scss";
 .pictures{
-  margin-top: 144px; //header区域+similar-words-wrapper
   padding: 0 48px;
+  padding-top: 144px; //header区域+similar-words-wrapper
   .header{
     .iconfont{
       color: #666;
@@ -70,7 +70,7 @@
   }
   
   
-  .images-wrapper{
+  /*.images-wrapper{
     box-sizing: border-box;
     .img{
       position: relative;
@@ -129,5 +129,5 @@
         }
       }
     }
-  }
+  }*/
 }

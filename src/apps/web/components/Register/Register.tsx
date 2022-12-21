@@ -43,8 +43,12 @@ const steps = [{title: ''}, {title: ''}, {title: ''}, {title: ''}];
 const phoneNumRegExp = /^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-9])|(18[0-9])|166|198|199|191|(147))\d{8}$/;
 let timerId: TimeoutId;
 
-
-const Register = ({mask=true,getContainer=document.body||false, ...props}) => {
+type getContainerType = HTMLElement | boolean
+const Register = ({mask=true,getContainer=document.body, ...props}: {
+  mask?: boolean,
+  getContainer?: getContainerType,
+  [key:string]: any
+}) => {
   const dispatch = useDispatch();
   const state = useSelector((state: any) => state.loginState);
 

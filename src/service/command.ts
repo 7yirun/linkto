@@ -26,5 +26,8 @@ export default {
   VERIFY_CODE: "/ai/draw/login/check/verify/code",
   GET_WORDS: "/ai/draw/dict/get/list",
   GET_SEARCH_WORDS: "/ai/draw/picture/get/search/word",
-  GET_IMG_DETAIL: "/ai/draw/picture/detail"
+  GET_IMG_DETAIL: "/ai/draw/picture/detail",
+  SET_CLIP_PRIVATE_STATUS: "/ai/draw/picture/clip/update/privateStatus",
+  SET_LIKE: "/ai/draw/picture/star",
+  CANCEL_LIKE: "/ai/draw/picture/cancel/star"
 }
