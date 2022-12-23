@@ -29,6 +29,12 @@ const Search: React.FC<{isPictures: boolean}> = (props) => {
     }
   }, [searchState.confirmSearch, searchState.description])
 
+  useEffect(()=>{
+    return ()=>{
+      debouncedSearch.cancel();
+    }
+  }, [])
+
   //当所有标签都未选中时 隐藏small-tag
   useEffect(() => {
     if (!searchState.mapArr.join('').split(',').join('')) {

@@ -33,7 +33,6 @@ const URLImage: React.FC<IProps> = ({imgUrl, maxWidth, maxHeight, ...props}) => 
       height = maxHeight;
       width = img ? img.width / scaleY : 0
     }
-    console.log(width, height);
     setImgProps({
       x: 0,
       y: 0,
@@ -43,23 +42,6 @@ const URLImage: React.FC<IProps> = ({imgUrl, maxWidth, maxHeight, ...props}) => 
     /*如果图片尺寸太大, 需要给他缩小到canvas可见范围===============end*/
   }, [img])
 
-
-
-  /* useEffect(()=>{
-     console.log('1111111111111');
-   }, [pictureState.currentLayerId])*/
-
-/*  useEffect(() => {
-    if (isSelected) {
-      imgRef.current.moveToTop();
-      // we need to attach transformer manually
-      /!*TODO*!/
-      // trRef.current.nodes([imgRef.current]);
-      /!*TODO*!/
-      // trRef.current.getLayer().batchDraw();
-    }
-  }, [isSelected]);*/
-
   return (
     <>
       <Image
@@ -67,28 +49,29 @@ const URLImage: React.FC<IProps> = ({imgUrl, maxWidth, maxHeight, ...props}) => 
         image={img}
         {...imgProps}
         {...props}
-       /* onDragEnd={(e) => {
-          setImgProps({
-            ...imgProps,
-            x: imgRef.current.x(),
-            y: imgRef.current.y()
-          })
-        }}
-        onTransformEnd={() => {
-          const node = imgRef.current;
-          const scaleX = node.scaleX();
-          const scaleY = node.scaleY();
-          node.scaleX(1);
-          node.scaleY(1);
-          console.log(scaleX, scaleY);
-          setImgProps({
-            ...imgProps,
-            x: node.x(),
-            y: node.y(),
-            width: node.width() * scaleX,
-            height: node.height() * scaleY,
-          })
-        }}*/
+
+        /* onDragEnd={(e) => {
+           setImgProps({
+             ...imgProps,
+             x: imgRef.current.x(),
+             y: imgRef.current.y()
+           })
+         }}
+         onTransformEnd={() => {
+           const node = imgRef.current;
+           const scaleX = node.scaleX();
+           const scaleY = node.scaleY();
+           node.scaleX(1);
+           node.scaleY(1);
+           console.log(scaleX, scaleY);
+           setImgProps({
+             ...imgProps,
+             x: node.x(),
+             y: node.y(),
+             width: node.width() * scaleX,
+             height: node.height() * scaleY,
+           })
+         }}*/
       />
       {/*{isSelected && props.draggable && (
         <Transformer
