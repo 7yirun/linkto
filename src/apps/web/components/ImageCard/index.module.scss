@@ -38,6 +38,9 @@
           justify-content: center;
           align-items: center;
           cursor: pointer;
+          &.stared{
+            background: $green;
+          }
         }
         //取消收藏
         .in-clip{

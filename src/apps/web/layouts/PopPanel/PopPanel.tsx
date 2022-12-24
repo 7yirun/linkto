@@ -40,15 +40,6 @@ const PopPanel: React.FC<PropType> = ({mask=true, getContainer=document.body||fa
         mask={mask}
       >
         <p className={'pannel-head'}>
-          {/* {
-          props.returnTo &&
-          <span
-            className={'returnTo'}
-            onClick={props.handleReturn}
-          >
-           <img src={Icons.back} alt="" className="back" />
-          </span>
-        } */}
           {
             props.returnTo &&
 						<img src={Icons.back} alt="" className={'returnTo'} onClick={props.handleReturn}/>

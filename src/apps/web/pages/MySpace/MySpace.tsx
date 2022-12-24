@@ -1,5 +1,5 @@
 import styles from "./MySpace.module.scss"
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import Personal from "apps/web/components/Personal/Personal"
 import {getStore} from "utils/utils";
 import EditUser from "apps/web/components/EditUser/EditUser"
@@ -9,11 +9,11 @@ import Waterfall from "apps/web/components/WaterFall/Waterfall2";
 import {useWindowResize} from "../../hooks";
 import Header from "apps/web/components/Header/Header"
 import ClipPictures from "../Bookmark/Subpage/ClipPictures/ClipPictures";
+import EditClip from "apps/web/components/EditClip/EditClip";
 
 const MySpace = (props: any) => {
   const accountInfo = JSON.parse(getStore("accountInfo", true) || '{}');
   const accountId = accountInfo.id;
-  const [edit, setEdit] = useState();
   const dispatch = useDispatch();
   const state = useSelector((state: any) => state.loginState);
 
@@ -51,7 +51,10 @@ const MySpace = (props: any) => {
     }
   }, [collect])
 
-
+  const [clipToEdit, setClipToEdit] = useState<{name:string, id:number}|null>(null)
+  const closePanel = useCallback(()=>{
+    setClipToEdit(null)
+  }, []);
   return (
     <div className={'my-space'}>
       <Header></Header>
@@ -98,6 +101,11 @@ const MySpace = (props: any) => {
                       className="iconfont icon-Draw"
                       onClick={(e) => {
                         e.stopPropagation();
+                        console.log(clip);
+                        setClipToEdit({
+                          name: clip.name,
+                          id: clip.id
+                        })
                       }}
                     />
                     {
@@ -155,6 +163,13 @@ const MySpace = (props: any) => {
           }
         </ul>
       </div>
+      {
+        clipToEdit &&
+		    <EditClip
+          close={closePanel}
+          clipInfo={clipToEdit}
+		    ></EditClip>
+      }
     </div>
   );
 };

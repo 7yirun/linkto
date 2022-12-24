@@ -2,9 +2,13 @@ import {useEffect, useState} from 'react';
 import "./SeeBig.scss"
 import CapsuleButton from "../CapsuleButton/CapsuleButton";
 import AddToBookmark from "../AddToBookmark/AddToBookmark";
-import {getImgDetail, focus, unFocus, setLike} from "service/service"
+import {getImgDetail, focus, unFocus, setLike, cancelLike} from "service/service"
 import {message} from 'antd'
 import {downloadURI} from "utils/utils"
+import {setLoadedImages} from "../../store/store";
+import {useHistory} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import {pictureStateType} from "../../pages/Create/Create";
 
 type imgDetailType = {
   id: number //要查看的大图的图片id
@@ -18,6 +22,7 @@ type imgDetailType = {
   isCollect: number  //0未收藏 1已收藏
   relationList: recommendType[]
   accountInfo: accountInfoType
+  isStar: number   //0未点赞 1已点赞
 }
 type recommendType = {
   id: number
@@ -30,11 +35,15 @@ type accountInfoType = {
   fansNum: number
   picClipNum: number
   hasFocused: boolean //是否关注
+  picNum: number //创作数
 }
 
 const SeeBig = (props: { id: number, close: () => void }) => {
   const [showAddTo, setShowAddTo] = useState(false);
   const [imgDetailInfo, setImgDetailInfo] = useState<imgDetailType>()
+  const history = useHistory()
+  const dispatch = useDispatch();
+  const pictureState = useSelector<any, pictureStateType>(state => state.pictureState);
   useEffect(() => {
     //显示弹窗时禁止滚动滚动条
     document.documentElement.style.overflow = 'hidden';
@@ -87,64 +96,49 @@ const SeeBig = (props: { id: number, close: () => void }) => {
 									<img src={imgDetailInfo.accountInfo.headPic} className={'profile'} alt=""/>
 									<div className="text-info">
 										<p>
-                      <span className={'accountName'}>{imgDetailInfo.accountInfo.accountName}</span>
+											<span className={'accountName'}>{imgDetailInfo.accountInfo.accountName}</span>
                       {
                         imgDetailInfo.accountInfo.hasFocused &&
-                        <span
-                          className={'focused'}
-                          onClick={()=>{
+												<span
+													className={'focused'}
+													onClick={() => {
                             unFocus({
                               focusedAccountId: imgDetailInfo.accountId
-                            }, ()=>{
-                              setImgDetailInfo({
-                                ...imgDetailInfo,
-                                accountInfo: {
-                                  ...imgDetailInfo.accountInfo,
-                                  hasFocused: false
-                                }
-                              })
+                            }, () => {
                               //刷新信息
                               updateImgDetailInfo()
-                            }, (err:any)=>{
+                            }, (err: any) => {
                               message.warning(err.msg);
                             })
                           }}
-                        >已关注</span>
+												>已关注</span>
                       }
-                    </p>
+										</p>
 										<ul>
 											<li>关注·{imgDetailInfo.accountInfo.focusNum}</li>
 											<li>粉丝·{imgDetailInfo.accountInfo.fansNum}</li>
-											<li>创作·{11111}</li>
+											<li>创作·{imgDetailInfo.accountInfo.picNum}</li>
 											<li>画夹·{imgDetailInfo.accountInfo.picClipNum}</li>
 										</ul>
 									</div>
 								</div>
                 {
                   !imgDetailInfo.accountInfo.hasFocused &&
-                  <div
-                    className="follow"
-                    onClick={()=>{
+									<div
+										className="follow"
+										onClick={() => {
                       focus({
                         focusedAccountId: imgDetailInfo.accountId
-                      }, ()=>{
-                        //请求关注
-                        setImgDetailInfo({
-                          ...imgDetailInfo,
-                          accountInfo: {
-                            ...imgDetailInfo.accountInfo,
-                            hasFocused: true
-                          }
-                        })
+                      }, () => {
                         //刷新信息
                         updateImgDetailInfo()
-                      }, (err:any)=>{
+                      }, (err: any) => {
                         message.warning(err.msg);
                       })
                     }}
-                  >
-                    关注
-                  </div>
+									>
+										关注
+									</div>
                 }
 								<div onClick={handleClose} className="close">
 									<span className={'iconfont icon-close'}></span>
@@ -157,28 +151,49 @@ const SeeBig = (props: { id: number, close: () => void }) => {
 								<div className="text-pannel">
 									<div className="head">
 										<p className={'icons'}>
+                      {
+                        imgDetailInfo.isStar === 0 ? <span
+                            className="iconfont icon-9"
+                            onClick={() => {
+                              //点赞
+                              setLike({picId: imgDetailInfo.id}, () => {
+                                updateImgDetailInfo()
+                              })
+                            }}
+                          />
+                          :
+                          <span
+                            className="iconfont icon-9 stared"
+                            onClick={() => {
+                              //取消点赞
+                              cancelLike({picId: imgDetailInfo.id}, () => {
+                                updateImgDetailInfo()
+                              })
+                            }}
+                          />
+                      }
 											<span
-                        className="iconfont icon-9"
-                        onClick={()=>{
-                          //点赞
-                          setLike({picId: imgDetailInfo.id}, ()=>{
-                            updateImgDetailInfo()
-                          })
-                        }}
-                      />
-											<span
-                        className="iconfont icon-13"
-                        onClick={()=>{
+												className="iconfont icon-13"
+												onClick={() => {
                           //二次创作
+                          history.push('/create')
+                          dispatch(setLoadedImages([
+                            ...pictureState.loadedImages,
+                            {
+                              name: "LinkTo_IMG_" + imgDetailInfo.id,
+                              src: imgDetailInfo.url,
+                              id: imgDetailInfo.id
+                            }
+                          ]))
                         }}
-                      />
+											/>
 											<span
-                        className="iconfont icon-16"
-                        onClick={()=>{
+												className="iconfont icon-16"
+												onClick={() => {
                           //下载
                           imgDetailInfo.url && downloadURI(imgDetailInfo.url, 'picture')
                         }}
-                      />
+											/>
 										</p>
                     {
                       <CapsuleButton
@@ -239,7 +254,7 @@ const SeeBig = (props: { id: number, close: () => void }) => {
 					onCancle={cancelAdd}
 					picId={imgDetailInfo.id}
 					myPictureDto={{url: imgDetailInfo.url}}
-          updateCallBack={updateImgDetailInfo}
+					updateCallBack={updateImgDetailInfo}
 				/>
       }
     </div>

@@ -193,6 +193,10 @@
               border-radius: 50%;
               background: rgba(0, 0, 0, 0.4);
               margin-right: 16px;
+              //已点赞
+              &.stared{
+                background: $green;
+              }
             }
 
             .capsule-button {
