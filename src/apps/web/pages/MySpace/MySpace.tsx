@@ -101,7 +101,6 @@ const MySpace = (props: any) => {
                       className="iconfont icon-Draw"
                       onClick={(e) => {
                         e.stopPropagation();
-                        console.log(clip);
                         setClipToEdit({
                           name: clip.name,
                           id: clip.id
@@ -109,45 +108,50 @@ const MySpace = (props: any) => {
                       }}
                     />
                     {
-                      clip.isPrivate === 1 ?
-                        <span
-                          className="iconfont icon-6 locked"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            //公开
-                            setClipPrivateStaus({
-                              id: clip.id,
-                              isPrivate: 0
-                            }, () => {
-                              setDisplayedList(displayedList.map((item) => {
-                                if (item.id === clip.id) {
-                                  item.isPrivate = 0;
-                                  return item
-                                }
-                                return item
-                              }))
-                            })
-                          }}
-                        /> :
-                        <span
-                          className="iconfont icon-23"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            //设为私密
-                            setClipPrivateStaus({
-                              id: clip.id,
-                              isPrivate: 1
-                            }, () => {
-                              setDisplayedList(displayedList.map((item) => {
-                                if (item.id === clip.id) {
-                                  item.isPrivate = 1;
-                                  return item
-                                }
-                                return item
-                              }))
-                            })
-                          }}
-                        />
+                      collect === COLLECT_TYPE.CREATE &&
+                      <>
+                        {
+                          clip.isPrivate === 1 ?
+                            <span
+                              className="iconfont icon-6 locked"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                //公开
+                                setClipPrivateStaus({
+                                  id: clip.id,
+                                  isPrivate: 0
+                                }, () => {
+                                  setDisplayedList(displayedList.map((item) => {
+                                    if (item.id === clip.id) {
+                                      item.isPrivate = 0;
+                                      return item
+                                    }
+                                    return item
+                                  }))
+                                })
+                              }}
+                            /> :
+                            <span
+                              className="iconfont icon-23"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                //设为私密
+                                setClipPrivateStaus({
+                                  id: clip.id,
+                                  isPrivate: 1
+                                }, () => {
+                                  setDisplayedList(displayedList.map((item) => {
+                                    if (item.id === clip.id) {
+                                      item.isPrivate = 1;
+                                      return item
+                                    }
+                                    return item
+                                  }))
+                                })
+                              }}
+                            />
+                        }
+                      </>
                     }
                   </div>
                   {
