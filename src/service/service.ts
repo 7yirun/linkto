@@ -134,6 +134,7 @@ interface ITextRequest {
   keywords: string
   numImages: number
   prompt: string
+  profession?: string  //行业词汇
   negativePrompt?: string
 }
 
@@ -270,7 +271,7 @@ export const setLike = (request: {picId: number}, success?:any, err?:any)=>{
 
 //取消点赞
 export const cancelLike = (request: {picId: number}, success?:any, err?:any)=>{
-  sendGet(command.SET_LIKE, request, success, err);
+  sendGet(command.CANCEL_LIKE, request, success, err);
 }
 
 

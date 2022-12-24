@@ -150,7 +150,6 @@ const Login = () => {
       {
         !state.isLogin && state.showLogin &&
         <PopPanel
-          close={close}
           className={'login'}
           title={'用户登录'}
           warning={errInfo}

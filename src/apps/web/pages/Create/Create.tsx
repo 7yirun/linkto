@@ -85,6 +85,8 @@ const Create = (props: any) => {
   //创作模式,按文字或者图片创作
   const [mode, setMode] = useState(MODE.junior);
 
+  //高级创作模式下用于切换工作台和图片展示区   //初始值必须是false, 避免高级创作创作好后一切换模式导致图片不见了
+  const [isWork, setIsWork] = useState<boolean>(false);
 
   //用户输入描述信息
   const description = searchState.description;
@@ -98,8 +100,6 @@ const Create = (props: any) => {
   //图片相关性
   const [relevance2, setRelevance2] = useState(getStore('relevance2', false) ? Number(getStore('relevance2', false)) : 70); //默认相关性
 
-  //高级创作模式下用于切换工作台和图片展示区
-  const [isWork, setIsWork] = useState<boolean>(false);
 
   //输入框里的negtive keyword
   const [negInput, setNegInput] = useState(getStore('negInput', false) || '');
@@ -198,19 +198,31 @@ const Create = (props: any) => {
     }
   }, [mode])
 
+  //从外界图片的二次创作操作跳转过来
+  useEffect(()=>{
+    console.log(pictureState.loadedImages);
+    //除去默认的背景图 还新增了别的图片
+    if(pictureState.loadedImages.length > 1){
+      setIsWork(true);
+      setMode(MODE.superior);
+      console.log(123);
+    }
+  }, [pictureState.loadedImages])
   //创作图片
   const createImg = (e: any) => {
     e.preventDefault();
     //英文关键词数组
     let keywordArr = searchState.mapArr.join().split(',').filter(str => str);
-    //进阶 高级 创作要拼接行业词汇
+    //行业词汇
+    let profession:string = '';
+    //进阶 高级 创作要传行业词汇
     if (mode === MODE.senior || mode === MODE.superior) {
       const tmp: string[] = [];
       choosedWords.forEach(id => {
         //行业用中文
         tmp.push(words.find(item => item.id == id)?.chinese || '')
       })
-      keywordArr = tmp.concat(keywordArr);
+      profession = tmp.join();
     }
     const keyword = keywordArr.join();
     let taskId: string;
@@ -242,7 +254,8 @@ const Create = (props: any) => {
         numImages: 4,
         prompt: description,
         keywords: keyword,
-        negativePrompt: negInput
+        negativePrompt: negInput,
+        profession: profession
       }, (res: any) => {
         //生成的图片按照所选尺寸显示
         setDisplayDimension(dimension)
@@ -541,15 +554,6 @@ const Create = (props: any) => {
                         <span className="iconfont icon-down"></span>
                       </div>
                     }
-                    {/*    {
-                    pictureState.loadedImages.length > 0 ?
-
-                      :
-                      <div className="none">
-                        <p>暂无内容</p>
-                        <span className="iconfont icon-down"></span>
-                      </div>
-                  }*/}
 									</Dropdown>
 									<UpLoad></UpLoad>
 									<span className={'iconfont icon-a-1'}></span>
@@ -586,7 +590,6 @@ const Create = (props: any) => {
                                   setImgSrc(`${createdImg[index]}`);
                                 }}
 													    ></span>
-															<span className={'iconfont icon-9'}></span>
 															<span
 																className={'iconfont icon-13'}
 																onClick={() => {

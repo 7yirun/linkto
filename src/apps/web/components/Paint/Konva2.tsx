@@ -1,5 +1,5 @@
 import React, {useRef, useState, memo, useEffect, forwardRef, useImperativeHandle} from 'react';
-import {Stage, Layer, Line, Transformer, Group} from 'react-konva';
+import {Stage, Layer, Line, Transformer, Group, Rect} from 'react-konva';
 import {Vector2d} from "konva/lib/types"
 import URLImage from "./URLImage"
 import styles from "./Konva.module.scss"
@@ -41,7 +41,6 @@ interface IProps {
 
 const SIZE_LIMIT = 10 * 1024 * 1024 //限制上传的最大图片大小为10MB
 const Konva = forwardRef((props: IProps, konvaRef) => {
-
   //用户操作的时候是橡皮功能, 提交数据的时候将此路径变为颜色填充从而生成蒙版图片
   const [eraseFill, setEraseFill] = useState<any>('destination-out');
   useImperativeHandle(konvaRef, () => ({
@@ -60,7 +59,7 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
   const [mode, setMode] = useState<MODE>(MODE.move);
   const [canvasWidth, setCanvasWidth] = useState<number>(0);
   const [canvasHeight, setCanvasHeight] = useState<number>(0);
-  const [currentColor, setCurrentColor] = useState<string>('#202020');
+  const [currentColor, setCurrentColor] = useState<string>('#000');
   const [currentStrokeWidth, setCurrentStrokeWidth] = useState<number>(5);
 
   const drawingAreaRef = useRef<HTMLDivElement>(null);
@@ -86,7 +85,9 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
 
   //第一次进入以及resize时, 自适应canvas画布的大小
   const updateCanvasArea = () => {
-    setCanvasHeight(drawingAreaRef.current?.offsetHeight || 0)
+    if(!isMounted){
+      setCanvasHeight(drawingAreaRef.current?.offsetHeight || 0)
+    }
     setCanvasWidth(drawingAreaRef.current?.offsetWidth || 0)
   }
   useEffect(() => {
@@ -98,18 +99,29 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
   }, [])
 
   // const [isSelected, setIsSelected] = useState<boolean>(false)
-  const groupRef = useRef<any>(null);
+  //Group元素有多个 需要用数组保存ref
+  const groupRefs = useRef<{[key:string]: any}>({});
+  const layerRef = useRef<any>();
   const trRef = useRef<any>();
+
+  // const [filter, setFilter] = useState<any>();
+
+
 
   // 当有新图加载/用户手动切换了图层/删除了图层 需要把当前图层显示在最顶层
   useEffect(() => {
-    groupRef.current.moveToTop()
+    groupRefs.current[pictureState.currentLayerId] && groupRefs.current[pictureState.currentLayerId].moveToTop()
   }, [pictureState.loadedImages, pictureState.currentLayerId])
 
   /*cache相关-------------------------------------------------------------------*/
   const isMounted = useMounted();
   useEffect(()=>{
-    isMounted && groupRef.current.cache()
+    if(isMounted){
+      for(let key in groupRefs.current){
+        //每个组都有重新cache, 因为历史记录操作会涉及所有Group
+        groupRefs.current[key].cache();
+      }
+    }
   }, [stepIndex])
   /*cache相关-------------------------------------------------------------------*/
 
@@ -118,7 +130,7 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
     if (mode === MODE.paint || mode === MODE.erase) {
       isPaint.current = true;
       // const pos: Vector2d = e.currentTarget.getPointerPosition();
-      const pos: Vector2d = groupRef.current.getRelativePointerPosition();
+      const pos: Vector2d = groupRefs.current[pictureState.currentLayerId].getRelativePointerPosition();
       const oldHistory = history.slice(0, stepIndex + 1);
       switch (mode) {
         case MODE.paint:
@@ -148,7 +160,7 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
     if (!isPaint.current) {
       return
     }
-    const pos: Vector2d = groupRef.current.getRelativePointerPosition();
+    const pos: Vector2d = groupRefs.current[pictureState.currentLayerId].getRelativePointerPosition();
 
     const currentHistoryObj: historyObj = history.slice(-1)[0];
 
@@ -160,7 +172,7 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
       const oldHistory = history.slice();
       oldHistory[oldHistory.length - 1].lines = lastLine;
       setHistory(oldHistory);
-      groupRef.current.cache()
+      groupRefs.current[pictureState.currentLayerId].cache()
 
     } else if (mode === MODE.erase) {
       //lastLine初始值是mouseDown事件中画下的那个点
@@ -170,8 +182,7 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
       const oldHistory = history.slice();
       oldHistory[oldHistory.length - 1].eraseLines = lastEraseLine;
       setHistory(oldHistory)
-      groupRef.current.cache()
-
+      groupRefs.current[pictureState.currentLayerId].cache()
     }
   }
 
@@ -230,14 +241,25 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
             还原
           </button>
         </li>
-        {/*<li>
+        <li>
           <button onClick={()=>{
-            dispatch(setLoadedImages([]))
-            setEraseFill('source-over')
+            // console.log(groupRef.current);
+            for(let key in groupRefs.current){
+              groupRefs.current[key].hide()
+            }
+            groupRefs.current[pictureState.currentLayerId].show()
+
+            groupRefs.current[pictureState.currentLayerId].cache();
+            // setEraseFill('source-over')
+            /*setFilter((imgData)=>{
+              console.log(imgData);
+            })*/
+
           }}>
+            <i className="iconfont icon-22"></i>
             test
           </button>
-        </li>*/}
+        </li>
       </ul>
       <div
         className="detail-operate"
@@ -258,7 +280,9 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
           mode === MODE.paint &&
 					<div className="color">
 						<p>颜色</p>
-						<input value={currentColor} onChange={(e) => {
+						<input
+              value={currentColor}
+              onChange={(e) => {
               setCurrentColor(e.target.value)
             }} type="color" name="" id=""/>
 					</div>
@@ -317,21 +341,23 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
                 return (
                   <React.Fragment key={imgObj.id}>
                     <Group
-                      ref={imgObj.id === pictureState.currentLayerId  ? groupRef : null}
-                      // draggable={mode === MODE.move && imgObj.id === pictureState.currentLayerId}
+                      // filters={filter}
+                      ref={(ele)=>{groupRefs.current[imgObj.id] = ele}}
+                      // draggable={mode === MODE.move && imgObj.id !== '背景图层001' && imgObj.id === pictureState.currentLayerId}
                       draggable={mode === MODE.move && imgObj.id !== '背景图层001'}
                       onDragEnd={(e)=>{
                       }}
-                      /*filters={[function (imageData) {
-                        // make all pixels opaque 100%
-                        var nPixels = imageData.data.length;
-                        for (var i = 3; i < nPixels; i += 4) {
-                          if(imageData.data[i] === 0){
-                            imageData.data[i] = 0;
-                          }
-                        }
-                      }]}*/
                     >
+                      {
+                        //实现擦除之后显示马赛克
+                        /*imgObj.id === "背景图层001" &&
+                        <Rect
+                          width={canvasWidth}
+                          height={canvasHeight}
+                          fill={'45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%'}
+                        >
+                        </Rect>*/
+                      }
                       <URLImage
                         imgUrl={imgObj.src}
                         maxWidth={canvasWidth}
@@ -370,8 +396,9 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
                           .filter(historyObj => historyObj.eraseLines && historyObj.id === imgObj.id)
                           .map((lineHistory, i) => (
                           <Line
+                            draggable={mode === MODE.move}
                             key={'eraseLine' + i}
-                            stroke={'#0f0'}
+                            stroke={'#000'}
                             strokeWidth={lineHistory.strokeWidth}
                             lineJoin={'round'}
                             points={lineHistory.eraseLines}

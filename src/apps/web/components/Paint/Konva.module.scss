@@ -103,10 +103,14 @@ $green: #43CF7C;
     }
     .drawing-area{
       flex-grow: 1;
+      height: 0;
       background: #252525;
       width: 100%;
       margin-bottom: 24px;
       margin-top: 10px;
+      >div{
+        height: 100%;
+      }
     }
   }
 }

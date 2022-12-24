@@ -138,8 +138,8 @@ const ClipDetail = (props: any) => {
                     <ImageCard
                       key={imgInfo.id}
                       inClip={inClip[index]}
-                      imgInfo={imgInfo}
-                      setImgInfo={setImgInfo}
+                      outimgInfo={imgInfo}
+                      outsetImgInfo={setImgInfo}
                       setImgToScale={setImgToScale}
                       setShowAddTo={setShowAddTo}
                       removeFromClip={handleRemoveFromClip}

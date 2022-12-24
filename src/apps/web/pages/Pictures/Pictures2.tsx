@@ -165,8 +165,8 @@ const Pictures = () => {
             return (
               <ImageCard
                 key={imgInfo.id}
-                imgInfo={imgInfo}
-                setImgInfo={setImgInfo}
+                outimgInfo={imgInfo}
+                outsetImgInfo={setImgInfo}
                 setImgToScale={setImgToScale}
                 setShowAddTo={setShowAddTo}
               />

@@ -1,8 +1,6 @@
 import './Bookmark.scss';
 import {useEffect, useState} from "react";
 import {Route, Switch, Redirect} from 'react-router-dom'
-import SubCreate from "./Subpage/SubCreate/SubCreate";
-import SubBookmark from "./Subpage/SubBookmark/SubBookmark";
 import SubMyFollow from "./Subpage/SubMyfollow/SubMyfollow";
 import SubMyHistory from "./Subpage/SubMyhistory/SubMyhistory";
 import SubPersonalInfo from "./Subpage/SubPersonalinfo/SubPersonalinfo";
@@ -11,8 +9,6 @@ import {NavLink} from "react-router-dom"
 const Bookmark = (props: any) => {
   const nav = [
     {name: '个人信息', path: '/sub-personalinfo', component: SubPersonalInfo},
-    {name: '我的创作', path: '/sub-mycreate', component: SubCreate},
-    {name: '我的收藏', path: '/sub-bookmark', component: SubBookmark},
     {name: '我的关注', path: '/sub-myfollow', component: SubMyFollow},
     {name: '我的点赞', path: '/sub-myhistory', component: SubMyHistory}
   ];

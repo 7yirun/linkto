@@ -1,5 +1,10 @@
-import React from 'react';
+import React, {useState} from 'react';
 import styles from "./index.module.scss"
+import {cancelLike, setLike} from "../../../../service/service";
+import {useHistory} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import {setLoadedImages} from "apps/web/store/store";
+import {pictureStateType} from "../../pages/Create/Create";
 
 export type imgInfoType = {
   id: number,
@@ -13,86 +18,143 @@ export type imgInfoType = {
   headPic: string
   collectCount: number
   starCount: number
+  isStar: number   //是否点过赞  0未点赞 1已点赞
 }
 
 interface Iprops {
-  imgInfo: imgInfoType
+  outimgInfo: imgInfoType
   setImgToScale?: (arg: boolean) => void
-  setImgInfo?: (arg: imgInfoType) => void
+  outsetImgInfo?: (arg: imgInfoType) => void
   setShowAddTo?: (arg: boolean) => void
   inClip?: boolean //图片是否已经在收藏夹中了
-  removeFromClip?:(id:number)=>void
-  addBackToClip?:(id:number)=>void
+  removeFromClip?: (id: number) => void
+  addBackToClip?: (id: number) => void
 }
 
-const ImageCard: React.FC<Iprops> = ({imgInfo, setImgToScale, setImgInfo, setShowAddTo, inClip,removeFromClip,addBackToClip}) => {
+const ImageCard: React.FC<Iprops> = ({
+                                       outimgInfo,
+                                       setImgToScale,
+                                       outsetImgInfo,
+                                       setShowAddTo,
+                                       inClip,
+                                       removeFromClip,
+                                       addBackToClip,
+                                     }) => {
+  const [imgInfo, setImgInfo] = useState<imgInfoType>(outimgInfo);
+  const history = useHistory()
+  const dispatch = useDispatch();
+  const pictureState = useSelector<any, pictureStateType>(state => state.pictureState);
+
   return (
-    <div
-      className={styles['images-wrapper']}
-      key={imgInfo.id}
-    >
-      <div className='img'>
-        <img src={imgInfo.smallUrl} alt=""/>
+    <>
+      {
+        imgInfo &&
         <div
-          className="hover-icons"
-          onClick={() => {
-            if (setImgToScale && setImgInfo) {
-              setImgToScale(true)
-              setImgInfo(imgInfo)
-            }
-          }}
+          className={styles['images-wrapper']}
+          key={imgInfo.id}
         >
-          {
-            !inClip ?
+          <div className='img'>
+            <img src={imgInfo.smallUrl} alt=""/>
+            <div
+              className="hover-icons"
+              onClick={() => {
+                //查看大图
+                if (setImgToScale && outsetImgInfo) {
+                  setImgToScale(true)
+                  outsetImgInfo(imgInfo)
+                }
+              }}
+            >
+              {
+                !inClip ?
+                  <span
+                    className={'iconfont icon-12'}
+                    onClick={(e) => {
+                      //图库 收藏
+                      if (setShowAddTo && outsetImgInfo) {
+                        setShowAddTo(true)
+                        outsetImgInfo(imgInfo)
+                      }
+                      //画夹 加回收藏夹
+                      if (addBackToClip) {
+                        addBackToClip(imgInfo.id)
+                      }
+                      e.stopPropagation();
+                    }}
+                  />
+                  :
+                  <span
+                    className={'iconfont in-clip icon-12'}
+                    onClick={(e) => {
+                      //取消收藏
+                      if (removeFromClip) {
+                        removeFromClip(imgInfo.id)
+                      }
+                      e.stopPropagation();
+                    }}
+                  />
+              }
               <span
-                className={'iconfont icon-12'}
+                className={`${imgInfo.isStar===1?'stared': ''} iconfont icon-9`}
                 onClick={(e) => {
-                  //图库 收藏
-                  if (setShowAddTo && setImgInfo) {
-                    setShowAddTo(true)
-                    setImgInfo(imgInfo)
-                  }
-                  //画夹 加回收藏夹
-                  if(addBackToClip){
-                    addBackToClip(imgInfo.id)
-                  }
                   e.stopPropagation();
+                  if(imgInfo.isStar === 0){
+                    console.log(imgInfo);
+                    setImgInfo && setImgInfo({
+                      ...imgInfo,
+                      isStar: 1,
+                      starCount: imgInfo.starCount+1
+                    })
+                    //点赞
+                    setLike({picId: imgInfo.id})
+                  } else {
+                    setImgInfo && setImgInfo({
+                      ...imgInfo,
+                      isStar: 0,
+                      starCount: imgInfo.starCount - 1
+                    })
+                    //取消点赞
+                    cancelLike({picId: imgInfo.id})
+                  }
                 }}
               />
-              :
               <span
-                className={'iconfont in-clip icon-12'}
+                className={'iconfont icon-13'}
                 onClick={(e) => {
-                  //取消收藏
-                  if(removeFromClip){
-                    removeFromClip(imgInfo.id)
-                  }
                   e.stopPropagation();
+                  history.push('/create')
+                  dispatch(setLoadedImages([
+                    ...pictureState.loadedImages,
+                    {
+                      name: "LinkTo_IMG_" + imgInfo.id,
+                      src: imgInfo.url,
+                      id: imgInfo.id
+                    }
+                  ]))
                 }}
               />
-          }
-          <span className={'iconfont icon-9'}/>
-          <span className={'iconfont icon-13'}/>
-        </div>
-      </div>
-      <div className="artist">
-        <ul>
-          <li>
-            <span className={'iconfont icon-12'}/>
-            <p>{imgInfo.collectCount}</p>
-          </li>
-          <li>
-            <span className={'iconfont icon-9'}/>
-            <p>{imgInfo.starCount}</p>
-          </li>
-          <li>
-            {/*浏览次数 暂无*/}
+            </div>
+          </div>
+          <div className="artist">
+            <ul>
+              <li>
+                <span className={'iconfont icon-12'}/>
+                <p>{imgInfo.collectCount}</p>
+              </li>
+              <li>
+                <span className={'iconfont icon-9'}/>
+                <p>{imgInfo.starCount}</p>
+              </li>
+              {/*<li>
+            浏览次数 暂无
             <span className={'iconfont icon-Show'}/>
             <p>1234</p>
-          </li>
-        </ul>
-      </div>
-    </div>
+          </li>*/}
+            </ul>
+          </div>
+        </div>
+      }
+    </>
   )
 };
 
