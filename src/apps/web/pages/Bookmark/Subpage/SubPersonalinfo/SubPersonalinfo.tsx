@@ -5,24 +5,23 @@ import { getFocusList, getWords } from "service/service";
 import ArtistCard from "../../../../components/ArtistCard/ArtistCard";
 import qs from "qs";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  setAccountInfo,
-  setShowRegister,
-} from "apps/web/store/store";
+import { setAccountInfo, setShowRegister } from "apps/web/store/store";
 import styles from "./EditUser.module.scss";
-import { getStore ,setStore} from "utils/utils";
+import { getStore, setStore } from "utils/utils";
 import CapsuleButton from "../../../../components/CapsuleButton/CapsuleButton";
-import { editUser, queryVerifyCode ,getPersonalInfo} from "service/service";
+import { editUser, queryVerifyCode, getPersonalInfo } from "service/service";
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
 import PopPanel from "apps/web/layouts/PopPanel/PopPanel";
 import md5 from "js-md5";
-import { message } from 'antd';
+import { message } from "antd";
 
 const SubPersonalinfo = (props: any) => {
   const dispatch = useDispatch();
   const [messageApi, contextHolder] = message.useMessage();
   const loginState = useSelector((state: any) => state.loginState);
-  const accountInfo = JSON.parse(getStore("accountInfo", true) || loginState.accountInfo);
+  const accountInfo = JSON.parse(
+    getStore("accountInfo", true) || loginState.accountInfo
+  );
   const [nickname, setNickname] = useState(accountInfo.accountName || "");
   const [sex, setSex] = useState(accountInfo.sex || 0);
   const [age, setAge] = useState(accountInfo.age || 0);
@@ -53,43 +52,50 @@ const SubPersonalinfo = (props: any) => {
   }, []);
 
   //获取个人信息
-  const hanledPersonInfo = ()=>{
-    getPersonalInfo({
-      //@ts-ignore
-      id: accountInfo.id
-    }, ({data}:{data:any})=>{
-      setStore('accountInfo', JSON.stringify(data), true);
-      console.log(data);
-      dispatch(setAccountInfo({
-        accountInfo: {
-          data
-        }
-      }))
-    })
-  }
+  const hanledPersonInfo = () => {
+    getPersonalInfo(
+      {
+        //@ts-ignore
+        id: accountInfo.id,
+      },
+      ({ data }: { data: any }) => {
+        setStore("accountInfo", JSON.stringify(data), true);
+        console.log(data);
+        dispatch(
+          setAccountInfo({
+            accountInfo: {
+              data,
+            },
+          })
+        );
+      }
+    );
+  };
 
-  const handleWords = (type:number) => {
+  const handleWords = (type: number) => {
     getWords({ type: 0 }, (res: any) => {
       let list = res.data;
-      let interestSelected:any = [];
-      type ? interestSelected = accountInfo.interestIds.split(',') : interestSelected =  interestIds.split(',');
-      let interestSelectedList :any= []
-       list.map((item: any) => {
+      let interestSelected: any = [];
+      type
+        ? (interestSelected = accountInfo.interestIds.split(","))
+        : (interestSelected = interestIds.split(","));
+      let interestSelectedList: any = [];
+      list.map((item: any) => {
         interestSelected.forEach((id: any) => {
-          if(item.id == JSON.parse(id)){
+          if (item.id == JSON.parse(id)) {
             item.checked = true;
-            interestSelectedList.push(item)
+            interestSelectedList.push(item);
           }
         });
       });
-      setinterestIdList(interestSelectedList)
+      setinterestIdList(interestSelectedList);
       setinterestList(list);
 
-      console.log("interestList==", interestSelectedList,list);
+      console.log("interestList==", interestSelectedList, list);
     });
   };
 
-  const handleInterest = (obj: any, index: number,type :number) => {
+  const handleInterest = (obj: any, index: number, type: number) => {
     return () => {
       let isChecked = interestIds.includes(obj.id);
       let newListData;
@@ -98,31 +104,31 @@ const SubPersonalinfo = (props: any) => {
         if (list.id == obj.id) {
           return {
             ...list,
-            checked: obj.checked ? false: true,
+            checked: obj.checked ? false : true,
           };
         } else {
           return list;
         }
       });
-      if(type){
-         interestIdList.map((list: any,i:number) => {
+      if (type) {
+        interestIdList.map((list: any, i: number) => {
           if (list.id == obj.id) {
             interestIdList.splice(index, 1);
           }
         });
-      }else{
+      } else {
         isChecked
-        ? interestIdList.splice(
-            interestIdList.findIndex((item) => item === obj.id),
-            1
-          )
-        : interestIdList.push(obj);
-        setinterestIdList(interestIdList)
+          ? interestIdList.splice(
+              interestIdList.findIndex((item) => item === obj.id),
+              1
+            )
+          : interestIdList.push(obj);
+        setinterestIdList(interestIdList);
       }
-     let ids:any = []
-     interestIdList.map((item:any)=>{
-      ids.push(item.id)
-     })
+      let ids: any = [];
+      interestIdList.map((item: any) => {
+        ids.push(item.id);
+      });
       setInterestIds(ids.toString());
       setinterestList(newListData);
     };
@@ -138,9 +144,7 @@ const SubPersonalinfo = (props: any) => {
     handleWords(1);
   };
 
-  useEffect(() => {
-   
-  }, [loginState.editUser]);
+  useEffect(() => {}, [loginState.editUser]);
 
   const confirm = () => {
     const req: any = {};
@@ -154,21 +158,21 @@ const SubPersonalinfo = (props: any) => {
     req.sex = sex;
     req.age = age;
     if (interestIdList.length) {
-      let interIds:any = []
-       interestIdList.map((item:any)=>{
-        interIds.push(item.id)
-      })
+      let interIds: any = [];
+      interestIdList.map((item: any) => {
+        interIds.push(item.id);
+      });
       req.interestIds = interIds.toString();
     }
     editUser(
       req,
       () => {
         console.log("succeed");
-        message.success('修改成功！')
+        message.success("修改成功！");
         hanledPersonInfo();
       },
       (err: any) => {
-        message.success(err.msg)
+        message.success(err.msg);
       }
     );
   };
@@ -177,7 +181,7 @@ const SubPersonalinfo = (props: any) => {
   };
   return (
     <div className={style["personal-info"]}>
-      { (
+      {
         <div className="info">
           <div className="column-content">
             <div className="column-left">头像</div>
@@ -191,12 +195,14 @@ const SubPersonalinfo = (props: any) => {
                 onChange={(e: any) => {
                   let fileReader = new FileReader();
                   console.log(e.target.files[0]);
-                  setAvatarFile(e.target.files[0]);
-                  fileReader.readAsDataURL(e.target.files[0]);
-                  fileReader.onload = () => {
-                    const url = fileReader?.result || "";
-                    setHeadPic(url);
-                  };
+                  if (e.target.files && e.target.files[0]) {
+                    setAvatarFile(e.target.files[0]);
+                    fileReader.readAsDataURL(e.target.files[0]);
+                    fileReader.onload = () => {
+                      const url = fileReader?.result || "";
+                      setHeadPic(url);
+                    };
+                  }
                 }}
               />
             </div>
@@ -253,7 +259,7 @@ const SubPersonalinfo = (props: any) => {
                     <li
                       key={"interest" + i}
                       className={obj.checked ? "choosed" : `${obj.checked}`}
-                      onDoubleClick={handleInterest(obj, i,1)}
+                      onDoubleClick={handleInterest(obj, i, 1)}
                     >
                       {obj.chinese}
                     </li>
@@ -285,7 +291,7 @@ const SubPersonalinfo = (props: any) => {
             </CapsuleButton>
           </div>
         </div>
-      )}
+      }
 
       <PopPanel
         close={close}
@@ -300,7 +306,7 @@ const SubPersonalinfo = (props: any) => {
               key={"interest" + i}
               className={obj.checked ? "choosed" : `${obj.checked}`}
             >
-              <CapsuleButton onClick={handleInterest(obj, i,0)}>
+              <CapsuleButton onClick={handleInterest(obj, i, 0)}>
                 {obj.chinese}
               </CapsuleButton>
             </li>
@@ -316,9 +322,12 @@ const SubPersonalinfo = (props: any) => {
           >
             取消
           </CapsuleButton>
-          <CapsuleButton className={"confirm"} onClick={(e: MouseEvent) => {
-            setOpen(false);
-          }}>
+          <CapsuleButton
+            className={"confirm"}
+            onClick={(e: MouseEvent) => {
+              setOpen(false);
+            }}
+          >
             {"完成"}
           </CapsuleButton>
         </div>
