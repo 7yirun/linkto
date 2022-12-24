@@ -30,7 +30,6 @@
 
     .info{
       width: 800px;
-      background: pink;
       .column-content{
         display: flex;
         align-items: center;
@@ -156,9 +155,8 @@
     }
     .interest-wrapper{
       ul{
-        width: 684px;
+        width: 710px;
         display: flex;
-        justify-content: space-between;
         flex-wrap: wrap;
         li{
           width: 148px;
@@ -170,6 +168,7 @@
           color: #43CF7C;
           font-size: 16px;
           margin-bottom: 16px;
+          margin-right: 24px;
           cursor: pointer;
         }
         
@@ -195,11 +194,23 @@
         margin: 32px 12px 0;
         &.cancel{
           background: #e5e5e5;
-          color: #808080;
+          color: #202020;
         }
         &.confirm{
         }
       }
     }
+     /*统一设置按钮选中和非选中时的颜色*/
+    
+  }
+ 
+  
+}
+
+.ant-modal-content{
+  background: pink!important;
+  li{
+    width: 148px;
+    height: 40px;
   }
 }

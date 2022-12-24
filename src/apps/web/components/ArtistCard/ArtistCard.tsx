@@ -46,6 +46,7 @@ const ArtistCard = (props:any) => {
         props.canEditName &&
 		    <span className="edit" onClick={()=>{
           dispatch(setEditUser('nickname'))
+          history.push('/see-artist/sub-personalinfo/id=' + props.id)
         }}>
           编辑个人资料
             </span>

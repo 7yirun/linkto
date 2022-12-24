@@ -39,7 +39,7 @@ const SeeArtist = (props:any) => {
   }, [])
   return (
     <div className={'see-artist'}>
-      <div className="see-artist-header">
+      {/* <div className="see-artist-header">
         {
           accountInfo &&
           <>
@@ -59,7 +59,7 @@ const SeeArtist = (props:any) => {
             </CapsuleButton>
           </>
         }
-      </div>
+      </div> */}
       <Bookmark accountId={accountId} others={true}></Bookmark>
     </div>
   );
