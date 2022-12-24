@@ -11,9 +11,9 @@ import {
   setShowRegister,
 } from "apps/web/store/store";
 import styles from "./EditUser.module.scss";
-import { getStore } from "utils/utils";
+import { getStore ,setStore} from "utils/utils";
 import CapsuleButton from "../../../../components/CapsuleButton/CapsuleButton";
-import { editUser, queryVerifyCode } from "service/service";
+import { editUser, queryVerifyCode ,getPersonalInfo} from "service/service";
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
 import PopPanel from "apps/web/layouts/PopPanel/PopPanel";
 import md5 from "js-md5";
@@ -50,14 +50,24 @@ const SubPersonalinfo = (props: any) => {
   const [avatarFile, setAvatarFile] = useState();
 
   useEffect(() => {
-    handleWords();
+    handleWords(0);
   }, []);
 
-  const handleWords = () => {
+  //获取个人信息
+  const hanledPersonInfo = ()=>{
+    getPersonalInfo({
+      //@ts-ignore
+      id: accountInfo.id
+    }, ({data}:{data:any})=>{
+      setStore('accountInfo', JSON.stringify(data), true);
+    })
+  }
+
+  const handleWords = (type:number) => {
     getWords({ type: 0 }, (res: any) => {
       let list = res.data;
-      console.log("interestIds==", interestIds);
-      let interestSelected = interestIds.split(',');
+      let interestSelected:any = [];
+      type ? interestSelected = accountInfo.interestIds.split(',') : interestSelected =  interestIds.split(',');
       let interestSelectedList :any= []
        list.map((item: any) => {
         interestSelected.forEach((id: any) => {
@@ -69,7 +79,6 @@ const SubPersonalinfo = (props: any) => {
       });
       setinterestIdList(interestSelectedList)
       setinterestList(list);
-      
 
       console.log("interestList==", interestSelectedList,list);
     });
@@ -105,8 +114,11 @@ const SubPersonalinfo = (props: any) => {
         : interestIdList.push(obj);
         setinterestIdList(interestIdList)
       }
-     
-      setInterestIds(interestIdList.toString());
+     let ids:any = []
+     interestIdList.map((item:any)=>{
+      ids.push(item.id)
+     })
+      setInterestIds(ids.toString());
       setinterestList(newListData);
     };
   };
@@ -118,7 +130,7 @@ const SubPersonalinfo = (props: any) => {
     setAge(accountInfo.age);
     setHeadPic(accountInfo.headPic);
     setInterestIds(accountInfo.interestIds);
-    handleWords();
+    handleWords(1);
   };
 
   useEffect(() => {
@@ -149,10 +161,10 @@ const SubPersonalinfo = (props: any) => {
       () => {
         console.log("succeed");
         message.success('修改成功！')
-
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
+        hanledPersonInfo();
+        // setTimeout(() => {
+          // window.location.reload();
+        // }, 2000);
       },
       (err: any) => {
         message.success(err.msg)

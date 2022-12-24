@@ -13,7 +13,7 @@ import {
 import styles from "./EditUser.module.scss";
 import { getStore } from "utils/utils";
 import CapsuleButton from "../../../../components/CapsuleButton/CapsuleButton";
-import { editUser, queryVerifyCode } from "service/service";
+import { editUser, queryVerifyCode,verifyCodeApi } from "service/service";
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
 import PopPanel from "apps/web/layouts/PopPanel/PopPanel";
 import md5 from "js-md5";
@@ -70,18 +70,18 @@ const SubPersonalinfo = (props: any) => {
   useEffect(() => {
   }, [loginState.editUser]);
 
-    //请求发送验证码
-    const handleQueryVerifyCode = (e: any) => {
-      e.preventDefault()
-      //如果手机号合法才请求
-      if (phoneNumRegExp.test(accountInfo.bindPhone)) {
-        queryVerifyCode(accountInfo.bindPhone);
-        setCodeWaiting(Waiting.Waiting);
-        startWaiting();
-      } else {
-        message.error('请输入正确的手机号!');
-      }
+  //请求发送验证码
+  const handleQueryVerifyCode = (e: any) => {
+    e.preventDefault()
+    //如果手机号合法才请求
+    if (phoneNumRegExp.test(accountInfo.bindPhone)) {
+      queryVerifyCode(accountInfo.bindPhone);
+      setCodeWaiting(Waiting.Waiting);
+      startWaiting();
+    } else {
+      message.error('请输入正确的手机号!');
     }
+  }
 
   const confirm = () => {
     console.log("保存==",password,password2,prevPwd)
@@ -333,13 +333,28 @@ const SubPersonalinfo = (props: any) => {
            </CapsuleButton>
            <CapsuleButton className={"confirm"}  onClick={() => {
               if( current.type == 'phone' &&current.step == 1){
-                setCodeWaiting(Waiting.Start);
-                setVerifyCode('')
-                clearInterval(timerId);
-                setCurrent({
-                  type:'phone',
-                  step: 2
-                })
+                const req: any = {};
+                req.accountName = accountInfo.accountName;
+                req.bindPhone = accountInfo.bindPhone;
+                req.verifyCode = verifyCode;
+
+                verifyCodeApi(
+                  req,
+                  () => {
+                    setCodeWaiting(Waiting.Start);
+                    setVerifyCode('')
+                    clearInterval(timerId);
+                    setCurrent({
+                      type:'phone',
+                      step: 2
+                    })
+                  },
+                  (err: any) => {
+                    message.error(err.msg)
+                  }
+                );
+
+               
               }else {
                 confirm()
               }

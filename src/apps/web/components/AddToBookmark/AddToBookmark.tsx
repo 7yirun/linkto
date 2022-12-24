@@ -147,7 +147,8 @@ const AddToBookmark = (props:IProps) => {
                             t.ishover = 0;
                             c[i] = t;
                             setList(c);
-                        }}>
+                        }}
+                        >
                         <p className='pic-info'>
                          { val.coverPic && <img src={val.coverPic} alt=""/>}
                          { !val.coverPic && <i className={'logo iconfont icon-icon'}>
@@ -164,7 +165,6 @@ const AddToBookmark = (props:IProps) => {
                             const req:any = {
                               picClipId: val.id
                             }
-
                             //收藏创作图片 传url
                             if(props.type === 0){
                               req.myPictureDto = props.myPictureDto

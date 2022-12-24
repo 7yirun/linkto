@@ -56,6 +56,10 @@ interface IRequestVerifyCode{
 export const verifyCode = (request: IRequestVerifyCode, success?:any, err?:any)=>{
   sendGet(command.VERIFY_CODE, request, success, err)
 }
+//验证注册时 手机and验证码 有效性
+export const verifyCodeApi = (request: IRequestVerifyCode, success?:any, err?:any)=>{
+  sendGet(command.VERIFY_CODE, request, success, err)
+}
 
 //注册
 interface IRequestRegister {
