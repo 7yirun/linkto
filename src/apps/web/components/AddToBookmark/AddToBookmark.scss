@@ -156,6 +156,8 @@
               cursor: pointer;
               color: #202020;
               font-size: 12px;
+              display: none;
+              position:absolute;
             }
             span {
               width: 64px;
@@ -165,6 +167,14 @@
               line-height: 24px;
               margin: 0 16px;
             }
+          }
+        }
+        .pic-folder:hover{
+          .capsule-button{
+            display: block;
+          }
+          .span{
+            display: none;
           }
         }
         .add {

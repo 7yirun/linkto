@@ -160,8 +160,8 @@ const AddToBookmark = (props:IProps) => {
                           <span> {val.name}</span>
                         </p>
                         <p className={'info'}>
-                          { val.ishover==0 && <span>{val.picNum}</span>}
-                          { val.ishover==1 && <CapsuleButton onClick={()=>{
+                          <span>{val.picNum}</span>
+                          <CapsuleButton onClick={()=>{
                             const req:any = {
                               picClipId: val.id
                             }
@@ -195,7 +195,7 @@ const AddToBookmark = (props:IProps) => {
                             });
                           }}
                           >收藏</CapsuleButton>
-                          }
+                          
                         </p>
                       </li>
                     )

@@ -160,14 +160,12 @@ const SubPersonalinfo = (props: any) => {
       })
       req.interestIds = interIds.toString();
     }
-
     editUser(
       req,
       () => {
         console.log("succeed");
         message.success('修改成功！')
         hanledPersonInfo();
-
       },
       (err: any) => {
         message.success(err.msg)
@@ -312,6 +310,7 @@ const SubPersonalinfo = (props: any) => {
           <CapsuleButton
             className={"cancel"}
             onClick={(e: MouseEvent) => {
+              handleWords(1);
               setOpen(false);
             }}
           >
