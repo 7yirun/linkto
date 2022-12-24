@@ -9,11 +9,12 @@ import {
   setEditUser,
   setShowEditUser,
   setShowRegister,
+  setAccountInfo
 } from "apps/web/store/store";
 import styles from "./EditUser.module.scss";
-import { getStore } from "utils/utils";
+import { getStore,setStore } from "utils/utils";
 import CapsuleButton from "../../../../components/CapsuleButton/CapsuleButton";
-import { editUser, queryVerifyCode, verifyCodeApi } from "service/service";
+import { editUser, queryVerifyCode, verifyCodeApi,getPersonalInfo } from "service/service";
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
 import PopPanel from "apps/web/layouts/PopPanel/PopPanel";
 import md5 from "js-md5";
@@ -25,7 +26,6 @@ const SubPersonalinfo = (props: any) => {
   const accountInfo = JSON.parse(
     getStore("accountInfo", true) || loginState.accountInfo
   );
-  console.log("accountInfo===", accountInfo);
   //原密码
   const [prevPwd, setPrevPwd] = useState("");
   //新密码
@@ -100,9 +100,10 @@ const SubPersonalinfo = (props: any) => {
       () => {
         console.log("succeed");
         message.success("修改成功！");
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
+        hanledPersonInfo();
+        // setTimeout(() => {
+        //   window.location.reload();
+        // }, 2000);
       },
       (err: any) => {
         message.error(err.msg);
@@ -111,6 +112,33 @@ const SubPersonalinfo = (props: any) => {
   };
   const close = () => {
     message.error("");
+  };
+  //获取个人信息
+  const hanledPersonInfo = () => {
+    getPersonalInfo(
+      {
+        //@ts-ignore
+        id: accountInfo.id,
+      },
+      ({ data }: { data: any }) => {
+        setStore("accountInfo", JSON.stringify(data), true);
+        dispatch(
+          setAccountInfo({
+            accountInfo: {
+              data,
+            },
+          })
+        );
+      }
+    );
+  };
+  //清空信息
+  const clear = () => {
+    setPrevPwd('');
+    setPassword('');
+    setPassword2('');
+    setPhoneNum('');
+    setVerifyCode('');
   };
   return (
     <div className={style["personal-info"]}>
@@ -315,10 +343,12 @@ const SubPersonalinfo = (props: any) => {
             <div className="confirm-buttons">
               <CapsuleButton
                 onClick={() => {
+                  clear();
                   setCurrent({
                     type: "phone",
                     step: 0,
                   });
+
                 }}
                 className={"cancel"}
               >
