@@ -187,7 +187,6 @@ const Register = ({mask=true,getContainer=document.body, ...props}: {
         ...formState,
         passwordError: 1
       })
-      
       return false
     }
     return true

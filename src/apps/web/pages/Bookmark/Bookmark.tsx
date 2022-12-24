@@ -4,11 +4,13 @@ import {Route, Switch, Redirect} from 'react-router-dom'
 import SubMyFollow from "./Subpage/SubMyfollow/SubMyfollow";
 import SubMyHistory from "./Subpage/SubMyhistory/SubMyhistory";
 import SubPersonalInfo from "./Subpage/SubPersonalinfo/SubPersonalinfo";
+import SubAccountManage from "./Subpage/SubAccountManage/SubAccountManage";
 import {NavLink} from "react-router-dom"
 
 const Bookmark = (props: any) => {
   const nav = [
     {name: '个人信息', path: '/sub-personalinfo', component: SubPersonalInfo},
+    {name: '账号管理', path: '/sub-accountmanage', component: SubAccountManage},
     {name: '我的关注', path: '/sub-myfollow', component: SubMyFollow},
     {name: '我的点赞', path: '/sub-myhistory', component: SubMyHistory}
   ];
@@ -29,12 +31,21 @@ const Bookmark = (props: any) => {
             <NavLink
               className={'sub-nav'}
               exact
-              to={others ? "/see-artist/sub-personalinfo/id=" + accountId : "/bookmark/sub-personalinfo"}
+              to={ "/bookmark/sub-personalinfo"}
             >
-              {!others?'个人信息':'11'}
+              {'个人信息'}
             </NavLink>
           </li>
           <li>
+            <NavLink
+              className={'sub-nav'}
+              exact
+              to={ "/bookmark/sub-accountmanage"}
+            >
+              {'账号管理'}
+            </NavLink>
+          </li>
+          {/* <li>
             <NavLink
               className={'sub-nav'}
               exact
@@ -60,7 +71,7 @@ const Bookmark = (props: any) => {
             >
               {!others?'我的关注':'他的关注'}
             </NavLink>
-          </li>
+          </li> */}
           {/* {
             nav.map((item, index) => {
               return (

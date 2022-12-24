@@ -76,6 +76,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      min-height: 300px;
     }
   }
   .pannel-buttons{
@@ -117,4 +118,39 @@
   .ant-modal-content{
     min-height: 556px;
   }
+}
+.panel-wrapper{
+  .panel-title {
+    padding-left: 66px!important;
+  }
+  ul{
+    width: 356px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    .capsule-button{
+      width: 108px;
+      height: 40px;
+      border-radius: 20px;
+      background: #E5E5E5;
+      text-align: center;
+      line-height: 40px;
+      color: #202020;
+      font-size: 16px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      
+    }
+    .choosed{
+      .capsule-button{
+        background: $green;
+        border-radius: 20px;
+        // width: 148px;
+        height: 40px;
+        font-size: 16px;
+      }
+    }
+  }
+ 
+
 }

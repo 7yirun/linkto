@@ -1,0 +1,104 @@
+@import "../../../../../../style/variable.scss";
+.personal-info{
+  color: #383838;
+  :global{
+  
+    .info{
+      width: 800px;
+      .column-content{
+        display: flex;
+        align-items: center;
+      }
+      .column-left{
+        color: #FFFFFF;
+        font-weight: 500;
+        font-size: 12px;
+        width: 60px;
+        text-align: center;
+      }
+      .input-frame{
+        width: 305px;
+        height: 40px;
+        margin: 15px 0;
+        padding-right: 15px;
+        position: relative;
+        &.code{
+          margin-top: 16px;
+        }
+        .capsule-button{
+          height: 24px;
+          position: absolute;
+          right: 8px;
+          top: 50%;
+          transform: translateY(-50%);
+          padding: 0 9px;
+          font-size: 12px;
+          &.waiting{
+            pointer-events: none;
+            background: transparent;
+            background: #ccc;
+            border-radius: 20px;
+            color: #666;
+            font-size: 12px;
+            pointer-events: none;
+            width: 80px;
+          }
+        }
+        input,select{
+          height: 100%;
+          width: 100%;
+          background: #E5E5E5;
+          border-radius: 20px;
+          padding-left: 15px;
+          color: #202020;
+          font-weight: 500;
+          font-size: 14px;
+          border:none;
+        }
+        input::placeholder{
+          color: #CCCCCC!important;
+        }
+        select{
+          padding-right: 15px;
+          outline: none;
+          appearance:none;  
+          -moz-appearance:none;
+          -webkit-appearance:none;
+          width: 320px;
+        }
+        &.original-pwd{
+          margin-top: 22px;
+        }
+        &.pwd{
+          margin-top: 16px;
+        }
+      }
+      .change{
+        width: 96px;
+        height: 40px;
+        color: #202020;
+        margin-left: 24px;
+        background: #e5e5e5;
+        font-weight: 500;
+      }
+    }
+
+    .confirm-buttons{
+      display: flex;
+      margin-left: 48px;
+      .capsule-button{
+        font-size: 16px;
+        height: 40px;
+        width: 96px;
+        margin: 22px 12px 0;
+        &.cancel{
+          background: #e5e5e5;
+          color: #202020;
+        }
+      }
+    }
+  }
+ 
+  
+}
+
