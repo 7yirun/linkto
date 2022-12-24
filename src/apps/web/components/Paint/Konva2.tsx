@@ -8,6 +8,7 @@ import {useDispatch, useSelector} from "react-redux"
 import {pictureStateType} from "apps/web/pages/Create/Create"
 import {message} from "antd";
 import Slider from '@mui/material/Slider';
+import {useMounted} from "../../hooks";
 
 enum MODE {
   none,
@@ -61,11 +62,10 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
   const [canvasHeight, setCanvasHeight] = useState<number>(0);
   const [currentColor, setCurrentColor] = useState<string>('#202020');
   const [currentStrokeWidth, setCurrentStrokeWidth] = useState<number>(5);
-  // const [selectedId, setSelectedId] = useState<string>('');
 
   const drawingAreaRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<any>();
-
+  //isPaint的时候不处理mousemove事件
   const isPaint = useRef<boolean>(false);
 
   //画布最终生成的图片
@@ -106,6 +106,12 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
     groupRef.current.moveToTop()
   }, [pictureState.loadedImages, pictureState.currentLayerId])
 
+  /*cache相关-------------------------------------------------------------------*/
+  const isMounted = useMounted();
+  useEffect(()=>{
+    isMounted && groupRef.current.cache()
+  }, [stepIndex])
+  /*cache相关-------------------------------------------------------------------*/
 
   //画线  需要重新开启新的历史记录
   const handleMouseDown = (e: any) => {
@@ -124,7 +130,6 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
             lineColor: currentColor
           }])
           setStepIndex(oldHistory.length); //newHistoryObj === newHistory[stepIndex]
-          console.log(history);
           break;
         case MODE.erase:
           //橡皮擦
@@ -143,7 +148,6 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
     if (!isPaint.current) {
       return
     }
-    // const pos: Vector2d = e.currentTarget.getPointerPosition();
     const pos: Vector2d = groupRef.current.getRelativePointerPosition();
 
     const currentHistoryObj: historyObj = history.slice(-1)[0];
@@ -156,6 +160,8 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
       const oldHistory = history.slice();
       oldHistory[oldHistory.length - 1].lines = lastLine;
       setHistory(oldHistory);
+      groupRef.current.cache()
+
     } else if (mode === MODE.erase) {
       //lastLine初始值是mouseDown事件中画下的那个点
       let lastEraseLine: number[] = currentHistoryObj.eraseLines!;
@@ -164,6 +170,8 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
       const oldHistory = history.slice();
       oldHistory[oldHistory.length - 1].eraseLines = lastEraseLine;
       setHistory(oldHistory)
+      groupRef.current.cache()
+
     }
   }
 
@@ -202,8 +210,6 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
         </li>
         <li>
           <button onClick={() => {
-            console.log(stepIndex);
-            console.log(history);
             if (stepIndex === 0) {
               return;
             }
@@ -215,7 +221,6 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
         </li>
         <li>
           <button onClick={() => {
-            console.log(stepIndex);
             if (stepIndex + 1 >= history.length) {
               return
             }
@@ -283,7 +288,6 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
           fileReader.readAsDataURL(file);
           fileReader.onload = (e) => {
             const id = file.name + Date.now()
-            console.log(id);
             dispatch(setLoadedImages([...pictureState.loadedImages, {
               src: fileReader.result,
               name: file.name,
@@ -318,13 +322,21 @@ const Konva = forwardRef((props: IProps, konvaRef) => {
                       draggable={mode === MODE.move && imgObj.id !== '背景图层001'}
                       onDragEnd={(e)=>{
                       }}
+                      /*filters={[function (imageData) {
+                        // make all pixels opaque 100%
+                        var nPixels = imageData.data.length;
+                        for (var i = 3; i < nPixels; i += 4) {
+                          if(imageData.data[i] === 0){
+                            imageData.data[i] = 0;
+                          }
+                        }
+                      }]}*/
                     >
                       <URLImage
                         imgUrl={imgObj.src}
                         maxWidth={canvasWidth}
                         maxHeight={canvasHeight}
                         onMouseEnter={() => {
-                          console.log('mouseenter');
                           if (mode === MODE.move) {
                             stageRef.current.container().style.cursor = 'move';
                           }
