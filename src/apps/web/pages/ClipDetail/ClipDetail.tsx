@@ -8,6 +8,7 @@ import qs from "qs"
 import {useWindowResize} from "../../hooks";
 import ImageCard from "../../components/ImageCard";
 import {imgInfoType} from "../../components/ImageCard"
+import SeeBig from "../../components/SeeBig/SeeBig";
 
 const ClipDetail = (props: any) => {
   const para = qs.parse(props.history.location.search.replace('?', ""))
@@ -120,10 +121,6 @@ const ClipDetail = (props: any) => {
           {
             clipName
           }
-          {/*<div className="owner">
-            <img src={} alt=""/>
-            <p>画夹拥有者名字</p>
-          </div>*/}
         </div>
         <div className="pictures-list">
           {
@@ -152,6 +149,13 @@ const ClipDetail = (props: any) => {
           }
         </div>
       </div>
+      {
+        imgToScale && imgInfo &&
+		    <SeeBig
+          close={closeBig}
+		      id={imgInfo.id}
+		    />
+      }
     </div>
   )
 }

@@ -24,7 +24,7 @@ const EditClip = (props: propType) => {
   const [close, setClose] = useState(false)
   return (
     <>
-      {
+         {
         <PopPanel
           open={!!props.clipInfo}
           title={'修改画夹'}
@@ -86,27 +86,29 @@ const EditClip = (props: propType) => {
         </PopPanel>
       }
       {
-        showWarning &&
-				<PopPanel
-					success={success}
-					className={styles['warning-popup']} close={() => {
-          setShowWarning(false)
-          setClose(false);
-        }} title={"温馨提示"}>
-					<div className="content-in">
-						<div className="note">
-							<p>确认要删除画夹吗？画夹删除后不可恢复哦~</p>
-							<p>删除后收录的创作会无法查看</p>
-						</div>
-						<div className="buttons">
-							<CapsuleButton
-								onClick={() => {
+        <PopPanel
+          open={showWarning}
+          success={success}
+          className={styles['warning-popup']}
+          close={() => {
+            setShowWarning(false)
+            setClose(false);
+          }}
+          title={"温馨提示"}>
+          <div className="content-in">
+            <div className="note">
+              <p>确认要删除画夹吗？画夹删除后不可恢复哦~</p>
+              <p>删除后收录的创作会无法查看</p>
+            </div>
+            <div className="buttons">
+              <CapsuleButton
+                onClick={() => {
                   setShowWarning(false)
                   setClose(false);
                 }}
-								className={'cancel'}>取消</CapsuleButton>
-							<CapsuleButton
-								onClick={() => {
+                className={'cancel'}>取消</CapsuleButton>
+              <CapsuleButton
+                onClick={() => {
                   deleteClip({
                     id: props.clipInfo.id
                   }, () => {
@@ -117,10 +119,10 @@ const EditClip = (props: propType) => {
                     window.location.reload();
                   })
                 }}
-								className={'del'}>删除</CapsuleButton>
-						</div>
-					</div>
-				</PopPanel>
+                className={'del'}>删除</CapsuleButton>
+            </div>
+          </div>
+        </PopPanel>
       }
     </>
   )
