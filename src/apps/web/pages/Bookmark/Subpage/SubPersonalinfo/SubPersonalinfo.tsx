@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import style from "./index.module.scss";
 import Icons from "lib/icons";
 import { getFocusList, getWords } from "service/service";
@@ -6,8 +6,7 @@ import ArtistCard from "../../../../components/ArtistCard/ArtistCard";
 import qs from "qs";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  setEditUser,
-  setShowEditUser,
+  setAccountInfo,
   setShowRegister,
 } from "apps/web/store/store";
 import styles from "./EditUser.module.scss";
@@ -60,6 +59,12 @@ const SubPersonalinfo = (props: any) => {
       id: accountInfo.id
     }, ({data}:{data:any})=>{
       setStore('accountInfo', JSON.stringify(data), true);
+      console.log(data);
+      dispatch(setAccountInfo({
+        accountInfo: {
+          data
+        }
+      }))
     })
   }
 
@@ -162,9 +167,7 @@ const SubPersonalinfo = (props: any) => {
         console.log("succeed");
         message.success('修改成功！')
         hanledPersonInfo();
-        // setTimeout(() => {
-          // window.location.reload();
-        // }, 2000);
+
       },
       (err: any) => {
         message.success(err.msg)
@@ -176,7 +179,6 @@ const SubPersonalinfo = (props: any) => {
   };
   return (
     <div className={style["personal-info"]}>
-     
       { (
         <div className="info">
           <div className="column-content">

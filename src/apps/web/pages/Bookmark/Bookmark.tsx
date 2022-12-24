@@ -1,11 +1,12 @@
 import './Bookmark.scss';
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Route, Switch, Redirect} from 'react-router-dom'
 import SubMyFollow from "./Subpage/SubMyfollow/SubMyfollow";
 import SubMyHistory from "./Subpage/SubMyhistory/SubMyhistory";
 import SubPersonalInfo from "./Subpage/SubPersonalinfo/SubPersonalinfo";
 import SubAccountManage from "./Subpage/SubAccountManage/SubAccountManage";
 import {NavLink} from "react-router-dom"
+import Header from "../../components/Header/Header";
 
 const Bookmark = (props: any) => {
   const nav = [
@@ -24,28 +25,30 @@ const Bookmark = (props: any) => {
   }
   // const [showArtist, setShowArtist] = useState(true);
   return (
-    <div className={'bookmark'}>
-      <div className="left">
-        <ul className={'left-nav'}>
-        <li>
-            <NavLink
-              className={'sub-nav'}
-              exact
-              to={ "/bookmark/sub-personalinfo"}
-            >
-              {'个人信息'}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              className={'sub-nav'}
-              exact
-              to={ "/bookmark/sub-accountmanage"}
-            >
-              {'账号管理'}
-            </NavLink>
-          </li>
-          {/* <li>
+    <>
+      <Header></Header>
+      <div className={'bookmark'}>
+        <div className="left">
+          <ul className={'left-nav'}>
+            <li>
+              <NavLink
+                className={'sub-nav'}
+                exact
+                to={ "/bookmark/sub-personalinfo"}
+              >
+                {'个人信息'}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                className={'sub-nav'}
+                exact
+                to={ "/bookmark/sub-accountmanage"}
+              >
+                {'账号管理'}
+              </NavLink>
+            </li>
+            {/* <li>
             <NavLink
               className={'sub-nav'}
               exact
@@ -72,7 +75,7 @@ const Bookmark = (props: any) => {
               {!others?'我的关注':'他的关注'}
             </NavLink>
           </li> */}
-          {/* {
+            {/* {
             nav.map((item, index) => {
               return (
                 <li key={item.name}
@@ -94,25 +97,26 @@ const Bookmark = (props: any) => {
               )
             })
           } */}
-        </ul>
+          </ul>
+        </div>
+        <div className="right">
+          {
+            <Switch>
+              {
+                nav.map(item => {
+                  return (
+                    <Route key={item.name} path={(others ? '/see-artist' : '/bookmark') + item.path}
+                           component={item.component}
+                    />
+                  )
+                })
+              }
+              <Redirect to={(others ? '/see-artist/sub-mycreate' : '/bookmark/sub-mycreate/showPrivate')}/>
+            </Switch>
+          }
+        </div>
       </div>
-      <div className="right">
-        {
-          <Switch>
-            {
-              nav.map(item => {
-                return (
-                  <Route key={item.name} path={(others ? '/see-artist' : '/bookmark') + item.path}
-                         component={item.component}
-                  />
-                )
-              })
-            }
-            <Redirect to={(others ? '/see-artist/sub-mycreate' : '/bookmark/sub-mycreate/showPrivate')}/>
-          </Switch>
-        }
-      </div>
-    </div>
+    </>
   )
 }
 export default Bookmark
