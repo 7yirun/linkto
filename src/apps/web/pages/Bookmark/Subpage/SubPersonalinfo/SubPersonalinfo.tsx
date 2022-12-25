@@ -97,34 +97,51 @@ const SubPersonalinfo = (props: any) => {
 
   const handleInterest = (obj: any, index: number, type: number) => {
     return () => {
+      console.log("点击的数据是===", obj);
       let isChecked = interestIds.includes(obj.id);
-      let newListData;
+      let newListData: any = [];
+
+      let status: boolean = false;
+      type
+        ? (status = false)
+        : obj.checked
+        ? (status = false)
+        : (status = true);
 
       newListData = interestList.map((list: any) => {
         if (list.id == obj.id) {
           return {
             ...list,
-            checked: obj.checked ? false : true,
+            checked: status,
           };
         } else {
           return list;
         }
       });
+
       if (type) {
-        interestIdList.map((list: any, i: number) => {
-          if (list.id == obj.id) {
-            interestIdList.splice(index, 1);
-          }
-        });
+        interestIdList.splice(
+          interestIdList.findIndex((item) => {
+            return item.id === obj.id;
+          }),
+          1
+        );
       } else {
-        isChecked
-          ? interestIdList.splice(
-              interestIdList.findIndex((item) => item === obj.id),
-              1
-            )
-          : interestIdList.push(obj);
+        if (isChecked) {
+          interestIdList.splice(
+            interestIdList.findIndex((item) => {
+              return item.id === obj.id;
+            }),
+            1
+          );
+        } else {
+          interestIdList.push(obj);
+        }
         setinterestIdList(interestIdList);
       }
+      console.log("弹窗数据===", newListData);
+      console.log("弹窗选择===", interestIdList);
+
       let ids: any = [];
       interestIdList.map((item: any) => {
         ids.push(item.id);
@@ -135,7 +152,6 @@ const SubPersonalinfo = (props: any) => {
   };
 
   const handleClose = () => {
-    // dispatch(setEditUser(false));
     setNickname(accountInfo.accountName);
     setSex(accountInfo.sex);
     setAge(accountInfo.age);
