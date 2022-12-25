@@ -25,11 +25,12 @@ const SubPersonalinfo = (props: any) => {
   const [nickname, setNickname] = useState(accountInfo.accountName || "");
   const [sex, setSex] = useState(accountInfo.sex || 0);
   const [age, setAge] = useState(accountInfo.age || 0);
+  //兴趣id字符
   const [interestIds, setInterestIds] = useState(accountInfo.interestIds || "");
   //兴趣集合
   const [interestList, setinterestList] = useState<Array<any>>([]);
   //选中的兴趣
-  const [interestIdList, setinterestIdList] = useState<Array<any>>([]);
+  // const [interestIdList, setinterestIdList] = useState<Array<any>>([]);
   //预览头像
   const [headPic, setHeadPic] = useState(accountInfo.headPic || "");
   //原密码
@@ -74,33 +75,40 @@ const SubPersonalinfo = (props: any) => {
 
   const handleWords = (type: number) => {
     getWords({ type: 0 }, (res: any) => {
-      let list = res.data;
+      let list:any = res.data;
+
+      console.log("兴趣返回--",list)
+      
       let interestSelected: any = [];
-      type
+      if(accountInfo.interestIds == '' || interestIds == ''){
+        interestSelected = []
+      }else{
+        type
         ? (interestSelected = accountInfo.interestIds.split(","))
         : (interestSelected = interestIds.split(","));
-      let interestSelectedList: any = [];
+      }
+       
+      // let interestSelectedList: any = [];
       list.map((item: any) => {
         interestSelected.forEach((id: any) => {
           if (item.id == JSON.parse(id)) {
             item.checked = true;
-            interestSelectedList.push(item);
+            // interestSelectedList.push(item);
           }
         });
       });
-      setinterestIdList(interestSelectedList);
+      // setinterestIdList(interestSelectedList);
       setinterestList(list);
-
-      console.log("interestList==", interestSelectedList, list);
+      
+      console.log("interestList==",list,interestIds);
     });
   };
 
   const handleInterest = (obj: any, index: number, type: number) => {
     return () => {
-      console.log("点击的数据是===", obj);
-      let isChecked = interestIds.includes(obj.id);
-      let newListData: any = [];
-
+      console.log("点击的数据是===", obj,interestIds);
+    
+      let cancelChecked = interestIds.includes(obj.id);//为true取消选择
       let status: boolean = false;
       type
         ? (status = false)
@@ -108,46 +116,21 @@ const SubPersonalinfo = (props: any) => {
         ? (status = false)
         : (status = true);
 
-      newListData = interestList.map((list: any) => {
-        if (list.id == obj.id) {
-          return {
-            ...list,
-            checked: status,
-          };
-        } else {
-          return list;
-        }
-      });
+        let newListData: any = [];
+        newListData = interestList.map((list: any) => {
+          if (list.id == obj.id) {
+            return {
+              ...list,
+              checked: status,
+            };
+          } else {
+            return list;
+          }
+        });
+        console.log("弹窗数据===", newListData,interestIds);
 
-      if (type) {
-        interestIdList.splice(
-          interestIdList.findIndex((item) => {
-            return item.id === obj.id;
-          }),
-          1
-        );
-      } else {
-        if (isChecked) {
-          interestIdList.splice(
-            interestIdList.findIndex((item) => {
-              return item.id === obj.id;
-            }),
-            1
-          );
-        } else {
-          interestIdList.push(obj);
-        }
-        setinterestIdList(interestIdList);
-      }
-      console.log("弹窗数据===", newListData);
-      console.log("弹窗选择===", interestIdList);
+        setinterestList(newListData);
 
-      let ids: any = [];
-      interestIdList.map((item: any) => {
-        ids.push(item.id);
-      });
-      setInterestIds(ids.toString());
-      setinterestList(newListData);
     };
   };
 
@@ -160,11 +143,25 @@ const SubPersonalinfo = (props: any) => {
     handleWords(1);
   };
 
-  useEffect(() => {}, [loginState.editUser]);
 
   const confirm = () => {
     const req: any = {};
     req.id = accountInfo.id;
+    console.log("保存====",interestList)
+    let interIds: any = [];
+    if (interestList.length) {
+      interestList.forEach((item: any) => {
+        if(item.checked){
+          interIds.push(item.id);
+        }
+      });
+    }
+    if(!interIds.length){
+        message.error("请最少选择一项兴趣！");
+        return;
+    }
+    req.interestIds = interIds.toString();
+    console.log("保存兴趣====", req.interestIds)
     if (nickname) {
       req.accountName = nickname;
     }
@@ -173,13 +170,8 @@ const SubPersonalinfo = (props: any) => {
     }
     req.sex = sex;
     req.age = age;
-    if (interestIdList.length) {
-      let interIds: any = [];
-      interestIdList.map((item: any) => {
-        interIds.push(item.id);
-      });
-      req.interestIds = interIds.toString();
-    }
+
+   
     editUser(
       req,
       () => {
@@ -271,8 +263,8 @@ const SubPersonalinfo = (props: any) => {
               <div className="interest">
                 {/*使用请求回来的数据*/}
                 <ul>
-                  {interestIdList.map((obj: any, i: number) => (
-                    <li
+                  {interestList.map((obj: any, i: number) => (
+                    obj.checked && <li
                       key={"interest" + i}
                       className={obj.checked ? "choosed" : `${obj.checked}`}
                       onDoubleClick={handleInterest(obj, i, 1)}
