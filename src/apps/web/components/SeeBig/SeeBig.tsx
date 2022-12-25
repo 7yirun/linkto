@@ -48,7 +48,7 @@ const SeeBig = (props: { id: number, close: () => void }) => {
     //显示弹窗时禁止滚动滚动条
     document.documentElement.style.overflow = 'hidden';
     return () => {
-      document.documentElement.style.overflow = 'auto';
+      document.documentElement.style.overflow = 'visible';
     }
   }, [])
   useEffect(() => {
@@ -93,7 +93,11 @@ const SeeBig = (props: { id: number, close: () => void }) => {
 						>
 							<div className="title">
 								<div className="user-info">
-									<img src={imgDetailInfo.accountInfo.headPic} className={'profile'} alt=""/>
+									<img
+                    onClick={()=>{
+                      history.push('/my-space?id=' + imgDetailInfo.accountId)
+                    }}
+                    src={imgDetailInfo.accountInfo.headPic} className={'profile'} alt=""/>
 									<div className="text-info">
 										<p>
 											<span className={'accountName'}>{imgDetailInfo.accountInfo.accountName}</span>

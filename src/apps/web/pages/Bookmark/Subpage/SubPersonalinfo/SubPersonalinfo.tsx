@@ -60,7 +60,6 @@ const SubPersonalinfo = (props: any) => {
       },
       ({ data }: { data: any }) => {
         setStore("accountInfo", JSON.stringify(data), true);
-        console.log(data);
         dispatch(
           setAccountInfo({
             accountInfo: {
@@ -80,6 +79,7 @@ const SubPersonalinfo = (props: any) => {
         ? (interestSelected = accountInfo.interestIds.split(","))
         : (interestSelected = interestIds.split(","));
       let interestSelectedList: any = [];
+
       list.map((item: any) => {
         interestSelected.forEach((id: any) => {
           if (item.id == JSON.parse(id)) {
@@ -88,6 +88,8 @@ const SubPersonalinfo = (props: any) => {
           }
         });
       });
+
+
       setinterestIdList(interestSelectedList);
       setinterestList(list);
 
@@ -320,7 +322,7 @@ const SubPersonalinfo = (props: any) => {
           {interestList.map((obj: any, i: number) => (
             <li
               key={"interest" + i}
-              className={obj.checked ? "choosed" : `${obj.checked}`}
+              className={obj.checked ? "choosed" : ''}
             >
               <CapsuleButton onClick={handleInterest(obj, i, 0)}>
                 {obj.chinese}
