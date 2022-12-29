@@ -67,17 +67,17 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
   const filterTransparent2Black = ({data}: {data:Uint8ClampedArray})=>{
     const nPixels = data.length
     for(let i=3; i<nPixels; i+=4){
-      //透明和半透明部分变为全黑
+      //透明和半透明部分变为全白
       if(data[i] < 255){
-        data[i-3] = 0
-        data[i-2] = 0
-        data[i-1] = 0
-        data[i] = 255;
-      } else {
-        //非透明部分变为全白
         data[i-3] = 255
         data[i-2] = 255
         data[i-1] = 255
+        data[i] = 255;
+      } else {
+        //非透明部分变为全黑
+        data[i-3] = 0
+        data[i-2] = 0
+        data[i-1] = 0
       }
     }
   }
@@ -104,7 +104,7 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
   // 当有新图加载/用户手动切换了图层/删除了图层 需要把当前图层显示在最顶层
   useEffect(() => {
     groupRefs.current[pictureState.currentLayerId] && groupRefs.current[pictureState.currentLayerId].moveToTop()
-    groupRefs.current = [];
+    // groupRefs.current = [];
   }, [pictureState.loadedImages, pictureState.currentLayerId])
 
   /*cache相关-------------------------------------------------------------------*/
@@ -205,6 +205,7 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
     }
     return imgBase64Obj;
   }
+
 
   return (
     <div className={styles.container}>

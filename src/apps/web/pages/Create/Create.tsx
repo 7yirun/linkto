@@ -78,10 +78,6 @@ const Create = (props: any) => {
   const [creatable, setCreatable] = useState(true);
   const [progress, setProgress] = useState(0);
 
-  //图片的预览链接 由本地生成
-  const [previewUrl, setPreviewUrl] = useState('');
-
-  const MAX_LENGTH = 200; //可输入的最大文字个数
   //创作模式,按文字或者图片创作
   const [mode, setMode] = useState(MODE.junior);
 
@@ -130,7 +126,6 @@ const Create = (props: any) => {
   //切换文字创作 / 图片创作 模式
   const changeModeTo = (mode: MODE) => {
     setMode(mode);
-    setPreviewUrl('');
     requestAnimationFrame(() => {
       (bsRef.current as any).refresh();
     })
