@@ -164,19 +164,24 @@ export const imgRefresh = (request: IRequestImgRefresh, success?: any, err?: any
 }
 
 interface IImgRequest {
-  guidance: number,
+  guidance: number, //0-20  default 7.5
   height: number,
   width: number,
-  initImage: any,
   keywords?: string,
   numImages: number,
   prompt?: string,
-  strength: number,
+  profession?: string  //中文
+  strength: number, //0-1  default 0.7
   negativePrompt?:string
+  initImageBase64: string//初始图
+  maskBase64: string//蒙版图
+  steps?:number  //5-100  default 20
 }
 
 export const img2img = (request: IImgRequest, success?: any, err?:any) => {
-  sendPost(command.IMG2IMG, request, success, err)
+  sendPost(command.IMG2IMG, request, success, err, {
+    ['Content-Type']: 'multipart/form-data'
+  })
 }
 
 //收藏图片

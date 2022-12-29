@@ -1,5 +1,5 @@
 @import "../../../../style/variable.scss";
-$black-bg: rgba(0,0,0,0.2);
+$black-bg: #1a1a1a;
 $subtag-margin-bottom: 8px;
 
 @mixin active {
@@ -115,6 +115,56 @@ $subtag-margin-bottom: 8px;
                 margin-bottom: 8px;
               }
             }
+            //高级创作
+            .free-dimension{
+              .row{
+                height: 32px;
+                display: flex;
+                align-items: center;
+                .title{
+                  margin-right: 8px;
+                }
+                .ant-input-number{
+                  width: 160px;
+                  border-radius: 16px;
+                  overflow: hidden;
+                  border: none;
+                  background-color: #202020;
+                  .ant-input-number-handler-wrap{
+                    flex-direction: row-reverse;
+                    align-items: center;
+                    opacity: 1;
+                    justify-content: space-between;
+                    width: 100%;
+                    padding: 0 4px;
+                    box-sizing: border-box;
+                    background: none;
+                    .ant-input-number-handler{
+                      width: 24px;
+                      height: 24px;
+                      border-radius: 50%;
+                      background-color: #181818;
+                      flex-grow: 0;
+                      border: none;
+                      >span{
+                        color: #fff;
+                        font-size: 32px;
+                      }
+                    }
+                  }
+                  .ant-input-number-input-wrap{
+                    .ant-input-number-input{
+                      text-align: center;
+                      font-size: 16px;
+                      font-weight: bold;
+                      color: $green;
+                      font-family: PingFangSC;
+                    }
+                  }
+                }
+              }
+            }
+
           }
           &.choose-tags {
             align-items: flex-start;

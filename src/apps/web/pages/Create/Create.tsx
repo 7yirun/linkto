@@ -21,9 +21,9 @@ import {
 } from "apps/web/store/store";
 import {useDispatch, useSelector} from "react-redux"
 import Slider from '@mui/material/Slider';
-import {message, Dropdown} from 'antd'
+import {message, Dropdown, InputNumber} from 'antd'
 import UpLoad from "apps/web/components/UpLoad/UpLoad";
-import Konva from "apps/web/components/Paint/Konva2"
+import Paint from "apps/web/components/Paint/Konva2"
 import type {MenuProps} from 'antd';
 import Header from "apps/web/components/Header/Header"
 
@@ -94,12 +94,19 @@ const Create = (props: any) => {
   // 默认选中第0个dimension
   const [dimension, setDimension] = useState(Number(getStore('dimension', false)));  //Number(null) => 0
 
+  //高级创作中可以自定义图片尺寸:
+  const customizeHeightRef = useRef<any>();
+  const customizeWidthRef = useRef<any>();
+
+
   const [displayDimension, setDisplayDimension] = useState<number>(dimension);
 
   const [relevance, setRelevance] = useState<number>(getStore('relevance', false) ? Number(getStore('relevance', false)) : 50); //默认相关性
   //图片相关性
   const [relevance2, setRelevance2] = useState(getStore('relevance2', false) ? Number(getStore('relevance2', false)) : 70); //默认相关性
 
+  //steps
+  const [steps, setSteps] = useState<number>(20)
 
   //输入框里的negtive keyword
   const [negInput, setNegInput] = useState(getStore('negInput', false) || '');
@@ -185,6 +192,7 @@ const Create = (props: any) => {
     english: string,
     id: number
   }
+
   const [words, setWords] = useState<IWord[]>([])
 
   //选中的行业id
@@ -199,10 +207,10 @@ const Create = (props: any) => {
   }, [mode])
 
   //从外界图片的二次创作操作跳转过来
-  useEffect(()=>{
+  useEffect(() => {
     console.log(pictureState.loadedImages);
     //除去默认的背景图 还新增了别的图片
-    if(pictureState.loadedImages.length > 1){
+    if (pictureState.loadedImages.length > 1) {
       setIsWork(true);
       setMode(MODE.superior);
       console.log(123);
@@ -214,7 +222,7 @@ const Create = (props: any) => {
     //英文关键词数组
     let keywordArr = searchState.mapArr.join().split(',').filter(str => str);
     //行业词汇
-    let profession:string = '';
+    let profession: string = '';
     //进阶 高级 创作要传行业词汇
     if (mode === MODE.senior || mode === MODE.superior) {
       const tmp: string[] = [];
@@ -271,24 +279,23 @@ const Create = (props: any) => {
         message.error(err.msg || '系统内部错误, 请稍后再试');
       })
     } else if (mode === MODE.superior) {
-
-      console.log(konvaRef.current.getFinishedPic());
-      return;
+      const {paint, mask} = konvaRef.current.generateImg()
       //@ts-ignore
       img2img({
         guidance: relevance * 15 / 100,
-        initImage: konvaRef.current.getFinishedPic(),
-        width: DIMESNION_OPTION[dimension].width,
-        height: DIMESNION_OPTION[dimension].height,
+        initImageBase64: paint,
+        maskBase64: mask,
+        width: customizeWidthRef.current.value,
+        height: customizeHeightRef.current.value,
         numImages: 4,
         prompt: description,
         keywords: keyword,
         strength: relevance2 / 100,
-        negativePrompt: negInput
+        negativePrompt: negInput,
+        steps: steps,
       }, (res: any) => {
         setCreatable(false);
-        // @ts-ignore
-        setIsWork(false);
+        setIsWork(true);
         //生成的图片按照所选尺寸显示
         setDisplayDimension(dimension)
         //清空已生成图片 显示默认占位图
@@ -366,37 +373,85 @@ const Create = (props: any) => {
                   </div>
                   {
                     mode === MODE.superior &&
-										<div className={'choose relevance'}>
-											<p>图片相关性</p>
-											<Slider
-												value={relevance2}
-												onChange={(e, newRelevance) => {
-                          setRelevance2(newRelevance as number)
-                        }}
-											></Slider>
-											<div className="percentage">{`${relevance2}%`}</div>
-										</div>
+										<>
+											<div className={'choose relevance'}>
+												<p>图片相关性</p>
+												<Slider
+													value={relevance2}
+													onChange={(e, newRelevance) => {
+                            setRelevance2(newRelevance as number)
+                          }}
+												></Slider>
+												<div className="percentage">{`${relevance2}%`}</div>
+											</div>
+											<div className={'choose relevance'}>
+												<p>生成步骤</p>
+												<Slider
+													min={5}
+													value={steps}
+													onChange={(e, newSteps) => {
+                            setSteps(newSteps as number)
+                          }}
+												></Slider>
+												<div className="percentage">{steps}</div>
+											</div>
+										</>
                   }
                   <div className={'choose dimension'}>
                     <p>尺寸</p>
-                    <div className='dimension-options'>
-                      {
-                        DIMESNION_OPTION.map((item, index) => {
-                          return (
-                            <CapsuleButton nobutton={1}
-                                           key={index}
-                                           data-checked={dimension === index ? "checked" : "unchecked"}
-                                           onClick={() => {
-                                             setDimension(index)
-                                           }}
-                            >
-                              {`${item.width}*${item.height}`}
-                            </CapsuleButton>
-                          )
-                        })
-                      }
-                    </div>
+                    {
+                      mode !== MODE.superior ?
+                        <div className='dimension-options'>
+                          {
+                            DIMESNION_OPTION.map((item, index) => {
+                              return (
+                                <CapsuleButton nobutton={1}
+                                               key={index}
+                                               data-checked={dimension === index ? "checked" : "unchecked"}
+                                               onClick={() => {
+                                                 setDimension(index)
+                                               }}
+                                >
+                                  {`${item.width}*${item.height}`}
+                                </CapsuleButton>
+                              )
+                            })
+                          }
+                        </div>
+                        :
+                        <div className="free-dimension">
+                          <div className="row">
+                            <span className={'title'}>宽度</span>
+                            <InputNumber
+                              ref={customizeWidthRef}
+                              defaultValue={1024}
+                              step={64}
+                              max={2048}
+                              min={512}
+                              controls={{
+                                upIcon: <span className={'iconfont icon-1'}></span>,
+                                downIcon: <span className={'iconfont icon-11'}></span>
+                              }}
+                            ></InputNumber>
+                          </div>
+                          <div className="row">
+                            <span className={'title'}>高度</span>
+                            <InputNumber
+                              ref={customizeHeightRef}
+                              defaultValue={1024}
+                              step={64}
+                              max={2048}
+                              min={512}
+                              controls={{
+                                upIcon: <span className={'iconfont icon-1'}></span>,
+                                downIcon: <span className={'iconfont icon-11'}></span>
+                              }}
+                            ></InputNumber>
+                          </div>
+                        </div>
+                    }
                   </div>
+
                   {
                     (mode === MODE.senior || mode === MODE.superior) &&
 										<div className="choose choose-tags">
@@ -560,13 +615,22 @@ const Create = (props: any) => {
 									<span
 										className={'delete-layer iconfont icon-24'}
 										onClick={() => {
-
+                      if (pictureState.loadedImages.length === 1) {
+                        message.warning('无法删除背景层')
+                        return;
+                      }
+                      const index: number = pictureState.loadedImages.findIndex(obj => obj.id === pictureState.currentLayerId);
+                      const imgArr: any[] = pictureState.loadedImages.slice();
+                      const newLayerId: string = pictureState.loadedImages[index - 1].id;
+                      imgArr.splice(index, 1);
+                      dispatch(setCurrentLayerId(newLayerId));
+                      dispatch(setLoadedImages(imgArr))
                     }}
 									></span>
 								</div>
-								<Konva
+								<Paint
 									ref={konvaRef}
-								></Konva>
+								></Paint>
 							</>
             }
             {/*创作好的图片展示区*/}
