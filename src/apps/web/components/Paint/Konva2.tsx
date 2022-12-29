@@ -64,26 +64,26 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
   //isPaint的时候不处理mousemove事件
   const isPaint = useRef<boolean>(false);
 
-  const filterTransparent2Black = ({data}: {data:Uint8ClampedArray})=>{
+  const filterTransparent2Black = ({data}: { data: Uint8ClampedArray }) => {
     const nPixels = data.length
-    for(let i=3; i<nPixels; i+=4){
+    for (let i = 3; i < nPixels; i += 4) {
       //透明和半透明部分变为全白
-      if(data[i] < 255){
-        data[i-3] = 255
-        data[i-2] = 255
-        data[i-1] = 255
+      if (data[i] < 255) {
+        data[i - 3] = 255
+        data[i - 2] = 255
+        data[i - 1] = 255
         data[i] = 255;
       } else {
         //非透明部分变为全黑
-        data[i-3] = 0
-        data[i-2] = 0
-        data[i-1] = 0
+        data[i - 3] = 0
+        data[i - 2] = 0
+        data[i - 1] = 0
       }
     }
   }
   //第一次进入以及resize时, 自适应canvas画布的大小
   const updateCanvasArea = () => {
-    if(!isMounted){
+    if (!isMounted) {
       setCanvasHeight(drawingAreaRef.current?.offsetHeight || 0)
     }
     setCanvasWidth(drawingAreaRef.current?.offsetWidth || 0)
@@ -97,7 +97,7 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
   }, [])
 
   //Group元素有多个 需要用数组保存ref
-  const groupRefs = useRef<{[key:string]: any}>({});
+  const groupRefs = useRef<{ [key: string]: any }>({});
   const layerRef = useRef<any>();
   const trRef = useRef<any>();
 
@@ -109,9 +109,9 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
 
   /*cache相关-------------------------------------------------------------------*/
   const isMounted = useMounted();
-  useEffect(()=>{
-    if(isMounted){
-      for(let key in groupRefs.current){
+  useEffect(() => {
+    if (isMounted) {
+      for (let key in groupRefs.current) {
         console.log(key);
         //每个组都要重新cache, 因为历史记录操作会涉及所有Group
         groupRefs.current[key] && groupRefs.current[key].cache();
@@ -123,7 +123,9 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
   //画线  需要重新开启新的历史记录
   const handleMouseDown = (e: any) => {
     if (mode === MODE.paint || mode === MODE.erase) {
-      if(pictureState.currentLayerId === '背景图层001'){return}
+      if (pictureState.currentLayerId === '背景图层001') {
+        return
+      }
       isPaint.current = true;
       const pos: Vector2d = groupRefs.current[pictureState.currentLayerId].getRelativePointerPosition();
       const oldHistory = history.slice(0, stepIndex + 1);
@@ -185,7 +187,7 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
     isPaint.current = false;
   }
 
-  const generateImg = ()=>{
+  const generateImg = () => {
     const imgBase64Obj = {
       paint: '',
       mask: ''
@@ -199,7 +201,7 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
     layerRef.current.clearCache();
     layerRef.current.filters([]);
     console.log(imgBase64Obj);
-    for(let key in groupRefs.current){
+    for (let key in groupRefs.current) {
       //每个组都要重新cache, 因为历史记录操作会涉及所有Group
       groupRefs.current[key].cache();
     }
@@ -278,10 +280,10 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
 					<div className="color">
 						<p>颜色</p>
 						<input
-              value={currentColor}
-              onChange={(e) => {
-              setCurrentColor(e.target.value)
-            }} type="color" name="" id=""/>
+							value={currentColor}
+							onChange={(e) => {
+                setCurrentColor(e.target.value)
+              }} type="color" name="" id=""/>
 					</div>
         }
       </div>
@@ -343,15 +345,15 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
             >
             </Rect>*/}
             {
-              pictureState.loadedImages.filter(img=>img.id !== '背景图层001').map((imgObj, i) => {
+              pictureState.loadedImages.filter(img => img.id !== '背景图层001').map((imgObj, i) => {
                 return (
                   <React.Fragment key={imgObj.id}>
                     <Group
-                      ref={(ele)=>{
+                      ref={(ele) => {
                         groupRefs.current[imgObj.id] = ele
                       }}
                       draggable={mode === MODE.move && imgObj.id !== '背景图层001'}
-                      onDragEnd={(e)=>{
+                      onDragEnd={(e) => {
                       }}
                     >
                       <URLImage
@@ -370,41 +372,39 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
                       {
                         //画线
                         history.slice(0, stepIndex + 1)
-                          .filter(historyObj => historyObj.lines && historyObj.id === imgObj.id)
+                          .filter(historyObj => historyObj.id === imgObj.id)
                           .map((lineHistory, i) => {
                             return (
-                              <Line
-                                key={'line' + i}
-                                stroke={lineHistory.lineColor}
-                                strokeWidth={lineHistory.strokeWidth}
-                                lineJoin={'round'}
-                                points={lineHistory.lines}
-                                lineCap={'round'}
-                                bezier={true}
-                              >
-                              </Line>
+                              <React.Fragment key={'line' + i}>
+                                {
+                                  lineHistory.lines &&
+																	<Line
+																		stroke={lineHistory.lineColor}
+																		strokeWidth={lineHistory.strokeWidth}
+																		lineJoin={'round'}
+																		points={lineHistory.lines}
+																		lineCap={'round'}
+																		bezier={true}
+																	/>
+                                }
+                                {
+                                  lineHistory.eraseLines &&
+																	<Line
+																		draggable={mode === MODE.move}
+																		stroke={'#000000'}
+																		strokeWidth={lineHistory.strokeWidth}
+																		lineJoin={'round'}
+																		points={lineHistory.eraseLines}
+																		lineCap={'round'}
+																		bezier={true}
+																		globalCompositeOperation={'destination-out'}
+																	/>
+                                }
+                              </React.Fragment>
                             )
                           })
                       }
-                      {
-                        //擦除
-                        history.slice(0, stepIndex + 1)
-                          .filter(historyObj => historyObj.eraseLines && historyObj.id === imgObj.id)
-                          .map((lineHistory, i) => (
-                            <Line
-                              draggable={mode === MODE.move}
-                              key={'eraseLine' + i}
-                              stroke={'#000000'}
-                              strokeWidth={lineHistory.strokeWidth}
-                              lineJoin={'round'}
-                              points={lineHistory.eraseLines}
-                              lineCap={'round'}
-                              bezier={true}
-                              globalCompositeOperation={'destination-out'}
-                            >
-                            </Line>
-                          ))
-                      }
+
                     </Group>
                     {
                       <Transformer
@@ -419,6 +419,7 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
         </Stage>
       </div>
     </div>
-  );
+  )
+    ;
 })
 export default Paint
