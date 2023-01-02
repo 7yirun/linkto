@@ -1,14 +1,16 @@
-import React, {useRef, useState, useEffect, forwardRef, useImperativeHandle} from 'react';
+import React, {useRef, useState, useEffect, forwardRef, useImperativeHandle, useCallback} from 'react';
 import {Stage, Layer, Line, Transformer, Group, Rect} from 'react-konva';
 import {Vector2d} from "konva/lib/types"
 import URLImage from "./URLImage"
 import styles from "./Konva.module.scss"
-import {setLoadedImages, setCurrentLayerId} from "apps/web/store/store";
+import {setLoadedImages} from "apps/web/store/store";
 import {useDispatch, useSelector} from "react-redux"
-import {pictureStateType} from "apps/web/pages/Create/Create"
+import {pictureStateType, LayerInfoType} from "apps/web/pages/Create/Create"
 import {message} from "antd";
 import Slider from '@mui/material/Slider';
 import {useMounted} from "../../hooks";
+import PaintLine from "./PaintLine"
+import PaintGroup from "./PaintGroup";
 
 enum MODE {
   none,
@@ -17,31 +19,39 @@ enum MODE {
   paint,//自由画图
 }
 
-type imgType = {
-  name: string
-  src: string
-  id: string
+//每一条line / eraseLine
+type LineType = {
+  line: number[], //保存点的坐标
+  layerId: string  //图层id
+  strokeWidth: number
+  lineColor?: string
+  type: string    //实线还是擦除 type = 'paint' || 'erase'
+}
+export type LayerType = {
+  name: string,    //图层名
+  layerId: string,
+  imgUrl: string   //该图层的图片地址
 }
 
-interface historyObj {
-  lines?: number[],       //画线
-  eraseLines?: number[],  //橡皮擦(line和图片一起擦除)
-  imageObj?: imgType     //存放图片  每张图片会形成单独的history
-  strokeWidth?: number  //笔触半径
-  lineColor?: string     //画笔颜色
-  id: string             //图层currentLayerId 记录是哪个图层产生的记录
+//每个historyObj都可以单独还原出当前画布所有信息 相当于是每一次快照都完全保存了
+interface IHistoryObj {
+  lines: LineType[],       //当前画布上所有线条信息+擦除信息
+  layers: LayerType[]       //当前画布上所有图层信息
+  currentLayerId: string   //当前选中的图层id
 }
-
 
 interface IProps {
   imgUrl?: string
+  updateLayerInfo: (arg: LayerInfoType)=>void  //删除/恢复图层时, 引起父组件图层下拉框的变化
 }
 
 const SIZE_LIMIT = 10 * 1024 * 1024 //限制上传的最大图片大小为10MB
 
 const Paint = forwardRef((props: IProps, konvaRef) => {
   useImperativeHandle(konvaRef, () => ({
-    generateImg
+    generateImg,
+    deleteLayer,
+    changeCurrentLayer
   }))
   const dispatch = useDispatch();
   const pictureState = useSelector<any, pictureStateType>(state => state.pictureState)
@@ -51,18 +61,79 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
       pixelRatio: 1
     })
   }
-  const [history, setHistory] = useState<historyObj[]>([{id: '背景图层001'}]);
+  const [history, setHistory] = useState<IHistoryObj[]>([{
+    lines: [],
+    layers: [
+      {
+        name: '背景图层',
+        layerId: '背景图层001',
+        imgUrl: ''
+      }
+    ],
+    currentLayerId: '背景图层001'
+  }]);
+
+  //记录历史记录的步骤
   const [stepIndex, setStepIndex] = useState(0);
+
+  //操作模式 移动/画笔/橡皮等等
   const [mode, setMode] = useState<MODE>(MODE.move);
+  //canvas画布宽高
   const [canvasWidth, setCanvasWidth] = useState<number>(0);
   const [canvasHeight, setCanvasHeight] = useState<number>(0);
-  const [currentColor, setCurrentColor] = useState<string>('#000000');
-  const [currentStrokeWidth, setCurrentStrokeWidth] = useState<number>(5);
-
+  //当前选择的颜色
+  const [currentColor, setCurrentColor] = useState<string>('#43CF7C');
+  //当前选择的线宽
+  const [currentStrokeWidth, setCurrentStrokeWidth] = useState<number>(10);
+  //div绘图区 用于获取宽高 限制canvas宽高
   const drawingAreaRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<any>();
-  //isPaint的时候不处理mousemove事件
+  //记录是否正在画线/擦除 isPaint的时候不处理mousemove事件, 也不能操作历史记录的撤销/恢复
   const isPaint = useRef<boolean>(false);
+
+
+  const deleteLayer = () => {
+    if (pictureState.loadedImages.length === 1) {
+      message.warning('无法删除背景层')
+      return;
+    }
+    const oldHistory = history.slice(0, stepIndex+1);
+    const currentState = oldHistory.slice(-1)[0];
+
+    //被删除的图层在history layers中的index   index一定是>=1的
+    const index: number = currentState.layers.findIndex(layer => layer.layerId === history[stepIndex].currentLayerId);
+    //新的currentLayerId 它是当前图层的前一个图层
+    const newLayerId: string = currentState.layers[index-1].layerId;
+    setHistory([
+      ...oldHistory,
+      {
+        lines: currentState.lines,
+        layers: currentState.layers.filter((layer:LayerType)=>layer.layerId !== history[stepIndex].currentLayerId),
+        currentLayerId: newLayerId
+      }
+    ])
+    setStepIndex(stepIndex + 1);
+  }
+
+  //通过父组件中的Dropdown组件下拉框切换当前图层 此方法暴露到ref给父组件调用
+  //该函数仅修改当前historyObj的currentLayerId, 不产生新history
+  const changeCurrentLayer = (layerId:string)=>{
+    //仅修改. 不改变长度
+    const oldHistory = history.slice();
+    const currentState = oldHistory[stepIndex];
+    currentState.currentLayerId = layerId;
+    oldHistory.splice(stepIndex, 1, currentState)
+    setHistory(oldHistory)
+  }
+
+  //更新Create父组件中下拉框的图层信息
+  useEffect(()=>{
+    props.updateLayerInfo({
+      layerArr: history[stepIndex].layers,
+      currentLayerId: history[stepIndex].currentLayerId
+    })
+  }, [stepIndex, history[stepIndex].currentLayerId])
+
 
   const filterTransparent2Black = ({data}: { data: Uint8ClampedArray }) => {
     const nPixels = data.length
@@ -83,11 +154,35 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
   }
   //第一次进入以及resize时, 自适应canvas画布的大小
   const updateCanvasArea = () => {
-    if (!isMounted) {
-      setCanvasHeight(drawingAreaRef.current?.offsetHeight || 0)
-    }
+    setCanvasHeight(drawingAreaRef.current?.offsetHeight || 0)
     setCanvasWidth(drawingAreaRef.current?.offsetWidth || 0)
   }
+  //缩放相关
+  useEffect(()=>{
+    if(mode === MODE.move && history[stepIndex].currentLayerId !== '背景图层001'){
+     /* trRef.current.nodes([groupRefs.current[history[stepIndex].currentLayerId]])*/
+    }
+  }, [mode, stepIndex])
+
+//离开创作区域时清空画布
+/*  useEffect(()=>{
+    return ()=>{
+      dispatch(setLoadedImages([pictureState.loadedImages[0]]));
+    }
+  }, [])*/
+/*  //离开创作区域时保留history
+  useEffect(()=>{
+    return ()=>{
+      setStore('paintHistory', JSON.stringify(history), true);
+    }
+  }, [history])
+  //离开创作区域时保留stepIndex
+  useEffect(()=>{
+    return ()=>{
+      setStore('stepIndex', JSON.stringify(stepIndex), true);
+    }
+  }, [stepIndex])*/
+
   useEffect(() => {
     updateCanvasArea()
     window.addEventListener('resize', updateCanvasArea)
@@ -103,52 +198,76 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
 
   // 当有新图加载/用户手动切换了图层/删除了图层 需要把当前图层显示在最顶层
   useEffect(() => {
-    groupRefs.current[pictureState.currentLayerId] && groupRefs.current[pictureState.currentLayerId].moveToTop()
-    // groupRefs.current = [];
-  }, [pictureState.loadedImages, pictureState.currentLayerId])
+    groupRefs.current[history[stepIndex].currentLayerId] && groupRefs.current[history[stepIndex].currentLayerId].moveToTop()
+    updateCanvasArea();
 
-  /*cache相关-------------------------------------------------------------------*/
-  const isMounted = useMounted();
+  }, [stepIndex, history[stepIndex].currentLayerId])
   useEffect(() => {
-    if (isMounted) {
-      for (let key in groupRefs.current) {
-        console.log(key);
-        //每个组都要重新cache, 因为历史记录操作会涉及所有Group
-        groupRefs.current[key] && groupRefs.current[key].cache();
-      }
+    //只有默认的初始图层时, history不发生变化
+    if(pictureState.loadedImages.length <=1){
+      return
     }
-  }, [stepIndex])
-  /*cache相关-------------------------------------------------------------------*/
+    // pictureState.loadedImages只会增加不会减少, 所以历史记录的stepIndex一定是增加
+    const oldHistory = history.slice(0, stepIndex+1);
+    const currentState = oldHistory.slice(-1)[0];
+    const arr = [
+      ...oldHistory,                     //之前的历史步骤保留原样
+      {
+        lines: currentState.lines,  //lines保留原样
+        layers: [
+          ...oldHistory.slice(-1)[0].layers,
+          {
+            name: pictureState.loadedImages.slice(-1)[0].name,
+            layerId: pictureState.loadedImages.slice(-1)[0].id,
+            imgUrl: pictureState.loadedImages.slice(-1)[0].src
+          }
+        ],
+        currentLayerId: pictureState.loadedImages.slice(-1)[0].id
+      }
+    ]
+    setHistory(arr)
+    setStepIndex(stepIndex + 1)
+  }, [pictureState.loadedImages])
+
+  /*cache相关-------------------------------------------------------------------start*/
+  // const isMounted = useMounted();
+  /*useEffect(() => {
+    for (let key in groupRefs.current) {
+      console.log(key);
+      //每个组都要重新cache, 因为历史记录操作会涉及所有Group
+      groupRefs.current[key] && groupRefs.current[key].cache();
+    }
+  }, [stepIndex])*/
+  /*cache相关-------------------------------------------------------------------end*/
 
   //画线  需要重新开启新的历史记录
   const handleMouseDown = (e: any) => {
     if (mode === MODE.paint || mode === MODE.erase) {
-      if (pictureState.currentLayerId === '背景图层001') {
+      if (history[stepIndex].currentLayerId === '背景图层001') {
         return
       }
       isPaint.current = true;
-      const pos: Vector2d = groupRefs.current[pictureState.currentLayerId].getRelativePointerPosition();
+      const pos: Vector2d = groupRefs.current[history[stepIndex].currentLayerId].getRelativePointerPosition();
       const oldHistory = history.slice(0, stepIndex + 1);
-      switch (mode) {
-        case MODE.paint:
-          //画线
-          setHistory([...oldHistory, {
-            id: pictureState.currentLayerId,
-            lines: [pos.x, pos.y],
-            strokeWidth: currentStrokeWidth,
-            lineColor: currentColor
+      const currentState: IHistoryObj = oldHistory.slice(-1)[0];
+      if (mode === MODE.paint || mode === MODE.erase) {
+        //画线或擦除
+        setHistory([
+          ...oldHistory,
+          {
+            ...currentState,
+            lines: [
+              ...currentState.lines,
+              {
+                type: mode === MODE.paint ? 'paint' : 'erase',
+                line: [pos.x, pos.y],
+                strokeWidth: currentStrokeWidth,
+                lineColor: currentColor,
+                layerId: currentState.currentLayerId
+              }
+            ]
           }])
-          setStepIndex(oldHistory.length); //newHistoryObj === newHistory[stepIndex]
-          break;
-        case MODE.erase:
-          //橡皮擦
-          setHistory([...oldHistory, {
-            id: pictureState.currentLayerId,
-            eraseLines: [pos.x, pos.y],
-            strokeWidth: currentStrokeWidth
-          }])
-          setStepIndex(oldHistory.length)
-          break;
+        setStepIndex(stepIndex+1);
       }
     }
   }
@@ -157,31 +276,29 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
     if (!isPaint.current) {
       return
     }
-    const pos: Vector2d = groupRefs.current[pictureState.currentLayerId].getRelativePointerPosition();
+    const pos: Vector2d = groupRefs.current[history[stepIndex].currentLayerId].getRelativePointerPosition();
 
-    const currentHistoryObj: historyObj = history.slice(-1)[0];
+    const currentHistoryObj: IHistoryObj = history.slice(-1)[0];
 
-    if (mode === MODE.paint) {
+    if (mode === MODE.paint || mode === MODE.erase) {
       //lastLine初始值是mouseDown事件中画下的那个点
-      let lastLine: number[] = currentHistoryObj.lines!;
+      let lastLine: number[] = currentHistoryObj.lines.slice(-1)[0].line;
       //将后续的点连上之前的点
       lastLine = lastLine.concat([pos.x, pos.y]);
+      //拷贝之前的history
       const oldHistory = history.slice();
-      oldHistory[oldHistory.length - 1].lines = lastLine;
+      //将之前history的最后一条line替换成新line
+      oldHistory.slice(-1)[0].lines.slice(-1)[0].line = lastLine;
+      //将修改完line之后的新的history整体替换
       setHistory(oldHistory);
-      groupRefs.current[pictureState.currentLayerId].cache()
+      groupRefs.current[history[stepIndex].currentLayerId].cache()
 
-    } else if (mode === MODE.erase) {
-      //lastLine初始值是mouseDown事件中画下的那个点
-      let lastEraseLine: number[] = currentHistoryObj.eraseLines!;
-      //将后续的点连上之前的点
-      lastEraseLine = lastEraseLine.concat([pos.x, pos.y]);
-      const oldHistory = history.slice();
-      oldHistory[oldHistory.length - 1].eraseLines = lastEraseLine;
-      setHistory(oldHistory)
-      groupRefs.current[pictureState.currentLayerId].cache()
+      // console.log(groupRefs.current[history[stepIndex].currentLayerId].getLayer());
+      // groupRefs.current[history[stepIndex].currentLayerId].getLayer().cache()
+      // groupRefs.current[history[stepIndex].currentLayerId].getLayer().batchDraw()
     }
   }
+
 
   const handleMouseUp = () => {
     isPaint.current = false;
@@ -200,7 +317,6 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
 
     layerRef.current.clearCache();
     layerRef.current.filters([]);
-    console.log(imgBase64Obj);
     for (let key in groupRefs.current) {
       //每个组都要重新cache, 因为历史记录操作会涉及所有Group
       groupRefs.current[key].cache();
@@ -298,7 +414,6 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
           e.preventDefault(); //防止打开新窗口
           const fileReader = new FileReader();
           const file = e.dataTransfer.files[0]
-          console.log(file);
           //限制上传类型为image
           if (!file.type.includes('image')) {
             message.warning('请上传图片格式文件')
@@ -316,8 +431,8 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
               name: file.name,
               id: id
             }]));
-            //每次上传新图片 将当前图层改变为新上传的图片的图层
-            dispatch(setCurrentLayerId(id));
+            // 每次上传新图片 将当前图层改变为新上传的图片的图层
+            // dispatch(setCurrentLayerId(id));
           }
           e.stopPropagation(); //firefox中防止打开新窗口
         }}
@@ -338,28 +453,22 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
           <Layer
             ref={layerRef}
           >
-            {/*<Rect
-              width={canvasWidth}
-              height={canvasHeight}
-              fill={"#fff"}
-            >
-            </Rect>*/}
             {
-              pictureState.loadedImages.filter(img => img.id !== '背景图层001').map((imgObj, i) => {
+              history[stepIndex].layers.filter((layer: LayerType) => layer.layerId !== '背景图层001').map((layer: LayerType) => {
                 return (
-                  <React.Fragment key={imgObj.id}>
-                    <Group
-                      ref={(ele) => {
-                        groupRefs.current[imgObj.id] = ele
+                  <React.Fragment key={layer.layerId}>
+                    <PaintGroup
+                      setNode={(ele:any) => {
+                        // ele && ele.cache();
+                        groupRefs.current[layer.layerId] = ele
                       }}
-                      draggable={mode === MODE.move && imgObj.id !== '背景图层001'}
-                      onDragEnd={(e) => {
-                      }}
+                      draggable={mode === MODE.move}
                     >
                       <URLImage
-                        imgUrl={imgObj.src}
+                        imgUrl={layer.imgUrl}
                         maxWidth={canvasWidth}
                         maxHeight={canvasHeight}
+
                         onMouseEnter={() => {
                           if (mode === MODE.move) {
                             stageRef.current.container().style.cursor = 'move';
@@ -371,46 +480,34 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
                       />
                       {
                         //画线
-                        history.slice(0, stepIndex + 1)
-                          .filter(historyObj => historyObj.id === imgObj.id)
-                          .map((lineHistory, i) => {
-                            return (
-                              <React.Fragment key={'line' + i}>
-                                {
-                                  lineHistory.lines &&
-																	<Line
-																		stroke={lineHistory.lineColor}
-																		strokeWidth={lineHistory.strokeWidth}
-																		lineJoin={'round'}
-																		points={lineHistory.lines}
-																		lineCap={'round'}
-																		bezier={true}
-																	/>
-                                }
-                                {
-                                  lineHistory.eraseLines &&
-																	<Line
-																		draggable={mode === MODE.move}
-																		stroke={'#000000'}
-																		strokeWidth={lineHistory.strokeWidth}
-																		lineJoin={'round'}
-																		points={lineHistory.eraseLines}
-																		lineCap={'round'}
-																		bezier={true}
-																		globalCompositeOperation={'destination-out'}
-																	/>
-                                }
-                              </React.Fragment>
-                            )
-                          })
+                        history[stepIndex].lines.map((line, i) => {
+                          return (
+                            <React.Fragment key={'line' + i}>
+                              {
+                                line && line.layerId === layer.layerId &&
+																<PaintLine
+																	groupNode={groupRefs.current[layer.layerId]}
+																	stroke={line.type === 'paint' ? line.lineColor : '#000000'}
+																	strokeWidth={line.strokeWidth}
+																	lineJoin={'round'}
+																	points={line.line}
+																	lineCap={'round'}
+																	bezier={true}
+																	perfectDrawEnabled={false}
+																	globalCompositeOperation={line.type === 'paint' ? 'source-over' : 'destination-out'}
+																/>
+                              }
+                            </React.Fragment>
+                          )
+                        })
                       }
-
-                    </Group>
-                    {
+                    </PaintGroup>
+                    {/*{
+                      mode === MODE.move && layer.layerId === history[stepIndex].currentLayerId &&
                       <Transformer
-                        ref={trRef}
-                      />
-                    }
+												ref={trRef}
+											/>
+                    }*/}
                   </React.Fragment>
                 )
               })

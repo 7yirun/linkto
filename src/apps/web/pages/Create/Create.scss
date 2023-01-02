@@ -383,6 +383,15 @@ $subtag-margin-bottom: 8px;
           grid-template: 1fr 1fr / 1fr 1fr;
           flex-direction: column;
           justify-content: space-between;
+          &.superior{
+            display: flex;
+            justify-content: center;
+            .img-placeholder{
+              aspect-ratio: unset !important;
+              width: 100%;
+              height: 100%;
+            }
+          }
           .img-placeholder{
             background: #242424;
             border-radius: 8px;

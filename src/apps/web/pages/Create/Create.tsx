@@ -5,16 +5,13 @@ import {useState, useRef, useEffect} from 'react'
 import BScroll from '@better-scroll/core'
 import ScrollBar from '@better-scroll/scroll-bar'
 import MouseWheel from '@better-scroll/mouse-wheel'
-import Icons from "lib/icons"
 import {queryKeywords, text2img, img2img, imgRefresh, getWords} from "service/service";
 import AddToBookmark from "apps/web/components/AddToBookmark/AddToBookmark";
 import SeeBig from "apps/web/components/SeeBig/SeeBig";
-import qs from "qs";
 import {setStore, getStore, downloadURI} from "utils/utils"
 import {
   setMapArr,
   setLanMap,
-  setCurrentLayerId,
   setLoadedImages,
   SearchStateType,
   StateType, setDescription
@@ -54,6 +51,16 @@ export interface ILoadedImg {
 export type pictureStateType = {
   loadedImages: ILoadedImg[]
   currentLayerId: string
+}
+
+export type LayerInfoType = {
+  layerArr: LayerType[]
+  currentLayerId: string
+}
+type LayerType = {
+  name: string,
+  layerId: string,
+  imgUrl: string,
 }
 
 const Create = (props: any) => {
@@ -203,12 +210,10 @@ const Create = (props: any) => {
 
   //从外界图片的二次创作操作跳转过来
   useEffect(() => {
-    console.log(pictureState.loadedImages);
     //除去默认的背景图 还新增了别的图片
     if (pictureState.loadedImages.length > 1) {
       setIsWork(true);
       setMode(MODE.superior);
-      console.log(123);
     }
   }, [pictureState.loadedImages])
   //创作图片
@@ -244,12 +249,12 @@ const Create = (props: any) => {
         imgRefresh({taskId: taskId}, success)
       }, 1000)
     }
+    if (!description && !keyword) {
+      //生成按钮和换一批按钮不可点击
+      message.warning('请输入或选择描述词')
+      return
+    }
     if (mode === MODE.junior || mode === MODE.senior) {
-      if (!description && !keyword) {
-        //生成按钮和换一批按钮不可点击
-        message.warning('请输入或选择描述词')
-        return
-      }
       text2img({
         guidance: relevance * 15 / 100,
         width: DIMESNION_OPTION[dimension].width,
@@ -274,6 +279,10 @@ const Create = (props: any) => {
         message.error(err.msg || '系统内部错误, 请稍后再试');
       })
     } else if (mode === MODE.superior) {
+      if (pictureState.loadedImages.length <= 1) {
+        message.warning('请上传至少一张图片');
+        return
+      }
       const {paint, mask} = konvaRef.current.generateImg()
       //@ts-ignore
       img2img({
@@ -282,7 +291,7 @@ const Create = (props: any) => {
         maskBase64: mask,
         width: customizeWidthRef.current.value,
         height: customizeHeightRef.current.value,
-        numImages: 4,
+        numImages: 1,
         prompt: description,
         keywords: keyword,
         strength: relevance2 / 100,
@@ -290,7 +299,7 @@ const Create = (props: any) => {
         steps: steps,
       }, (res: any) => {
         setCreatable(false);
-        setIsWork(true);
+        setIsWork(false);
         //生成的图片按照所选尺寸显示
         setDisplayDimension(dimension)
         //清空已生成图片 显示默认占位图
@@ -307,7 +316,6 @@ const Create = (props: any) => {
     }
   }
 
-  const [imgToScale, setImgToScale] = useState(false);
   const [imgToAdd, setImgToAdd] = useState(false);
   const [imgSrc, setImgSrc] = useState<string>();
 
@@ -317,21 +325,36 @@ const Create = (props: any) => {
 
   //设置当前选中的是哪个图层
   const handleMenuClick: MenuProps['onClick'] = (e) => {
-    dispatch(setCurrentLayerId(e.key))
+    konvaRef.current.changeCurrentLayer(e.key)
   };
-  const items: MenuProps['items'] = pictureState.loadedImages.map((img: ILoadedImg, index: number) => {
+
+  //将setLayerInfo方法传给Konva子组件. 子组件layer改变时调用setLayerInfo让父组件同步变化
+  const [layerInfo, setLayerInfo] = useState<LayerInfoType>({
+    layerArr: [{
+      name: pictureState.loadedImages[0].name,
+      layerId: pictureState.loadedImages[0].id,
+      imgUrl: pictureState.loadedImages[0].src,
+    }],
+    currentLayerId: pictureState.loadedImages[0].id
+  });
+
+
+
+
+  const items: MenuProps['items'] = layerInfo.layerArr.map((layer: LayerType, index: number) => {
     return {
       label: (
         <p>
           {
-            img.src ?
-              <img src={img.src} alt=""/>
-              : <span className="pure-color"></span>
+            layer.imgUrl ?
+              <img src={layer.imgUrl} alt=""/>
+              :
+              <span className="pure-color"></span>
           }
-          <span>{img.name}</span>
+          <span>{layer.name}</span>
         </p>
       ),
-      key: img.id
+      key: layer.layerId
     }
   })
 
@@ -383,6 +406,7 @@ const Create = (props: any) => {
 												<p>生成步骤</p>
 												<Slider
 													min={5}
+													max={50}
 													value={steps}
 													onChange={(e, newSteps) => {
                             setSteps(newSteps as number)
@@ -555,7 +579,18 @@ const Create = (props: any) => {
             <div className="operate-buttons">
               {
                 creatable ?
-                  <CapsuleButton onClick={createImg} className={'create'}>开始创作</CapsuleButton>
+                  <>
+                    {
+                      mode !== MODE.superior?
+                        <CapsuleButton onClick={createImg} className={'create'}>开始创作</CapsuleButton>
+                        :
+                        isWork ? <CapsuleButton onClick={createImg} className={'create'}>开始创作</CapsuleButton> :
+                        <CapsuleButton
+                          onClick={() => {
+                            setIsWork(!isWork);
+                          }}>返回创作区</CapsuleButton>
+                    }
+                  </>
                   :
                   <CapsuleButton nobutton={1} className={'create disable'}>
                     <span className={'text'}>{`创作中(${progress}%)`}</span>
@@ -563,12 +598,12 @@ const Create = (props: any) => {
                   </CapsuleButton>
               }
               {
-                mode === MODE.superior && !isWork &&
+                mode === MODE.superior && isWork &&
 								<CapsuleButton
 									onClick={() => {
-                    setIsWork(true);
+                    setIsWork(false);
                   }}
-								>返回创作区</CapsuleButton>
+								>{"返回创作结果"}</CapsuleButton>
               }
             </div>
             {
@@ -585,20 +620,21 @@ const Create = (props: any) => {
                       <div>
                         <p>
                           {
-                            pictureState.currentLayerId === '背景图层001' ?
+                            layerInfo.currentLayerId === '背景图层001' ?
                               <span className={'pure-color'}></span> :
-                              <img src={pictureState.currentLayerId ?
-                                pictureState.loadedImages.find(obj => obj.id === pictureState.currentLayerId)?.src
+                              <img src={layerInfo.currentLayerId ?
+                                layerInfo.layerArr.find((layer: LayerType) => layer.layerId === layerInfo.currentLayerId)?.imgUrl
                                 :
-                                pictureState.loadedImages[0].src} alt=""/>
+                                layerInfo.layerArr[0].imgUrl} alt=""/>
                           }
                           <span>
                             {
-                              pictureState.currentLayerId
+                              layerInfo.currentLayerId
                                 ?
-                                pictureState.loadedImages.find(obj => obj.id === pictureState.currentLayerId)?.name
+                                layerInfo.layerArr.find((layer: LayerType) => layer.layerId === layerInfo.currentLayerId)?.name
                                 :
-                                pictureState.loadedImages[0].name}
+                                layerInfo.layerArr[0].name
+                            }
                           </span>
                         </p>
                         <span className="iconfont icon-down"></span>
@@ -610,21 +646,13 @@ const Create = (props: any) => {
 									<span
 										className={'delete-layer iconfont icon-24'}
 										onClick={() => {
-                      if (pictureState.loadedImages.length === 1) {
-                        message.warning('无法删除背景层')
-                        return;
-                      }
-                      const index: number = pictureState.loadedImages.findIndex(obj => obj.id === pictureState.currentLayerId);
-                      const imgArr: any[] = pictureState.loadedImages.slice();
-                      const newLayerId: string = pictureState.loadedImages[index - 1].id;
-                      imgArr.splice(index, 1);
-                      dispatch(setCurrentLayerId(newLayerId));
-                      dispatch(setLoadedImages(imgArr))
+                      konvaRef.current.deleteLayer()
                     }}
 									></span>
 								</div>
 								<Paint
 									ref={konvaRef}
+									updateLayerInfo={setLayerInfo}
 								></Paint>
 							</>
             }
@@ -632,9 +660,10 @@ const Create = (props: any) => {
             {
               !isWork &&
 							<div className="img-wrapper">
-								<div className={`dim${displayDimension + 1} img-center`}>
+								<div className={`dim${displayDimension + 1} img-center ${mode === MODE.superior ? 'superior' : ''}`}>
                   {
-                    [...Array(4)].map((val, index) => (
+                    mode === MODE.superior ?
+                    [...Array(1 )].map((val, index) => (
                       <div key={index} className="img-placeholder">
                         <i className={'iconfont icon-4'}></i>
                         {
@@ -672,7 +701,46 @@ const Create = (props: any) => {
 													</>
                         }
                       </div>
-                    ))
+                    )):
+                      [...Array(4 )].map((val, index) => (
+                        <div key={index} className="img-placeholder">
+                          <i className={'iconfont icon-4'}></i>
+                          {
+                            createdImg.length > 1 &&
+				                    <>
+					                    <img src={`${createdImg[index]}?time=${Date.now()}`} alt=""/>
+					                    <p className={"hover-icons"}>
+													    <span
+														    className={'iconfont icon-12'}
+														    onClick={() => {
+                                  setImgToAdd(true);
+                                  setImgSrc(`${createdImg[index]}`);
+                                }}
+													    ></span>
+						                    <span
+							                    className={'iconfont icon-13'}
+							                    onClick={() => {
+                                    //二次创作
+                                    setMode(MODE.superior);
+                                    setIsWork(true);
+                                    dispatch(setLoadedImages([...pictureState.loadedImages, {
+                                      name: `picture${index + 1}`,
+                                      src: `${createdImg[index]}?time=${Date.now()}`,
+                                      id: `picture${index + 1}${Date.now()}`
+                                    }]))
+                                  }}
+						                    ></span>
+						                    <span className={'iconfont icon-16'}
+						                          onClick={() => {
+                                        downloadURI(`${createdImg[index]}`, 'picture' + (index + 1));
+                                      }}
+						                    >
+                            </span>
+					                    </p>
+				                    </>
+                          }
+                        </div>
+                      ))
                   }
 								</div>
 							</div>

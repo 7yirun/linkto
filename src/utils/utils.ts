@@ -7,7 +7,7 @@ export const setStore = (name: string, content: string, isLocal?: boolean) => {
 }
 
 
-export const getStore = (name:string, isLocal ?: boolean) => {
+export const getStore = (name:string, isLocal ?: boolean):string | null => {
   if (isLocal) {
     return localStorage.getItem(name);
   } else {

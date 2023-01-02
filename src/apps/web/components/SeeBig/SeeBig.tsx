@@ -186,7 +186,7 @@ const SeeBig = (props: { id: number, close: () => void }) => {
                             {
                               name: "LinkTo_IMG_" + imgDetailInfo.id,
                               src: imgDetailInfo.url,
-                              id: imgDetailInfo.id
+                              id: 'LinkTo_IMG_' + imgDetailInfo.id + Date.now()
                             }
                           ]))
                         }}

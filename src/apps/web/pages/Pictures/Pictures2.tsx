@@ -3,7 +3,6 @@ import React, {useEffect, useState, useRef, SyntheticEvent} from "react";
 import Header from "apps/web/components/Header/Header"
 import {getSearchWords} from "../../../../service/service";
 import "./Picture.scss"
-import debounce from 'lodash/debounce.js'
 import {useWindowResize} from "apps/web/hooks";
 import {Dropdown} from "antd";
 import {setDescription, StateType, SearchStateType, setConfirmSearch} from "apps/web/store/store";
@@ -76,8 +75,6 @@ const Pictures = () => {
   }
 
   useEffect(()=>{
-    console.log(searchState.confirmSearch, 'start====');
-
     //获取热门推荐词
     getSearchWords({
       topNum: 5,

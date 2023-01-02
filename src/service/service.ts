@@ -175,7 +175,7 @@ interface IImgRequest {
   negativePrompt?:string
   initImageBase64: string//初始图
   maskBase64: string//蒙版图
-  steps?:number  //5-100  default 20
+  steps?:number  //5-50  default 20
 }
 
 export const img2img = (request: IImgRequest, success?: any, err?:any) => {
