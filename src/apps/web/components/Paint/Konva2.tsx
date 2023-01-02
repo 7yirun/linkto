@@ -319,7 +319,8 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
     layerRef.current.filters([]);
     for (let key in groupRefs.current) {
       //每个组都要重新cache, 因为历史记录操作会涉及所有Group
-      groupRefs.current[key].cache();
+      //有的Group可能被删掉了 要判断非null
+      groupRefs.current[key] && groupRefs.current[key].cache();
     }
     return imgBase64Obj;
   }
@@ -458,6 +459,7 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
                 return (
                   <React.Fragment key={layer.layerId}>
                     <PaintGroup
+                      showTransformer={mode===MODE.move && layer.layerId === history[stepIndex].currentLayerId}
                       setNode={(ele:any) => {
                         // ele && ele.cache();
                         groupRefs.current[layer.layerId] = ele
