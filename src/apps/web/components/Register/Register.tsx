@@ -434,19 +434,17 @@ const Register = ({mask=true,getContainer=document.body, ...props}: {
                 if (current < steps.length - 1) {
                   if (current === 0) {
                     if (handleCheck(e)) {
-                      //==============================================================================to do
                       verifyCode({
                         bindPhone: formState.phoneNum,
                         verifyCode: formState.verifyCode,
-                        accountName: formState.nickname
+                        accountName: formState.nickname,
+                        isRegister: 1,
                       }, ()=>{
                         setCurrent(current + 1)
                       }, (err:any)=>{
                         setErrInfo(err.msg)
                       })
                       // setCurrent(current + 1)
-                      
-                      //==============================================================================to do
                     }
                     return;
                   }

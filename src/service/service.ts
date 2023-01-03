@@ -50,7 +50,8 @@ export const queryVerifyCode = (bindPhone: string, success?: any): void => {
 interface IRequestVerifyCode{
   bindPhone: string,
   verifyCode: string,
-  accountName: string
+  accountName: string,
+  isRegister?: number          //0否  1注册时
 }
 //验证注册时 手机and验证码 有效性
 export const verifyCode = (request: IRequestVerifyCode, success?:any, err?:any)=>{

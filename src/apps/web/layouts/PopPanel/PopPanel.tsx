@@ -42,7 +42,8 @@ const PopPanel: React.FC<PropType> = ({mask=true, getContainer=document.body||fa
         <p className={'pannel-head'}>
           {
             props.returnTo &&
-						<img src={Icons.back} alt="" className={'returnTo'} onClick={props.handleReturn}/>
+            <span className={'iconfont icon-Back returnTo'} onClick={props.handleReturn}></span>
+						// <img src={Icons.back} alt="" className={'returnTo'} onClick={props.handleReturn}/>
           }
           <span className={!props.returnTo ? `panel-title` : ''}>{props.title}</span>
           {

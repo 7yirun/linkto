@@ -37,6 +37,9 @@ const PaintGroup:React.FC<IProps> = (props) => {
         props.showTransformer &&
         <Transformer
           ref={trRef}
+          anchorFill={'#43CF7C'}
+          anchorStroke={'#43CF7C'}
+          borderStroke={'#43CF7C'}
         >
         </Transformer>
       }
