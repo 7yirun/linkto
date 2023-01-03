@@ -5,25 +5,22 @@ import {useState, useRef, useEffect} from 'react'
 import BScroll from '@better-scroll/core'
 import ScrollBar from '@better-scroll/scroll-bar'
 import MouseWheel from '@better-scroll/mouse-wheel'
-import Icons from "lib/icons"
 import {queryKeywords, text2img, img2img, imgRefresh, getWords} from "service/service";
 import AddToBookmark from "apps/web/components/AddToBookmark/AddToBookmark";
 import SeeBig from "apps/web/components/SeeBig/SeeBig";
-import qs from "qs";
 import {setStore, getStore, downloadURI} from "utils/utils"
 import {
   setMapArr,
   setLanMap,
-  setCurrentLayerId,
   setLoadedImages,
   SearchStateType,
   StateType, setDescription
 } from "apps/web/store/store";
 import {useDispatch, useSelector} from "react-redux"
 import Slider from '@mui/material/Slider';
-import {message, Dropdown} from 'antd'
+import {message, Dropdown, InputNumber} from 'antd'
 import UpLoad from "apps/web/components/UpLoad/UpLoad";
-import Konva from "apps/web/components/Paint/Konva2"
+import Paint from "apps/web/components/Paint/Konva2"
 import type {MenuProps} from 'antd';
 import Header from "apps/web/components/Header/Header"
 
@@ -56,6 +53,16 @@ export type pictureStateType = {
   currentLayerId: string
 }
 
+export type LayerInfoType = {
+  layerArr: LayerType[]
+  currentLayerId: string
+}
+type LayerType = {
+  name: string,
+  layerId: string,
+  imgUrl: string,
+}
+
 const Create = (props: any) => {
   message.config({
     duration: 2,
@@ -78,10 +85,6 @@ const Create = (props: any) => {
   const [creatable, setCreatable] = useState(true);
   const [progress, setProgress] = useState(0);
 
-  //图片的预览链接 由本地生成
-  const [previewUrl, setPreviewUrl] = useState('');
-
-  const MAX_LENGTH = 200; //可输入的最大文字个数
   //创作模式,按文字或者图片创作
   const [mode, setMode] = useState(MODE.junior);
 
@@ -94,12 +97,19 @@ const Create = (props: any) => {
   // 默认选中第0个dimension
   const [dimension, setDimension] = useState(Number(getStore('dimension', false)));  //Number(null) => 0
 
+  //高级创作中可以自定义图片尺寸:
+  const customizeHeightRef = useRef<any>();
+  const customizeWidthRef = useRef<any>();
+
+
   const [displayDimension, setDisplayDimension] = useState<number>(dimension);
 
   const [relevance, setRelevance] = useState<number>(getStore('relevance', false) ? Number(getStore('relevance', false)) : 50); //默认相关性
   //图片相关性
   const [relevance2, setRelevance2] = useState(getStore('relevance2', false) ? Number(getStore('relevance2', false)) : 70); //默认相关性
 
+  //steps
+  const [steps, setSteps] = useState<number>(20)
 
   //输入框里的negtive keyword
   const [negInput, setNegInput] = useState(getStore('negInput', false) || '');
@@ -123,7 +133,6 @@ const Create = (props: any) => {
   //切换文字创作 / 图片创作 模式
   const changeModeTo = (mode: MODE) => {
     setMode(mode);
-    setPreviewUrl('');
     requestAnimationFrame(() => {
       (bsRef.current as any).refresh();
     })
@@ -185,6 +194,7 @@ const Create = (props: any) => {
     english: string,
     id: number
   }
+
   const [words, setWords] = useState<IWord[]>([])
 
   //选中的行业id
@@ -199,13 +209,11 @@ const Create = (props: any) => {
   }, [mode])
 
   //从外界图片的二次创作操作跳转过来
-  useEffect(()=>{
-    console.log(pictureState.loadedImages);
+  useEffect(() => {
     //除去默认的背景图 还新增了别的图片
-    if(pictureState.loadedImages.length > 1){
+    if (pictureState.loadedImages.length > 1) {
       setIsWork(true);
       setMode(MODE.superior);
-      console.log(123);
     }
   }, [pictureState.loadedImages])
   //创作图片
@@ -214,7 +222,7 @@ const Create = (props: any) => {
     //英文关键词数组
     let keywordArr = searchState.mapArr.join().split(',').filter(str => str);
     //行业词汇
-    let profession:string = '';
+    let profession: string = '';
     //进阶 高级 创作要传行业词汇
     if (mode === MODE.senior || mode === MODE.superior) {
       const tmp: string[] = [];
@@ -241,12 +249,12 @@ const Create = (props: any) => {
         imgRefresh({taskId: taskId}, success)
       }, 1000)
     }
+    if (!description && !keyword) {
+      //生成按钮和换一批按钮不可点击
+      message.warning('请输入或选择描述词')
+      return
+    }
     if (mode === MODE.junior || mode === MODE.senior) {
-      if (!description && !keyword) {
-        //生成按钮和换一批按钮不可点击
-        message.warning('请输入或选择描述词')
-        return
-      }
       text2img({
         guidance: relevance * 15 / 100,
         width: DIMESNION_OPTION[dimension].width,
@@ -271,23 +279,26 @@ const Create = (props: any) => {
         message.error(err.msg || '系统内部错误, 请稍后再试');
       })
     } else if (mode === MODE.superior) {
-
-      console.log(konvaRef.current.getFinishedPic());
-      return;
+      if (pictureState.loadedImages.length <= 1) {
+        message.warning('请上传至少一张图片');
+        return
+      }
+      const {paint, mask} = konvaRef.current.generateImg()
       //@ts-ignore
       img2img({
         guidance: relevance * 15 / 100,
-        initImage: konvaRef.current.getFinishedPic(),
-        width: DIMESNION_OPTION[dimension].width,
-        height: DIMESNION_OPTION[dimension].height,
-        numImages: 4,
+        initImageBase64: paint,
+        maskBase64: mask,
+        width: customizeWidthRef.current.value,
+        height: customizeHeightRef.current.value,
+        numImages: 1,
         prompt: description,
         keywords: keyword,
         strength: relevance2 / 100,
-        negativePrompt: negInput
+        negativePrompt: negInput,
+        steps: steps,
       }, (res: any) => {
         setCreatable(false);
-        // @ts-ignore
         setIsWork(false);
         //生成的图片按照所选尺寸显示
         setDisplayDimension(dimension)
@@ -305,7 +316,6 @@ const Create = (props: any) => {
     }
   }
 
-  const [imgToScale, setImgToScale] = useState(false);
   const [imgToAdd, setImgToAdd] = useState(false);
   const [imgSrc, setImgSrc] = useState<string>();
 
@@ -315,21 +325,36 @@ const Create = (props: any) => {
 
   //设置当前选中的是哪个图层
   const handleMenuClick: MenuProps['onClick'] = (e) => {
-    dispatch(setCurrentLayerId(e.key))
+    konvaRef.current.changeCurrentLayer(e.key)
   };
-  const items: MenuProps['items'] = pictureState.loadedImages.map((img: ILoadedImg, index: number) => {
+
+  //将setLayerInfo方法传给Konva子组件. 子组件layer改变时调用setLayerInfo让父组件同步变化
+  const [layerInfo, setLayerInfo] = useState<LayerInfoType>({
+    layerArr: [{
+      name: pictureState.loadedImages[0].name,
+      layerId: pictureState.loadedImages[0].id,
+      imgUrl: pictureState.loadedImages[0].src,
+    }],
+    currentLayerId: pictureState.loadedImages[0].id
+  });
+
+
+
+
+  const items: MenuProps['items'] = layerInfo.layerArr.map((layer: LayerType, index: number) => {
     return {
       label: (
         <p>
           {
-            img.src ?
-              <img src={img.src} alt=""/>
-              : <span className="pure-color"></span>
+            layer.imgUrl ?
+              <img src={layer.imgUrl} alt=""/>
+              :
+              <span className="pure-color"></span>
           }
-          <span>{img.name}</span>
+          <span>{layer.name}</span>
         </p>
       ),
-      key: img.id
+      key: layer.layerId
     }
   })
 
@@ -366,37 +391,86 @@ const Create = (props: any) => {
                   </div>
                   {
                     mode === MODE.superior &&
-										<div className={'choose relevance'}>
-											<p>图片相关性</p>
-											<Slider
-												value={relevance2}
-												onChange={(e, newRelevance) => {
-                          setRelevance2(newRelevance as number)
-                        }}
-											></Slider>
-											<div className="percentage">{`${relevance2}%`}</div>
-										</div>
+										<>
+											<div className={'choose relevance'}>
+												<p>图片相关性</p>
+												<Slider
+													value={relevance2}
+													onChange={(e, newRelevance) => {
+                            setRelevance2(newRelevance as number)
+                          }}
+												></Slider>
+												<div className="percentage">{`${relevance2}%`}</div>
+											</div>
+											<div className={'choose relevance'}>
+												<p>生成步骤</p>
+												<Slider
+													min={5}
+													max={50}
+													value={steps}
+													onChange={(e, newSteps) => {
+                            setSteps(newSteps as number)
+                          }}
+												></Slider>
+												<div className="percentage">{steps}</div>
+											</div>
+										</>
                   }
                   <div className={'choose dimension'}>
                     <p>尺寸</p>
-                    <div className='dimension-options'>
-                      {
-                        DIMESNION_OPTION.map((item, index) => {
-                          return (
-                            <CapsuleButton nobutton={1}
-                                           key={index}
-                                           data-checked={dimension === index ? "checked" : "unchecked"}
-                                           onClick={() => {
-                                             setDimension(index)
-                                           }}
-                            >
-                              {`${item.width}*${item.height}`}
-                            </CapsuleButton>
-                          )
-                        })
-                      }
-                    </div>
+                    {
+                      mode !== MODE.superior ?
+                        <div className='dimension-options'>
+                          {
+                            DIMESNION_OPTION.map((item, index) => {
+                              return (
+                                <CapsuleButton nobutton={1}
+                                               key={index}
+                                               data-checked={dimension === index ? "checked" : "unchecked"}
+                                               onClick={() => {
+                                                 setDimension(index)
+                                               }}
+                                >
+                                  {`${item.width}*${item.height}`}
+                                </CapsuleButton>
+                              )
+                            })
+                          }
+                        </div>
+                        :
+                        <div className="free-dimension">
+                          <div className="row">
+                            <span className={'title'}>宽度</span>
+                            <InputNumber
+                              ref={customizeWidthRef}
+                              defaultValue={1024}
+                              step={64}
+                              max={2048}
+                              min={512}
+                              controls={{
+                                upIcon: <span className={'iconfont icon-1'}></span>,
+                                downIcon: <span className={'iconfont icon-11'}></span>
+                              }}
+                            ></InputNumber>
+                          </div>
+                          <div className="row">
+                            <span className={'title'}>高度</span>
+                            <InputNumber
+                              ref={customizeHeightRef}
+                              defaultValue={1024}
+                              step={64}
+                              max={2048}
+                              min={512}
+                              controls={{
+                                upIcon: <span className={'iconfont icon-1'}></span>,
+                                downIcon: <span className={'iconfont icon-11'}></span>
+                              }}
+                            ></InputNumber>
+                          </div>
+                        </div>
+                    }
                   </div>
+
                   {
                     (mode === MODE.senior || mode === MODE.superior) &&
 										<div className="choose choose-tags">
@@ -505,7 +579,18 @@ const Create = (props: any) => {
             <div className="operate-buttons">
               {
                 creatable ?
-                  <CapsuleButton onClick={createImg} className={'create'}>开始创作</CapsuleButton>
+                  <>
+                    {
+                      mode !== MODE.superior?
+                        <CapsuleButton onClick={createImg} className={'create'}>开始创作</CapsuleButton>
+                        :
+                        isWork ? <CapsuleButton onClick={createImg} className={'create'}>开始创作</CapsuleButton> :
+                        <CapsuleButton
+                          onClick={() => {
+                            setIsWork(!isWork);
+                          }}>返回创作区</CapsuleButton>
+                    }
+                  </>
                   :
                   <CapsuleButton nobutton={1} className={'create disable'}>
                     <span className={'text'}>{`创作中(${progress}%)`}</span>
@@ -513,12 +598,12 @@ const Create = (props: any) => {
                   </CapsuleButton>
               }
               {
-                mode === MODE.superior && !isWork &&
+                mode === MODE.superior && isWork &&
 								<CapsuleButton
 									onClick={() => {
-                    setIsWork(true);
+                    setIsWork(false);
                   }}
-								>返回创作区</CapsuleButton>
+								>{"返回创作结果"}</CapsuleButton>
               }
             </div>
             {
@@ -535,20 +620,21 @@ const Create = (props: any) => {
                       <div>
                         <p>
                           {
-                            pictureState.currentLayerId === '背景图层001' ?
+                            layerInfo.currentLayerId === '背景图层001' ?
                               <span className={'pure-color'}></span> :
-                              <img src={pictureState.currentLayerId ?
-                                pictureState.loadedImages.find(obj => obj.id === pictureState.currentLayerId)?.src
+                              <img src={layerInfo.currentLayerId ?
+                                layerInfo.layerArr.find((layer: LayerType) => layer.layerId === layerInfo.currentLayerId)?.imgUrl
                                 :
-                                pictureState.loadedImages[0].src} alt=""/>
+                                layerInfo.layerArr[0].imgUrl} alt=""/>
                           }
                           <span>
                             {
-                              pictureState.currentLayerId
+                              layerInfo.currentLayerId
                                 ?
-                                pictureState.loadedImages.find(obj => obj.id === pictureState.currentLayerId)?.name
+                                layerInfo.layerArr.find((layer: LayerType) => layer.layerId === layerInfo.currentLayerId)?.name
                                 :
-                                pictureState.loadedImages[0].name}
+                                layerInfo.layerArr[0].name
+                            }
                           </span>
                         </p>
                         <span className="iconfont icon-down"></span>
@@ -560,22 +646,24 @@ const Create = (props: any) => {
 									<span
 										className={'delete-layer iconfont icon-24'}
 										onClick={() => {
-
+                      konvaRef.current.deleteLayer()
                     }}
 									></span>
 								</div>
-								<Konva
+								<Paint
 									ref={konvaRef}
-								></Konva>
+									updateLayerInfo={setLayerInfo}
+								></Paint>
 							</>
             }
             {/*创作好的图片展示区*/}
             {
               !isWork &&
 							<div className="img-wrapper">
-								<div className={`dim${displayDimension + 1} img-center`}>
+								<div className={`dim${displayDimension + 1} img-center ${mode === MODE.superior ? 'superior' : ''}`}>
                   {
-                    [...Array(4)].map((val, index) => (
+                    mode === MODE.superior ?
+                    [...Array(1 )].map((val, index) => (
                       <div key={index} className="img-placeholder">
                         <i className={'iconfont icon-4'}></i>
                         {
@@ -613,7 +701,46 @@ const Create = (props: any) => {
 													</>
                         }
                       </div>
-                    ))
+                    )):
+                      [...Array(4 )].map((val, index) => (
+                        <div key={index} className="img-placeholder">
+                          <i className={'iconfont icon-4'}></i>
+                          {
+                            createdImg.length > 1 &&
+				                    <>
+					                    <img src={`${createdImg[index]}?time=${Date.now()}`} alt=""/>
+					                    <p className={"hover-icons"}>
+													    <span
+														    className={'iconfont icon-12'}
+														    onClick={() => {
+                                  setImgToAdd(true);
+                                  setImgSrc(`${createdImg[index]}`);
+                                }}
+													    ></span>
+						                    <span
+							                    className={'iconfont icon-13'}
+							                    onClick={() => {
+                                    //二次创作
+                                    setMode(MODE.superior);
+                                    setIsWork(true);
+                                    dispatch(setLoadedImages([...pictureState.loadedImages, {
+                                      name: `picture${index + 1}`,
+                                      src: `${createdImg[index]}?time=${Date.now()}`,
+                                      id: `picture${index + 1}${Date.now()}`
+                                    }]))
+                                  }}
+						                    ></span>
+						                    <span className={'iconfont icon-16'}
+						                          onClick={() => {
+                                        downloadURI(`${createdImg[index]}`, 'picture' + (index + 1));
+                                      }}
+						                    >
+                            </span>
+					                    </p>
+				                    </>
+                          }
+                        </div>
+                      ))
                   }
 								</div>
 							</div>

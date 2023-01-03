@@ -2,7 +2,7 @@ import React, {ReactNode} from 'react';
 import styles from "./UpLoad.module.scss"
 import {message} from 'antd'
 
-import {setCurrentLayerId, setLoadedImages} from "apps/web/store/store";
+import {setLoadedImages} from "apps/web/store/store";
 import {useDispatch, useSelector} from "react-redux"
 
 interface IProps {
@@ -29,7 +29,6 @@ const UpLoad: React.FC<IProps> = (props) => {
         accept="image/jpeg, image/jpg, image/png, image/gif, image/bmp"
         onChange={(e) => {
           const file = e.target.files![0];
-          console.log(file);
           //点击上传文件然后点取消 也会触发onchange, 此时file为undefined
           if(!file){
             return
@@ -53,7 +52,7 @@ const UpLoad: React.FC<IProps> = (props) => {
               id: id
             }]))
             //每次上传新图片 将当前图层改变为新上传的图片的图层
-            dispatch(setCurrentLayerId(id));
+            // dispatch(setCurrentLayerId(id));
           }
           //value值要重置, 否则第二次上传相同文件时onchange不触发
           e.target.value = '';

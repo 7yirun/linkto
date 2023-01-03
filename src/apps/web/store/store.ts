@@ -72,19 +72,14 @@ const pictureSlice = createSlice({
   name: 'pictureSlice',
   initialState: {
     loadedImages: loadedImages,
-    currentLayerId: '背景图层001'
   },
   reducers: {
     setLoadedImages(state, action){
       state.loadedImages = action.payload
     },
-    setCurrentLayerId(state, action){
-      state.currentLayerId = action.payload
-      console.log(state.currentLayerId);
-    }
   }
 })
-export const {setLoadedImages, setCurrentLayerId} = pictureSlice.actions
+export const {setLoadedImages} = pictureSlice.actions
 
 const store = configureStore({
   reducer: {

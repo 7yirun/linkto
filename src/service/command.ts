@@ -10,7 +10,7 @@ export default {
   TEXT2IMG: "/ai/draw/picture/ai/txt2img",
   ADD_NEW_BOOKMARK: "/ai/draw/picture/clip/add",
   IMG_REFRESH: "/ai/draw/picture/ai2img/refresh",
-  IMG2IMG: "/ai/draw/picture/ai/img2img",
+  IMG2IMG: "/ai/draw/picture/ai/inPaint",
   COLLECT_IMG: "/ai/draw/picture/collect",
   CANCEL_COLLECT_IMG: "/ai/draw/picture/cancel/collect",
   SET_PICTURE: "/ai/draw/picture/update",

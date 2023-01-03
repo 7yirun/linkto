@@ -208,6 +208,8 @@ const Register = ({mask=true,getContainer=document.body, ...props}: {
         dispatch(setShowRegister(false))
         dispatch(setShowLogin(true));
       }, 1000)
+    }, (err:any)=>{
+      setErrInfo(err.msg)
     })
   }
   const resetPasswordError = () => {
@@ -226,14 +228,14 @@ const Register = ({mask=true,getContainer=document.body, ...props}: {
   )
 
   useEffect(() => {
-    getWords({type: 0}, (res: any) => {
+    current === 3 && getWords({type: 0}, (res: any) => {
       let list = res.data
       list.forEach((item:any )=> {
          item.checked = false
       })
       setinterestList(list);
     })
-  }, [])
+  }, [current])
 
   const handleInterest = (obj:any,index:number)=>{
     return ()=>{

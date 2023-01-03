@@ -128,7 +128,7 @@ const ImageCard: React.FC<Iprops> = ({
                     {
                       name: "LinkTo_IMG_" + imgInfo.id,
                       src: imgInfo.url,
-                      id: imgInfo.id
+                      id: 'LinkTo_IMG_' + imgInfo.id + Date.now()
                     }
                   ]))
                 }}

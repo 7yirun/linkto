@@ -7,6 +7,7 @@ import {getSearchWords} from "service/service"
 import styles from "./Search.module.scss"
 import {CSSTransition} from 'react-transition-group'
 import debounce from 'lodash/debounce.js'
+import {message} from 'antd'
 
 
 const Search: React.FC<{isPictures: boolean}> = (props) => {
@@ -61,6 +62,7 @@ const Search: React.FC<{isPictures: boolean}> = (props) => {
           }}
           onChange={(e) => {
             if (e.target.value.length > 200) {
+              message.warning('描述词不得超过200字')
               return;
             }
             dispatch(setDescription(e.target.value));
@@ -72,7 +74,7 @@ const Search: React.FC<{isPictures: boolean}> = (props) => {
             }
           }}
         />
-        <div className="text-limit">{searchState.description.length + '/200'}</div>
+        {/*<div className="text-limit">{searchState.description.length + '/200'}</div>*/}
       </div>
       <CSSTransition
         classNames={'small-tags'}

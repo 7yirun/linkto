@@ -67,13 +67,8 @@ const SubMyFollow = (props: any) => {
               return (
                 <li className={'list-item'} key={item.id}>
                   <ArtistCard
-                    clickable={true}
-                    headPic={item.headPic}
-                    picClipNum={item.picClipNum}
-                    accountName={item.accountName}
-                    fansNum={item.fansNum}
-                    focusNum={item.focusNum}
-                    id={item.id}
+                    accountInfo={item}
+                    canEditName={false}
                   ></ArtistCard>
                 </li>
               )

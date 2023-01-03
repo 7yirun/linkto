@@ -2,20 +2,19 @@ import styles from "./MySpace.module.scss"
 import React, {useCallback, useEffect, useState} from 'react';
 import Personal from "apps/web/components/Personal/Personal"
 import {getStore} from "utils/utils";
-import EditUser from "apps/web/components/EditUser/EditUser"
 import {useSelector, useDispatch} from 'react-redux'
 import {queryBookmarkList, setClipPrivateStaus} from "service/service"
-import Waterfall from "apps/web/components/WaterFall/Waterfall2";
-import {useWindowResize} from "../../hooks";
 import Header from "apps/web/components/Header/Header"
-import ClipPictures from "../Bookmark/Subpage/ClipPictures/ClipPictures";
 import EditClip from "apps/web/components/EditClip/EditClip";
+import qs from "qs";
+import {useHistory} from "react-router-dom";
 
 const MySpace = (props: any) => {
   const accountInfo = JSON.parse(getStore("accountInfo", true) || '{}');
   const accountId = accountInfo.id;
-  const dispatch = useDispatch();
-  const state = useSelector((state: any) => state.loginState);
+
+  const history = useHistory()
+  const otherId = Number(qs.parse(history.location.search.replace('?', "")).id)
 
   type clipInfo = {
     id: number
@@ -37,15 +36,15 @@ const MySpace = (props: any) => {
   const [collect, setCollect] = useState(COLLECT_TYPE.CREATE);
   useEffect(() => {
     if (collect === COLLECT_TYPE.CREATE) {
-      queryBookmarkList({
-        type: COLLECT_TYPE.CREATE,
-      }, (res: any) => {
+      const req:{type:COLLECT_TYPE, accountId?: number} = {type: COLLECT_TYPE.CREATE}
+      otherId && (req.accountId = otherId);
+      queryBookmarkList(req, (res: any) => {
         setDisplayedList(res.data)
       })
     } else {
-      queryBookmarkList({
-        type: COLLECT_TYPE.BOOKMARK,
-      }, (res: any) => {
+      const req:{type:COLLECT_TYPE, accountId?: number} = {type: COLLECT_TYPE.BOOKMARK}
+      otherId && (req.accountId = otherId);
+      queryBookmarkList(req, (res: any) => {
         setDisplayedList(res.data)
       })
     }
