@@ -88,16 +88,13 @@ const SubPersonalinfo = (props: any) => {
         : (interestSelected = interestIds.split(","));
       }
        
-      // let interestSelectedList: any = [];
       list.map((item: any) => {
         interestSelected.forEach((id: any) => {
           if (item.id == JSON.parse(id)) {
             item.checked = true;
-            // interestSelectedList.push(item);
           }
         });
       });
-      // setinterestIdList(interestSelectedList);
       setinterestList(list);
       
       console.log("interestList==",list,interestIds);
@@ -108,7 +105,6 @@ const SubPersonalinfo = (props: any) => {
     return () => {
       console.log("点击的数据是===", obj,interestIds);
     
-      let cancelChecked = interestIds.includes(obj.id);//为true取消选择
       let status: boolean = false;
       type
         ? (status = false)
