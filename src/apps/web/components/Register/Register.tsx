@@ -167,6 +167,13 @@ const Register = ({mask=true,getContainer=document.body, ...props}: {
   }, [restTime])
 
   const handleReturn = () => {
+    if(current === 3){
+      setFormState({
+        ...formState,
+        interestIds: ''
+      })
+      setinterestIdList([]);
+    }
     setCurrent(current - 1);
   }
   //检测数据合法性
@@ -257,7 +264,8 @@ const Register = ({mask=true,getContainer=document.body, ...props}: {
         ...formState,
         interestIds: interestIdList.toString()
       })
-      setinterestList(interestIdList);
+      // setinterestList(interestIdList);
+      setinterestIdList(interestIdList);
       setinterestList(newListData);
    }
   }

@@ -2,17 +2,13 @@ import React, { useState, useEffect } from "react";
 import style from "./index.module.scss";
 import Icons from "lib/icons";
 import { getFocusList, getWords } from "service/service";
-import ArtistCard from "../../../../components/ArtistCard/ArtistCard";
-import qs from "qs";
 import { useSelector, useDispatch } from "react-redux";
 import { setAccountInfo, setShowRegister } from "apps/web/store/store";
 import styles from "./EditUser.module.scss";
 import { getStore, setStore } from "utils/utils";
 import CapsuleButton from "../../../../components/CapsuleButton/CapsuleButton";
-import { editUser, queryVerifyCode, getPersonalInfo } from "service/service";
-import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
+import { editUser, getPersonalInfo } from "service/service";
 import PopPanel from "apps/web/layouts/PopPanel/PopPanel";
-import md5 from "js-md5";
 import { message } from "antd";
 
 const SubPersonalinfo = (props: any) => {
@@ -29,8 +25,6 @@ const SubPersonalinfo = (props: any) => {
   const [interestIds, setInterestIds] = useState(accountInfo.interestIds || "");
   //兴趣集合
   const [interestList, setinterestList] = useState<Array<any>>([]);
-  //选中的兴趣
-  // const [interestIdList, setinterestIdList] = useState<Array<any>>([]);
   //预览头像
   const [headPic, setHeadPic] = useState(accountInfo.headPic || "");
   //原密码
@@ -76,9 +70,6 @@ const SubPersonalinfo = (props: any) => {
   const handleWords = (type: number) => {
     getWords({ type: 0 }, (res: any) => {
       let list:any = res.data;
-
-      console.log("兴趣返回--",list)
-      
       let interestSelected: any = [];
       if(accountInfo.interestIds == '' || interestIds == ''){
         interestSelected = []
@@ -88,26 +79,19 @@ const SubPersonalinfo = (props: any) => {
         : (interestSelected = interestIds.split(","));
       }
        
-      // let interestSelectedList: any = [];
       list.map((item: any) => {
         interestSelected.forEach((id: any) => {
           if (item.id == JSON.parse(id)) {
             item.checked = true;
-            // interestSelectedList.push(item);
           }
         });
       });
-      // setinterestIdList(interestSelectedList);
       setinterestList(list);
-      
-      console.log("interestList==",list,interestIds);
     });
   };
 
   const handleInterest = (obj: any, index: number, type: number) => {
     return () => {
-      console.log("点击的数据是===", obj,interestIds);
-    
       let cancelChecked = interestIds.includes(obj.id);//为true取消选择
       let status: boolean = false;
       type
@@ -127,8 +111,6 @@ const SubPersonalinfo = (props: any) => {
             return list;
           }
         });
-        console.log("弹窗数据===", newListData,interestIds);
-
         setinterestList(newListData);
 
     };
@@ -143,11 +125,9 @@ const SubPersonalinfo = (props: any) => {
     handleWords(1);
   };
 
-
   const confirm = () => {
     const req: any = {};
     req.id = accountInfo.id;
-    console.log("保存====",interestList)
     let interIds: any = [];
     if (interestList.length) {
       interestList.forEach((item: any) => {
@@ -161,7 +141,6 @@ const SubPersonalinfo = (props: any) => {
         return;
     }
     req.interestIds = interIds.toString();
-    console.log("保存兴趣====", req.interestIds)
     if (nickname) {
       req.accountName = nickname;
     }
@@ -175,7 +154,6 @@ const SubPersonalinfo = (props: any) => {
     editUser(
       req,
       () => {
-        console.log("succeed");
         message.success("修改成功！");
         hanledPersonInfo();
       },
