@@ -18,15 +18,7 @@ type PropType = {
 }
 
 const PopPanel: React.FC<PropType> = ({mask=true, getContainer=document.body||false, ...props}) => {
-  const [isModalOpen, setIsModalOpen] = useState(true);
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
   return (
-    <div>
       <Modal
         open={props.open}
         className={props.className ? `${props.className} pannel` : 'pannel'}
@@ -43,7 +35,6 @@ const PopPanel: React.FC<PropType> = ({mask=true, getContainer=document.body||fa
           {
             props.returnTo &&
             <span className={'iconfont icon-Back returnTo'} onClick={props.handleReturn}></span>
-						// <img src={Icons.back} alt="" className={'returnTo'} onClick={props.handleReturn}/>
           }
           <span className={!props.returnTo ? `panel-title` : ''}>{props.title}</span>
           {
@@ -53,16 +44,13 @@ const PopPanel: React.FC<PropType> = ({mask=true, getContainer=document.body||fa
             !props.success && props.warning && <span className={"pannel-warning"}>{props.warning}</span>
           }
         </p>
-
         <div className="pannel-content">
           {
             props.children
           }
         </div>
-
       </Modal>
 
-    </div>
   );
 };
 

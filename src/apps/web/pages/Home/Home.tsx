@@ -3,19 +3,11 @@ import Swiper from 'swiper/js/swiper.js';
 import 'swiper/css/swiper.min.css'
 import {useEffect, useRef, useState} from "react";
 import CapsuleButton from "apps/web/components/CapsuleButton/CapsuleButton"
-import {useSelector, useDispatch} from 'react-redux'
+import {useDispatch} from 'react-redux'
 import {queryImg, welcome} from "service/service"
-import {setShowRegister, setShowLogin, setIsLogin, setConfirmSearch, setDescription} from 'apps/web/store/store'
-import qs from "qs";
+import {setConfirmSearch, setDescription} from 'apps/web/store/store'
 import Header from "apps/web/components/Header/Header"
 import Register from "apps/web/components/Register/Register"
-
-interface IPicture {
-  name: string,
-  description: string,
-  url: string,
-  id: number
-}
 
 type imgType = {
   id: number
@@ -26,50 +18,24 @@ type imgType = {
 }
 
 const Home = (props: any) => {
-  const loginState = useSelector((state: any) => state.loginState);
   const dispatch = useDispatch();
-  const [imgToScale, setImgToScale] = useState('');
   const [list, setList] = useState<imgType[]>([]);
-  const [searchVal, setSearchVal] = useState('');
-  const inputRef = useRef(null);
-  let [welcomeData, setWelcomeData] = useState({accountNum: 0, pictureNum: 0});
 
-  //左侧描述词
-  const [demos, setDemos] = useState([''])
-  const [activeIndex, setActiveIndex] = useState(0);
-  const timer = useRef<any>();
-
-  const firstRender = useRef(true);
-  /*useEffect(() => {
-    if (firstRender.current) {
-      welcome((res: any) => {
-        setWelcomeData(res.data);
-      })
-      firstRender.current = false
-    }
-  }, [welcomeData])*/
-  const scaleImage = (url: string) => {
-    return () => {
-      setImgToScale(url)
-    }
-  }
   /*lingtu 1.2============================================== start*/
   const homeRef = useRef<HTMLDivElement>(null);
   const swiperRef = useRef<any>(null);
 
   useEffect(() => {
+    swiperRef.current = new Swiper(homeRef.current, {
+      direction: "vertical",
+      mousewheel: true,
+      speed: 600,
+    });
     queryImg({
       pageSize: 20,
       pageNum: 1
     }, (res: any) => {
       setList(res.data.list);
-      requestAnimationFrame(() => {
-        swiperRef.current = new Swiper(homeRef.current, {
-          direction: "vertical",
-          mousewheel: true,
-          speed: 600,
-        });
-      })
     })
     return () => {
       swiperRef.current?.destroy();
@@ -84,7 +50,7 @@ const Home = (props: any) => {
     <div ref={homeRef} className={'swiper homepage'}>
       <div className="swiper-wrapper">
         {/*第1页*/}
-        <section className={'swiper-slide full-page'}>
+        <section className={'swiper-slide swiper-no-swiping full-page'}>
           <Header></Header>
           <div className="search">
             <input type="text"
@@ -138,7 +104,7 @@ const Home = (props: any) => {
           ></span>
         </section>
         {/*第2页*/}
-        <section className={'swiper-slide full-page'}>
+        <section className={'swiper-slide swiper-no-swiping full-page'}>
           <div className="poster-wrapper">
             <div className="poster">
               <img src={tempImg.page2} alt=""/>
@@ -158,7 +124,7 @@ const Home = (props: any) => {
           </div>
         </section>
         {/*第3页*/}
-        <section className={'swiper-slide full-page'}>
+        <section className={'swiper-slide swiper-no-swiping full-page'}>
           <div className="text-wrapper">
             <div className="text">
               <h2>收藏你喜欢的
@@ -195,7 +161,7 @@ const Home = (props: any) => {
           </div>
         </section>
         {/*第4页*/}
-        <section className={'swiper-slide full-page'}>
+        <section className={'swiper-slide swiper-no-swiping full-page'}>
           <div className="poster-wrapper">
             <div className="poster">
               <img src={tempImg.page4} alt=""/>
@@ -218,7 +184,7 @@ const Home = (props: any) => {
           </div>
         </section>
         {/*第5页*/}
-        <section className={'swiper-slide full-page'}>
+        <section className={'swiper-slide swiper-no-swiping full-page'}>
           <div className="text-wrapper">
             <div className="text">
               <h2 style={{marginBottom: 0}}>注册</h2>
@@ -233,17 +199,6 @@ const Home = (props: any) => {
           </div>
         </section>
       </div>
-      {/*{
-        loginState.isLogin && welcomeData.accountNum > 0 &&
-	      <div className="welcome">
-		      <p>AI生成
-			      <strong>{welcomeData.pictureNum}</strong>
-			      张画作，您是第
-			      <strong>{welcomeData.accountNum}</strong>
-			      位创作者
-		      </p>
-	      </div>
-      }*/}
     </div>
   )
 }

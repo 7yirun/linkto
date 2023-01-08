@@ -201,7 +201,6 @@ const Register = ({mask=true,getContainer=document.body, ...props}: {
 
   //提交注册表单
   const handleSubmit = (e: any) => {
-    console.log("注册表单",formState)
     register({
       bindPhone: formState.phoneNum,
       accountName: formState.nickname,
@@ -294,6 +293,7 @@ const Register = ({mask=true,getContainer=document.body, ...props}: {
                   }
                   
                   <input placeholder={item.placeholder}
+                         autoFocus={index === 0}
                          autoComplete={'off'}
                          type={item.type === "password" || item.type === "repeatPassword" ? "password" : "text"}
                          value={((formState as any)[item.type])}
@@ -402,7 +402,6 @@ const Register = ({mask=true,getContainer=document.body, ...props}: {
             current === 3 &&
 						<div className="interest-wrapper">
 							<div className="interest" ref={bsDomRef}>
-                {/*使用请求回来的数据*/}
 								<ul>
                   {
                     interestList.map((obj: any, i:number) =>

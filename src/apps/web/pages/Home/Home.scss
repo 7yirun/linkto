@@ -6,6 +6,8 @@
   .full-page {
     width: 100%;
     position: relative;
+    height: 100vh;
+
     //第一页
     &:nth-child(1) {
       overflow: hidden;
@@ -259,48 +261,50 @@
     &:nth-child(5){
       .poster{
         width: 100%;
-        >div{
+        .ant-modal-root{
           height: 100%;
-          .ant-modal-root{
+          transform: translateZ(0);
+          .ant-modal-wrap{
             height: 100%;
-            .ant-modal-wrap{
-              position: relative;
+            .ant-modal{
+              width: 100%;
               height: 100%;
-              .ant-modal{
-                width: 100%;
-                height: 100%;
+              background-color: transparent;
+              left: 0;
+              top: 0;
+              transform: unset;
+
+              .ant-modal-content{
+                box-shadow: none;
                 background-color: transparent;
-                .ant-modal-content{
-                  box-shadow: none;
-                  background-color: transparent;
-                  .pannel-head{
+                .pannel-head{
+                  color: #fff;
+                  .panel-title{
+                    opacity: 0;
+                  }
+                  .pannel-success,.pannel-warning{
+                    width: 400px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                  }
+                }
+                .pannel-content{
+                  .form-item input{
+                    background: #383838;
                     color: #fff;
-                    .panel-title{
-                      opacity: 0;
-                    }
-                    .pannel-success,.pannel-warning{
-                      width: 400px;
-                      left: 50%;
-                      transform: translateX(-50%);
-                    }
                   }
-                  .pannel-content{
-                    .form-item input{
-                      background: #383838;
-                      color: #fff;
-                    }
-                  }
-                  .pannel-buttons{
-                    background-color: transparent;
-                    .capsule-button:nth-child(1){
-                      display: none;
-                    }
+                }
+                .pannel-buttons{
+                  background-color: transparent;
+                  .capsule-button:nth-child(1){
+                    display: none;
                   }
                 }
               }
             }
           }
         }
+
 
       }
       .text-wrapper{
