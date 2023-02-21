@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {Modal} from 'antd'
-import Icons from "lib/icons"
 import './PopPanel.scss'
 
 type PropType = {

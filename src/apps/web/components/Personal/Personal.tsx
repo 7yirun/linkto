@@ -1,9 +1,7 @@
 import React, {useEffect, useState, useRef} from 'react';
 import style from "./Personal.module.scss"
 import {getPersonalInfo} from "service/service";
-import {setShowEditUser, setShowRegister, setEditUser} from 'apps/web/store/store'
 import ArtistCard from "../ArtistCard/ArtistCard";
-import {useSelector, useDispatch} from "react-redux";
 import {useHistory} from "react-router-dom";
 import qs from "qs";
 
@@ -24,7 +22,6 @@ const Personal = (props: any) => {
   //如果路由中传了其他人的id, 则是查看他人主页; 否则查看自己的主页
   const otherId = Number(qs.parse(history.location.search.replace('?', "")).id)
 
-  const dispatch = useDispatch();
   const willUmount = useRef(false)
   const accountId = props.id
 
@@ -45,7 +42,6 @@ const Personal = (props: any) => {
       }
     })
   }, [])
-  const [editName, setEditName] = useState(false)
 
   return (
     <div className={style['personal']}>

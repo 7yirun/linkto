@@ -1,22 +1,18 @@
 import React, {useState, useEffect} from 'react';
 import PopPanel from "../../layouts/PopPanel/PopPanel";
 import {useSelector, useDispatch} from 'react-redux'
-import {setEditUser, setShowEditUser, setShowRegister} from 'apps/web/store/store'
+import {setEditUser} from 'apps/web/store/store'
 import styles from "./EditUser.module.scss"
-import {getStore} from 'utils/utils'
 import Icons from "lib/icons"
 import CapsuleButton from "../CapsuleButton/CapsuleButton";
 import {editUser, queryVerifyCode} from "service/service";
 import {TimeoutId} from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
-// import {getPersonalInfo} from "service/service"
 import md5 from 'js-md5'
 
 const EditUser = (props: any) => {
   const dispatch = useDispatch();
   const loginState = useSelector((state: any) => state.loginState);
 
-  // console.log(loginState.accountInfo);
-  // const accountInfo = JSON.parse(getStore('accountInfo', true) || "{}")
   const accountInfo = loginState.accountInfo;
   const [nickname, setNickname] = useState(accountInfo.accountName || '');
   //预览头像
@@ -137,7 +133,6 @@ const EditUser = (props: any) => {
           <span>修改头像昵称</span>
         </li>
         <li className={`sub-title ${props.type === 'password' ? 'active' : ''}`} onClick={() => {
-          // setEditType('password')
           dispatch(setEditUser('password'))
         }}>
           <span>修改密码</span>
@@ -157,7 +152,6 @@ const EditUser = (props: any) => {
 						<input type="file" name="" id=""
 						       onChange={(e: any) => {
                      let fileReader = new FileReader();
-                     console.log(e.target.files[0]);
                      setAvatarFile(e.target.files[0])
                      fileReader.readAsDataURL(e.target.files[0])
                      fileReader.onload = () => {

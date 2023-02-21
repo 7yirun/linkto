@@ -23,17 +23,6 @@ const Header = (props: any) => {
     return JSON.parse(getStore('accountInfo', true) || '{}');
   }
 
-  //判断当前路由是否是首页
-  const [isHome, setIsHome] = useState<boolean>(true);
-  useEffect(() => {
-    setIsHome(history.location.pathname === '/')
-    const removeListen = history.listen((location: { pathname: string }) => {
-      setIsHome(location.pathname === '/')
-    })
-    return () => {
-      removeListen()
-    }
-  }, [history])
   const handleLogout = () => {
     logout(() => {
       dispatch(setIsLogin(false));

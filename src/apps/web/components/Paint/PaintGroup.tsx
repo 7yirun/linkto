@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, forwardRef} from 'react';
 import {Group, Transformer} from 'react-konva'
 import {GroupConfig} from "konva/lib/Group";
-import Konva from "konva";
 
 interface IProps extends GroupConfig{
   setNode: (ele:any)=>void

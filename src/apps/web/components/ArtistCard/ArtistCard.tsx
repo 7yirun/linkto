@@ -20,7 +20,6 @@ const ArtistCard = ({accountInfo, canEditName, setAccountInfo}: IProps) => {
   }
 
   const history = useHistory()
-  const listInfo: item[] = [];
   const dispatch = useDispatch();
 
   return (

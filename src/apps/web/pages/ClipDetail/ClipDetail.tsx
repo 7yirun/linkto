@@ -1,7 +1,6 @@
 import React, {useEffect, useState, useRef} from 'react';
-import Icons from "lib/icons"
 import style from "./ClipDetail.module.scss"
-import {clipPictures, setPicture, queryImg, addToBookMark, removeFromBookMark} from "service/service"
+import {clipPictures, setPicture, addToBookMark, removeFromBookMark} from "service/service"
 import Header from "apps/web/components/Header/Header"
 import Waterfall from "apps/web/components/WaterFall/Waterfall2"
 import qs from "qs"
@@ -24,13 +23,10 @@ const ClipDetail = (props: any) => {
 
   //当前点击的图片信息 用于收藏 / 查看大图
   const [imgInfo, setImgInfo] = useState<imgInfoType>();
-  /*收藏相关--------------------------------start*/
-  const [showAddTo, setShowAddTo] = useState(false);
+
   //记录图片收藏 / 取消收藏的状态
   const [inClip, setInClip] = useState<boolean[]>([])
-  const cancelAdd = () => {
-    setShowAddTo(false)
-  }
+
   const handleAddToClip = (picId: number) => {
     const index = list.findIndex((imgInfo: imgInfoType) => imgInfo.id === picId);
     console.log(index);
@@ -74,34 +70,6 @@ const ClipDetail = (props: any) => {
 //显示 收藏/取消收藏按钮
 // const {showBookmark = false} = props;
   const [list, setList] = useState([]);
-  const handleSetPublic = (id: number, index: number) => {
-    return () => {
-      setPicture({
-        isPrivate: 0,
-        picId: id
-      }, () => {
-        let templist = [...list];
-        // @ts-ignore
-        templist[index].isPrivate = 0;
-        setList(templist)
-      })
-    }
-  }
-  const handleSetPrivate = (id: number, index: number) => {
-    return () => {
-      setPicture({
-        isPrivate: 1,
-        picId: id
-      }, () => {
-        let templist = [...list];
-        // @ts-ignore
-        templist[index].isPrivate = 1;
-        setList(templist)
-      })
-    }
-  }
-
-  const firstRef = useRef(true);
   const [clipName, setClipName] = useState('');
   useEffect(() => {
     clipPictures({
@@ -138,7 +106,6 @@ const ClipDetail = (props: any) => {
                       outimgInfo={imgInfo}
                       outsetImgInfo={setImgInfo}
                       setImgToScale={setImgToScale}
-                      setShowAddTo={setShowAddTo}
                       removeFromClip={handleRemoveFromClip}
                       addBackToClip={handleAddToClip}
                     />

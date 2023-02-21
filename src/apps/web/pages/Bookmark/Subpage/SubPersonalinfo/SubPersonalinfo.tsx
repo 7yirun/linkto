@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
 import style from "./index.module.scss";
-import Icons from "lib/icons";
-import { getFocusList, getWords } from "service/service";
+import { getWords } from "service/service";
 import { useSelector, useDispatch } from "react-redux";
-import { setAccountInfo, setShowRegister } from "apps/web/store/store";
-import styles from "./EditUser.module.scss";
+import { setAccountInfo } from "apps/web/store/store";
 import { getStore, setStore } from "utils/utils";
 import CapsuleButton from "../../../../components/CapsuleButton/CapsuleButton";
 import { editUser, getPersonalInfo } from "service/service";
@@ -13,7 +11,6 @@ import { message } from "antd";
 
 const SubPersonalinfo = (props: any) => {
   const dispatch = useDispatch();
-  const [messageApi, contextHolder] = message.useMessage();
   const loginState = useSelector((state: any) => state.loginState);
   const accountInfo = JSON.parse(
     getStore("accountInfo", true) || loginState.accountInfo
@@ -27,19 +24,8 @@ const SubPersonalinfo = (props: any) => {
   const [interestList, setinterestList] = useState<Array<any>>([]);
   //预览头像
   const [headPic, setHeadPic] = useState(accountInfo.headPic || "");
-  //原密码
-  const [prevPwd, setPrevPwd] = useState("");
-  //新密码
-  const [password, setPassword] = useState("");
-  //重复新密码
-  const [password2, setPassword2] = useState("");
   const [open, setOpen] = useState(false);
-  //新手机号
-  const [phoneNum, setPhoneNum] = useState("");
-  //验证码
-  const [verifyCode, setVerifyCode] = useState("");
   const [errInfo, setErrInfo] = useState("");
-  const [successInfo, setSuccessInfo] = useState("");
   const [avatarFile, setAvatarFile] = useState();
 
   useEffect(() => {
@@ -92,7 +78,6 @@ const SubPersonalinfo = (props: any) => {
 
   const handleInterest = (obj: any, index: number, type: number) => {
     return () => {
-      let cancelChecked = interestIds.includes(obj.id);//为true取消选择
       let status: boolean = false;
       type
         ? (status = false)
@@ -180,7 +165,6 @@ const SubPersonalinfo = (props: any) => {
                 id=""
                 onChange={(e: any) => {
                   let fileReader = new FileReader();
-                  console.log(e.target.files[0]);
                   if (e.target.files && e.target.files[0]) {
                     setAvatarFile(e.target.files[0]);
                     fileReader.readAsDataURL(e.target.files[0]);

@@ -6,6 +6,7 @@ const CapsuleButton = ({...props}) => {
   if(!props.nobutton){
     return (
       <button
+        type={'button'}
         {...props}
         onClick={(e)=>{
           e.preventDefault();

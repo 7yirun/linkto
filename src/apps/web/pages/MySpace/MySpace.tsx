@@ -2,7 +2,6 @@ import styles from "./MySpace.module.scss"
 import React, {useCallback, useEffect, useState} from 'react';
 import Personal from "apps/web/components/Personal/Personal"
 import {getStore} from "utils/utils";
-import {useSelector, useDispatch} from 'react-redux'
 import {queryBookmarkList, setClipPrivateStaus} from "service/service"
 import Header from "apps/web/components/Header/Header"
 import EditClip from "apps/web/components/EditClip/EditClip";

@@ -4,8 +4,6 @@ import "./AddToBookmark.scss"
 import {message} from "antd";
 import {queryBookmarkList} from "service/service";
 import CapsuleButton from "../CapsuleButton/CapsuleButton";
-import {useDispatch} from "react-redux";
-import {useHistory} from "react-router-dom";
 import {addNewBookmark, addToBookMark} from "service/service";
 import ScrollBar from '@better-scroll/scroll-bar'
 import BScroll from '@better-scroll/core'
@@ -39,13 +37,10 @@ const AddToBookmark = (props:IProps) => {
   const [list,setList] = useState([]);
   const [searchVal, setSearchVal] = useState('');
   const unmountRef = useRef(false);
-  const dispatch = useDispatch();
-  const history = useHistory();
   const [filteredList, setFilteredList] = useState([])
   const wrapperRef = useRef<any>()
   const bsRef = useRef(null);
   const [createVal, setCreateVal] = useState('');
-  const [isHover, setIsHover] = useState(0);
   const [isCreate, setIsCreate] = useState(0);
   const [createLen, setCreateLen] = useState(0);
   useEffect(()=>{

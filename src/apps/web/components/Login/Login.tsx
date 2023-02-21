@@ -69,7 +69,6 @@ const Login = () => {
     }
   }, [restTime])
   useEffect(()=>{
-    //这里不确定是否需要clear timer, 因为它可能是闭包 下次组件创建时是有值的
     timerId && clearInterval(timerId);
     return ()=>{
       clearInterval(timerId);
@@ -164,16 +163,17 @@ const Login = () => {
                   return (
                     <div key={'pwd' + index} className="form-item">
                        {
-                    //  ( item.type === "password" || item.type === "phoneNum") && verifyError ? 
-                    //     <img src={Icons.unchecked} alt=""/>
-                    //     : 
-                    //     <img src={item.icon} alt=""/>
                     <i className={`iconfont ${item.icon } ${( item.type === "password" || item.type === "phoneNum") &&verifyError ? 'pwd-error' : ''}`}></i>
                       }
                       <input type={item.type === "password" ? "password" : "text"}
                              placeholder={item.placeholder}
                              value={((formData as any)[item.type])}
                              className={ ( item.type === "password" || item.type === "phoneNum") && verifyError ? `password-error` : ''}
+                             onKeyDown={(e)=>{
+                               if(e.key === 'Enter'){
+                                 login(e);
+                               }
+                             }}
                              onChange={(e) => {
                                if (item.type === "password") {
                                  setPassWord(e.target.value)
@@ -235,42 +235,6 @@ const Login = () => {
               <CapsuleButton onClick={close} className={'cancel'}>取消</CapsuleButton>
               <CapsuleButton onClick={login} className={'confirm'}>登录</CapsuleButton>
             </div>
-            {/* {
-              !codeLogin &&
-				      <>
-					      <div className={'cannot-login'}>
-						      <p onClick={() => {
-                    dispatch(setShowRegister(true))
-                    dispatch(setShowLogin(false))
-                  }}>立即注册</p>
-						      <p onClick={() => {
-                    setCodeLogin(true);
-                    setPhoneNum("");
-                    setErrInfo("");
-                  }}>忘记密码</p>
-					      </div>
-					      <div className={'other-login'}>
-						      <p className={'wechat'}
-						         onClick={()=>{
-                       setErrInfo('该功能暂未开通')
-                     }}
-						      >
-							      <img src={Icons.wechat} alt=""/>
-							      <span>微信扫码登录</span>
-						      </p>
-						      <p className={'varify-code'}
-						         onClick={()=>{
-                       setCodeLogin(true);
-                       setPhoneNum("");
-                       setErrInfo("");
-                     }}
-						      >
-							      <img src={Icons.varify} alt=""/>
-							      <span>手机验证码登录</span>
-						      </p>
-					      </div>
-				      </>
-            } */}
           </form>
         </PopPanel>
       }

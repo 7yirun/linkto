@@ -10,26 +10,6 @@ const SubMyFollow = (props: any) => {
   const [artistList, setArtistList] = useState([]);
   //搜索艺术家
   const [keyword, setKeyword] = useState("");
-
-  /*
-  * {
-                "id": 24,
-                "accountName": "duck不必",
-                "password": null,
-                "bindPhone": null,
-                "headPic": "http://120.79.230.129/picture/默认头像.png",
-                "address": null,
-                "job": null,
-                "age": null,
-                "focusNum": 0,
-                "fansNum": 1,
-                "picClipNum": 4,
-                "createAt": null,
-                "token": null,
-                "hasFocused": null,
-                "updateAt": null
-            },
-  * */
   useEffect(()=>{
     let request = {
       focusType: 1,        //1我的关注  2我的粉丝

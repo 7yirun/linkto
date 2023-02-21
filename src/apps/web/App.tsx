@@ -1,10 +1,9 @@
 import React, {useEffect} from 'react';
-import {Route, Switch, Redirect, useHistory} from 'react-router-dom'
-import Header from "apps/web/components/Header/Header"
+import {Route, Switch, useHistory} from 'react-router-dom'
 import Login from "apps/web/components/Login/Login";
 import Register from "apps/web/components/Register/Register";
 import {useSelector, useDispatch} from 'react-redux'
-import {setShowRegister, setShowLogin, setIsLogin} from 'apps/web/store/store'
+import {setShowLogin, setIsLogin} from 'apps/web/store/store'
 import './App.scss'
 import EditUser from "./components/EditUser/EditUser";
 import {getStore} from "utils/utils"

@@ -1,6 +1,6 @@
 import useImage from 'use-image';
-import React, {useRef, useEffect, useState} from 'react'
-import {Image, Transformer} from 'react-konva';
+import React, { useEffect, useState} from 'react'
+import {Image} from 'react-konva';
 
 interface IProps {
   imgUrl: string

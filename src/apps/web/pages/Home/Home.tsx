@@ -4,7 +4,7 @@ import 'swiper/css/swiper.min.css'
 import {useEffect, useRef, useState} from "react";
 import CapsuleButton from "apps/web/components/CapsuleButton/CapsuleButton"
 import {useDispatch} from 'react-redux'
-import {queryImg, welcome} from "service/service"
+import {queryImg} from "service/service"
 import {setConfirmSearch, setDescription} from 'apps/web/store/store'
 import Header from "apps/web/components/Header/Header"
 import Register from "apps/web/components/Register/Register"

@@ -1,4 +1,4 @@
-import React, {useRef, useEffect, useState, useLayoutEffect, ReactNode} from 'react';
+import React, { useEffect, useState, ReactNode} from 'react';
 import "./WaterFall.scss"
 
 type Prop = {

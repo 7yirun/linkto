@@ -15,15 +15,6 @@ export const getStore = (name:string, isLocal ?: boolean):string | null => {
   }
 }
 
-
-const getLength = (input:number | string):number=>{
-  if((<string>input).length){
-    return (<string>input).length
-  } else {
-    return input.toString().length
-  }
-}
-
 //同源地址才能下载, 否则是打开显示大图片的新tab页
 export function downloadURI(uri:string, name:string) {
   const link:HTMLAnchorElement = document.createElement('a');

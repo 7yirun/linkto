@@ -1,10 +1,9 @@
 import Waterfall from "apps/web/components/WaterFall/Waterfall2";
-import React, {useEffect, useState, useRef, SyntheticEvent} from "react";
+import React, {useEffect, useState, useRef} from "react";
 import Header from "apps/web/components/Header/Header"
 import {getSearchWords} from "../../../../service/service";
 import "./Picture.scss"
 import {useWindowResize} from "apps/web/hooks";
-import {Dropdown} from "antd";
 import {setDescription, StateType, SearchStateType, setConfirmSearch} from "apps/web/store/store";
 import {useSelector, useDispatch} from 'react-redux'
 import {queryImg} from "service/service"

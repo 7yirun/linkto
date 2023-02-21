@@ -1,5 +1,5 @@
 import './Bookmark.scss';
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {Route, Switch, Redirect} from 'react-router-dom'
 import SubMyFollow from "./Subpage/SubMyfollow/SubMyfollow";
 import SubMyHistory from "./Subpage/SubMyhistory/SubMyhistory";
@@ -16,14 +16,12 @@ const Bookmark = (props: any) => {
     {name: '我的点赞', path: '/sub-myhistory', component: SubMyHistory}
   ];
 
-  const [activePage, setActivePage] = useState(0);
-  const {others, accountId} = props;
+  const {others} = props;
   if (others) {
     nav.map(item => {
       item.name = item.name.replace('我的', '他的')
     })
   }
-  // const [showArtist, setShowArtist] = useState(true);
   return (
     <>
       <Header></Header>

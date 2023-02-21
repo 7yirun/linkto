@@ -7,7 +7,6 @@ import ScrollBar from '@better-scroll/scroll-bar'
 import MouseWheel from '@better-scroll/mouse-wheel'
 import {queryKeywords, text2img, img2img, imgRefresh, getWords} from "service/service";
 import AddToBookmark from "apps/web/components/AddToBookmark/AddToBookmark";
-import SeeBig from "apps/web/components/SeeBig/SeeBig";
 import {setStore, getStore, downloadURI} from "utils/utils"
 import {
   setMapArr,
@@ -139,7 +138,6 @@ const Create = (props: any) => {
   }
   const bsRef = useRef(null);
 
-  let bs: any;
   useEffect(() => {
     let willUnmount = false;
     bsRef.current = new BScroll('.choose-style-limit', {

@@ -1,22 +1,13 @@
 import { useState, useEffect } from "react";
 import style from "./index.module.scss";
-import Icons from "lib/icons";
-import { getFocusList, getWords } from "service/service";
-import ArtistCard from "../../../../components/ArtistCard/ArtistCard";
-import qs from "qs";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  setEditUser,
-  setShowEditUser,
-  setShowRegister,
   setAccountInfo
 } from "apps/web/store/store";
-import styles from "./EditUser.module.scss";
 import { getStore,setStore } from "utils/utils";
 import CapsuleButton from "../../../../components/CapsuleButton/CapsuleButton";
 import { editUser, queryVerifyCode, verifyCodeApi,getPersonalInfo } from "service/service";
 import { TimeoutId } from "@reduxjs/toolkit/dist/query/core/buildMiddleware/types";
-import PopPanel from "apps/web/layouts/PopPanel/PopPanel";
 import md5 from "js-md5";
 import { message } from "antd";
 
@@ -101,9 +92,6 @@ const SubPersonalinfo = (props: any) => {
         console.log("succeed");
         message.success("修改成功！");
         hanledPersonInfo();
-        // setTimeout(() => {
-        //   window.location.reload();
-        // }, 2000);
       },
       (err: any) => {
         message.error(err.msg);

@@ -263,7 +263,6 @@ const Register = ({mask=true,getContainer=document.body, ...props}: {
         ...formState,
         interestIds: interestIdList.toString()
       })
-      // setinterestList(interestIdList);
       setinterestIdList(interestIdList);
       setinterestList(newListData);
    }
