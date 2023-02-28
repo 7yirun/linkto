@@ -8,7 +8,6 @@ import {useDispatch, useSelector} from "react-redux"
 import {pictureStateType, LayerInfoType} from "apps/web/pages/Create/Create"
 import {message} from "antd";
 import Slider from '@mui/material/Slider';
-import {useMounted} from "../../hooks";
 import PaintLine from "./PaintLine"
 import PaintGroup from "./PaintGroup";
 
@@ -56,6 +55,10 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
   const dispatch = useDispatch();
   const pictureState = useSelector<any, pictureStateType>(state => state.pictureState)
 
+  const pixelRatioRef = useRef<number>(1);
+  useEffect(()=>{
+    pixelRatioRef.current = window.devicePixelRatio
+  }, [])
   const getFinishedPic = () => {
     return stageRef.current.toDataURL({
       pixelRatio: 1
@@ -153,17 +156,27 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
     }
   }
   //第一次进入以及resize时, 自适应canvas画布的大小
-  const updateCanvasArea = () => {
+  /*const updateCanvasArea = () => {
     setCanvasHeight(drawingAreaRef.current?.offsetHeight || 0)
     setCanvasWidth(drawingAreaRef.current?.offsetWidth || 0)
   }
+  //缩放比, 默认100代表100%*/
+  const [ratio, setRatio] = useState<number>(100)
+
+
+  // useEffect(()=>{
+    //让HDPI显示器下canvas像素等于设置值
+    // Konva.pixelRatio = pictureState.canvasHeight / canvasHeight;
+    // console.log(Konva.pixelRatio);
+  // }, [canvasWidth, canvasHeight])
+
   //缩放相关
-  useEffect(()=>{
+ /* useEffect(()=>{
     if(mode === MODE.move && history[stepIndex].currentLayerId !== '背景图层001'){
-     /* trRef.current.nodes([groupRefs.current[history[stepIndex].currentLayerId]])*/
+     /!* trRef.current.nodes([groupRefs.current[history[stepIndex].currentLayerId]])*!/
     }
   }, [mode, stepIndex])
-
+*/
 //离开创作区域时清空画布
 /*  useEffect(()=>{
     return ()=>{
@@ -183,13 +196,13 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
     }
   }, [stepIndex])*/
 
-  useEffect(() => {
+  /*useEffect(() => {
     updateCanvasArea()
     window.addEventListener('resize', updateCanvasArea)
     return () => {
       window.removeEventListener('resize', updateCanvasArea)
     }
-  }, [])
+  }, [])*/
 
   //Group元素有多个 需要用数组保存ref
   const groupRefs = useRef<{ [key: string]: any }>({});
@@ -199,7 +212,7 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
   // 当有新图加载/用户手动切换了图层/删除了图层 需要把当前图层显示在最顶层
   useEffect(() => {
     groupRefs.current[history[stepIndex].currentLayerId] && groupRefs.current[history[stepIndex].currentLayerId].moveToTop()
-    updateCanvasArea();
+    // updateCanvasArea();
 
   }, [stepIndex, history[stepIndex].currentLayerId])
   useEffect(() => {
@@ -292,8 +305,6 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
       //将修改完line之后的新的history整体替换
       setHistory(oldHistory);
       groupRefs.current[history[stepIndex].currentLayerId].cache()
-
-      // console.log(groupRefs.current[history[stepIndex].currentLayerId].getLayer());
       // groupRefs.current[history[stepIndex].currentLayerId].getLayer().cache()
       // groupRefs.current[history[stepIndex].currentLayerId].getLayer().batchDraw()
     }
@@ -304,17 +315,22 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
     isPaint.current = false;
   }
 
+  const bgRef = useRef<any>(null);
+
   const generateImg = () => {
+    //隐藏黑白方格
+    bgRef.current && bgRef.current.hide()
+    setTimeout(()=>{
+      bgRef.current && bgRef.current.show()
+    }, 500)
     const imgBase64Obj = {
       paint: '',
       mask: ''
     }
     imgBase64Obj.paint = getFinishedPic().split(',')[1]
-
     layerRef.current.cache();
     layerRef.current.filters([filterTransparent2Black])
     imgBase64Obj.mask = getFinishedPic().split(',')[1]
-
     layerRef.current.clearCache();
     layerRef.current.filters([]);
     for (let key in groupRefs.current) {
@@ -323,6 +339,38 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
       groupRefs.current[key] && groupRefs.current[key].cache();
     }
     return imgBase64Obj;
+  }
+
+  /*黑白方格*/
+  const WIDTH = Math.round(64 / pixelRatioRef.current);
+  const HEIGHT = Math.round(64 / pixelRatioRef.current);
+  const grid = [['white', 'grey'], ['grey', 'white']]
+  const gridComponents = [];
+  const stagePos = {x:0, y:0};
+  // const [stagePos, setStagePos] = useState({ x: 0, y: 0 });
+  const startX = Math.floor((-stagePos.x - window.innerWidth) / WIDTH) * WIDTH;
+  const endX = Math.floor((-stagePos.x + window.innerWidth * 2) / WIDTH) * WIDTH;
+  const startY = Math.floor((-stagePos.y - window.innerHeight) / HEIGHT) * HEIGHT;
+  const endY = Math.floor((-stagePos.y + window.innerHeight * 2) / HEIGHT) * HEIGHT;
+  let i=0;
+  for(let x=startX; x<endX; x+=WIDTH){
+    for(let y=startY; y<endY; y+=HEIGHT){
+      if(i === 4) {
+        i = 0
+      }
+      const indexX = Math.abs(x / WIDTH) % grid.length;
+      const indexY = Math.abs(y / HEIGHT) % grid[0].length;
+      gridComponents.push(
+        <Rect
+          x={x}
+          y={y}
+          width={WIDTH}
+          height={HEIGHT}
+          fill={grid[indexX][indexY]}
+          key={`${x}-${y}`}
+        />
+      );
+    }
   }
 
 
@@ -375,6 +423,19 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
             <i className="iconfont icon-Back"></i>
             还原
           </button>
+        </li>
+        <li>
+          <span style={{whiteSpace: 'nowrap'}}>画布缩放比例: </span>
+          <Slider
+            value={ratio}
+            max={200}
+            min={50}
+            onChange={(e, v)=>{{
+              setRatio(v as number)
+            }}}
+          >
+          </Slider>
+          <p>{ratio}%</p>
         </li>
       </ul>
       <div
@@ -440,12 +501,15 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
       >
         <Stage
           ref={stageRef}
-          width={canvasWidth}
-          height={canvasHeight}
+          width={pictureState.canvasWidth / pixelRatioRef.current}
+          height={pictureState.canvasHeight / pixelRatioRef.current}
+          style={{
+            transformOrigin: 'left top',
+            transform: `scale(${ratio / 100})`,
+          }}
           onMouseDown={(e) => {
             handleMouseDown(e)
           }}
-
           onMouseMove={(e) => {
             handleMouseMove(e)
           }}
@@ -453,67 +517,79 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
         >
           <Layer
             ref={layerRef}
+            clip={{
+              x: 0,
+              y: 0,
+              width: pictureState.canvasWidth,
+              height: pictureState.canvasHeight,
+              draggable: false
+            }}
           >
-            {
-              history[stepIndex].layers.filter((layer: LayerType) => layer.layerId !== '背景图层001').map((layer: LayerType) => {
-                return (
-                  <React.Fragment key={layer.layerId}>
-                    <PaintGroup
-                      showTransformer={mode===MODE.move && layer.layerId === history[stepIndex].currentLayerId}
-                      setNode={(ele:any) => {
-                        // ele && ele.cache();
-                        groupRefs.current[layer.layerId] = ele
-                      }}
-                      draggable={mode === MODE.move}
-                    >
-                      <URLImage
-                        imgUrl={layer.imgUrl}
-                        maxWidth={canvasWidth}
-                        maxHeight={canvasHeight}
+            <>
+              <Group ref={bgRef}>
+                {gridComponents}
+              </Group>
+              {
+                history[stepIndex].layers.filter((layer: LayerType) => layer.layerId !== '背景图层001').map((layer: LayerType) => {
+                  return (
+                    <React.Fragment key={layer.layerId}>
+                      <PaintGroup
 
-                        onMouseEnter={() => {
-                          if (mode === MODE.move) {
-                            stageRef.current.container().style.cursor = 'move';
-                          }
+                        showTransformer={mode===MODE.move && layer.layerId === history[stepIndex].currentLayerId}
+                        setNode={(ele:any) => {
+                          // ele && ele.cache();
+                          groupRefs.current[layer.layerId] = ele
                         }}
-                        onMouseLeave={() => {
-                          stageRef.current.container().style.cursor = 'default';
-                        }}
-                      />
-                      {
-                        //画线
-                        history[stepIndex].lines.map((line, i) => {
-                          return (
-                            <React.Fragment key={'line' + i}>
-                              {
-                                line && line.layerId === layer.layerId &&
-																<PaintLine
-																	groupNode={groupRefs.current[layer.layerId]}
-																	stroke={line.type === 'paint' ? line.lineColor : '#000000'}
-																	strokeWidth={line.strokeWidth}
-																	lineJoin={'round'}
-																	points={line.line}
-																	lineCap={'round'}
-																	bezier={true}
-																	perfectDrawEnabled={false}
-																	globalCompositeOperation={line.type === 'paint' ? 'source-over' : 'destination-out'}
-																/>
-                              }
-                            </React.Fragment>
-                          )
-                        })
-                      }
-                    </PaintGroup>
-                    {/*{
+                        draggable={mode === MODE.move}
+                      >
+                        <URLImage
+                          imgUrl={layer.imgUrl}
+                          maxWidth={canvasWidth}
+                          maxHeight={canvasHeight}
+                          onMouseEnter={() => {
+                            if (mode === MODE.move) {
+                              stageRef.current.container().style.cursor = 'move';
+                            }
+                          }}
+                          onMouseLeave={() => {
+                            stageRef.current.container().style.cursor = 'default';
+                          }}
+                        />
+                        {
+                          //画线
+                          history[stepIndex].lines.map((line, i) => {
+                            return (
+                              <React.Fragment key={'line' + i}>
+                                {
+                                  line && line.layerId === layer.layerId &&
+											            <PaintLine
+												            groupNode={groupRefs.current[layer.layerId]}
+												            stroke={line.type === 'paint' ? line.lineColor : '#000000'}
+												            strokeWidth={line.strokeWidth}
+												            lineJoin={'round'}
+												            points={line.line}
+												            lineCap={'round'}
+												            bezier={true}
+												            perfectDrawEnabled={false}
+												            globalCompositeOperation={line.type === 'paint' ? 'source-over' : 'destination-out'}
+											            />
+                                }
+                              </React.Fragment>
+                            )
+                          })
+                        }
+                      </PaintGroup>
+                      {/*{
                       mode === MODE.move && layer.layerId === history[stepIndex].currentLayerId &&
                       <Transformer
 												ref={trRef}
 											/>
                     }*/}
-                  </React.Fragment>
-                )
-              })
-            }
+                    </React.Fragment>
+                  )
+                })
+              }
+            </>
           </Layer>
         </Stage>
       </div>

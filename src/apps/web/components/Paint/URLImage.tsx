@@ -1,5 +1,5 @@
 import useImage from 'use-image';
-import React, { useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {Image} from 'react-konva';
 
 interface IProps {
@@ -12,6 +12,10 @@ interface IProps {
 
 const URLImage: React.FC<IProps> = ({imgUrl, maxWidth, maxHeight,onLoad, ...props}) => {
   const [img] = useImage(imgUrl, 'anonymous');
+  const pixelRatioRef = useRef<number>(1);
+  useEffect(()=>{
+    pixelRatioRef.current = window.devicePixelRatio
+  }, [])
   const [imgProps, setImgProps] = useState<{
     x: number,
     y: number,
@@ -22,35 +26,21 @@ const URLImage: React.FC<IProps> = ({imgUrl, maxWidth, maxHeight,onLoad, ...prop
     if(!img){
       return
     }
-    /*如果图片尺寸太大, 需要给他缩小到canvas可见范围===============start*/
-    let [scaleX, scaleY] = [1, 1];
+    // 如果图片尺寸太大, 需要给他缩小到canvas可见范围===============start
     let [width, height] = [img.width, img.height];
-    if (img && width > maxWidth) {
-      scaleX = width / maxWidth
-    }
-    if (img && height > maxHeight) {
-      scaleY = height / maxHeight
-    }
-    if (scaleX > scaleY) {
-      width = maxWidth;
-      height = img ? height / scaleX : 0
-    } else if(scaleX < scaleY){
-      height = maxHeight;
-      width = img ? width / scaleY : 0
-    }
     setImgProps({
       x: 0,
       y: 0,
-      width: width,
-      height: height
+      width: width / pixelRatioRef.current,
+      height: height / pixelRatioRef.current
     })
     /*如果图片尺寸太大, 需要给他缩小到canvas可见范围===============end*/
   }, [img])
   return (
     <Image
       image={img}
-      {...imgProps}
       {...props}
+      {...imgProps}
     />
   );
 };

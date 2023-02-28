@@ -72,14 +72,23 @@ const pictureSlice = createSlice({
   name: 'pictureSlice',
   initialState: {
     loadedImages: loadedImages,
+    //画布大小, 关联到尺寸按钮值
+    canvasWidth: 1024,
+    canvasHeight: 1024
   },
   reducers: {
     setLoadedImages(state, action){
       state.loadedImages = action.payload
     },
+    setCanvasWidth(state, action){
+      state.canvasWidth = action.payload
+    },
+    setCanvasHeight(state, action){
+      state.canvasHeight = action.payload
+    }
   }
 })
-export const {setLoadedImages} = pictureSlice.actions
+export const {setLoadedImages, setCanvasHeight, setCanvasWidth} = pictureSlice.actions
 
 const store = configureStore({
   reducer: {

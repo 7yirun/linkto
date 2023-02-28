@@ -8,12 +8,13 @@ import MouseWheel from '@better-scroll/mouse-wheel'
 import {queryKeywords, text2img, img2img, imgRefresh, getWords} from "service/service";
 import AddToBookmark from "apps/web/components/AddToBookmark/AddToBookmark";
 import {setStore, getStore, downloadURI} from "utils/utils"
+
 import {
   setMapArr,
   setLanMap,
   setLoadedImages,
   SearchStateType,
-  StateType, setDescription
+  StateType, setDescription, setCanvasHeight, setCanvasWidth
 } from "apps/web/store/store";
 import {useDispatch, useSelector} from "react-redux"
 import Slider from '@mui/material/Slider';
@@ -48,7 +49,9 @@ export interface ILoadedImg {
 }
 
 export type pictureStateType = {
-  loadedImages: ILoadedImg[]
+  loadedImages: ILoadedImg[],
+  canvasWidth: number,
+  canvasHeight: number
   currentLayerId: string
 }
 
@@ -97,9 +100,8 @@ const Create = (props: any) => {
   const [dimension, setDimension] = useState(Number(getStore('dimension', false)));  //Number(null) => 0
 
   //高级创作中可以自定义图片尺寸:
-  const customizeHeightRef = useRef<any>();
-  const customizeWidthRef = useRef<any>();
-
+  // const customizeHeightRef = useRef<any>();
+  // const customizeWidthRef = useRef<any>();
 
   const [displayDimension, setDisplayDimension] = useState<number>(dimension);
 
@@ -287,8 +289,8 @@ const Create = (props: any) => {
         guidance: relevance * 15 / 100,
         initImageBase64: paint,
         maskBase64: mask,
-        width: customizeWidthRef.current.value,
-        height: customizeHeightRef.current.value,
+        width: pictureState.canvasWidth,
+        height: pictureState.canvasHeight,
         numImages: 1,
         prompt: description,
         keywords: keyword,
@@ -439,31 +441,63 @@ const Create = (props: any) => {
                         <div className="free-dimension">
                           <div className="row">
                             <span className={'title'}>宽度</span>
-                            <InputNumber
-                              ref={customizeWidthRef}
-                              defaultValue={1024}
-                              step={64}
-                              max={2048}
-                              min={512}
-                              controls={{
-                                upIcon: <span className={'iconfont icon-1'}></span>,
-                                downIcon: <span className={'iconfont icon-11'}></span>
-                              }}
-                            ></InputNumber>
+                            <div className="adjust-group">
+                              <span
+                                className="adjust-down"
+                                onClick={()=>{
+                                  let width = pictureState.canvasWidth - 64;
+                                  if(width < 512){
+                                    width = 512
+                                  }
+                                  dispatch(setCanvasWidth(width))
+                                }}
+                              >
+                                <i className={'iconfont icon-11'}></i>
+                              </span>
+                              <p>{pictureState.canvasWidth}</p>
+                              <span
+                                className="adjust-up"
+                                onClick={()=>{
+                                  let width = pictureState.canvasWidth + 64;
+                                  if(width > 2048){
+                                    width = 2048
+                                  }
+                                  dispatch(setCanvasWidth(width))
+                                }}
+                              >
+                                <i className={'iconfont icon-1'}></i>
+                              </span>
+                            </div>
                           </div>
                           <div className="row">
                             <span className={'title'}>高度</span>
-                            <InputNumber
-                              ref={customizeHeightRef}
-                              defaultValue={1024}
-                              step={64}
-                              max={2048}
-                              min={512}
-                              controls={{
-                                upIcon: <span className={'iconfont icon-1'}></span>,
-                                downIcon: <span className={'iconfont icon-11'}></span>
-                              }}
-                            ></InputNumber>
+                            <div className="adjust-group">
+                              <span
+                                className="adjust-down"
+                                onClick={()=>{
+                                  let height = pictureState.canvasHeight - 64;
+                                  if(height < 512){
+                                    height = 512
+                                  }
+                                  dispatch(setCanvasHeight(height))
+                                }}
+                              >
+                                <i className={'iconfont icon-11'}></i>
+                              </span>
+                              <p>{pictureState.canvasHeight}</p>
+                              <span
+                                className="adjust-up"
+                                onClick={()=>{
+                                  let height = pictureState.canvasHeight + 64;
+                                  if(height > 2048){
+                                    height = 2048
+                                  }
+                                  dispatch(setCanvasHeight(height))
+                                }}
+                              >
+                                <i className={'iconfont icon-1'}></i>
+                              </span>
+                            </div>
                           </div>
                         </div>
                     }

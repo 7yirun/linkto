@@ -121,10 +121,41 @@ $subtag-margin-bottom: 8px;
                 height: 32px;
                 display: flex;
                 align-items: center;
+                &:first-child{
+                  margin-bottom: 10px;
+                }
                 .title{
                   margin-right: 8px;
                 }
-                .ant-input-number{
+                .adjust-group{
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  width: 160px;
+                  background-color: #202020;
+                  border-radius: 16px;
+                  padding: 0 4px;
+                  box-sizing: border-box;
+                  text-align: center;
+                  color: $green;
+                  font-weight: bold;
+                  p{
+                    width: auto;
+                  }
+                  .adjust-down, .adjust-up{
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 50%;
+                    background-color: #181818;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: 32px;
+                    color: #fff;
+                    cursor: pointer;
+                  }
+                }
+                /*.ant-input-number{
                   width: 160px;
                   border-radius: 16px;
                   overflow: hidden;
@@ -161,7 +192,7 @@ $subtag-margin-bottom: 8px;
                       font-family: PingFangSC;
                     }
                   }
-                }
+                }*/
               }
             }
 
