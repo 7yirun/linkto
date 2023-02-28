@@ -342,36 +342,9 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
   }
 
   /*黑白方格*/
-  const WIDTH = Math.round(64 / pixelRatioRef.current);
-  const HEIGHT = Math.round(64 / pixelRatioRef.current);
-  const grid = [['white', 'grey'], ['grey', 'white']]
-  const gridComponents = [];
-  const stagePos = {x:0, y:0};
-  // const [stagePos, setStagePos] = useState({ x: 0, y: 0 });
-  const startX = Math.floor((-stagePos.x - window.innerWidth) / WIDTH) * WIDTH;
-  const endX = Math.floor((-stagePos.x + window.innerWidth * 2) / WIDTH) * WIDTH;
-  const startY = Math.floor((-stagePos.y - window.innerHeight) / HEIGHT) * HEIGHT;
-  const endY = Math.floor((-stagePos.y + window.innerHeight * 2) / HEIGHT) * HEIGHT;
-  let i=0;
-  for(let x=startX; x<endX; x+=WIDTH){
-    for(let y=startY; y<endY; y+=HEIGHT){
-      if(i === 4) {
-        i = 0
-      }
-      const indexX = Math.abs(x / WIDTH) % grid.length;
-      const indexY = Math.abs(y / HEIGHT) % grid[0].length;
-      gridComponents.push(
-        <Rect
-          x={x}
-          y={y}
-          width={WIDTH}
-          height={HEIGHT}
-          fill={grid[indexX][indexY]}
-          key={`${x}-${y}`}
-        />
-      );
-    }
-  }
+  const WIDTH = useRef<number>(Math.round(16 / pixelRatioRef.current));
+  const HEIGHT = useRef<number>(Math.round(16 / pixelRatioRef.current));
+  const grid = useRef([['white', 'grey'], ['grey', 'white']])
 
 
   return (
@@ -499,6 +472,15 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
           e.stopPropagation(); //firefox中防止打开新窗口
         }}
       >
+        {/*<div>
+          {
+            [...Array(Math.ceil(pictureState.canvasWidth / WIDTH.current))].map((v1, i1)=>{
+              return [...Array(Math.ceil(pictureState.canvasHeight / HEIGHT.current))].map((v2, i2)=>{
+                return `${i1}-${i2}`
+              })
+            }).flat()
+          }
+        </div>*/}
         <Stage
           ref={stageRef}
           width={pictureState.canvasWidth / pixelRatioRef.current}
@@ -527,7 +509,20 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
           >
             <>
               <Group ref={bgRef}>
-                {gridComponents}
+                {
+                  [...Array(Math.ceil(pictureState.canvasWidth / WIDTH.current))].map((v1, i1)=>{
+                    return [...Array(Math.ceil(pictureState.canvasHeight / HEIGHT.current))].map((v2, i2)=>{
+                      return (<Rect
+                        x={i1*WIDTH.current}
+                        y={i2*HEIGHT.current}
+                        width={WIDTH.current}
+                        height={HEIGHT.current}
+                        fill={grid.current[i1%2][i2%2]}
+                        key={`${i1}-${i2}`}
+                      ></Rect>)
+                    })
+                  }).flat()
+                }
               </Group>
               {
                 history[stepIndex].layers.filter((layer: LayerType) => layer.layerId !== '背景图层001').map((layer: LayerType) => {
