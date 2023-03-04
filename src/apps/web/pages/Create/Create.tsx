@@ -219,7 +219,10 @@ const Create = (props: any) => {
   //创作图片
   const createImg = (e: any) => {
     e.preventDefault();
-    konvaRef.current.changeCurrentLayer('背景图层001')
+    //高级创作时去掉缩放框
+    if(mode === MODE.superior){
+      konvaRef.current.changeCurrentLayer('背景图层001')
+    }
     //英文关键词数组
     let keywordArr = searchState.mapArr.join().split(',').filter(str => str);
     //行业词汇
