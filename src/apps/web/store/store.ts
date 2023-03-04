@@ -73,8 +73,8 @@ const pictureSlice = createSlice({
   initialState: {
     loadedImages: loadedImages,
     //画布大小, 关联到尺寸按钮值
-    canvasWidth: 1024,
-    canvasHeight: 1024
+    canvasWidth: 2048,
+    canvasHeight: 2048
   },
   reducers: {
     setLoadedImages(state, action){

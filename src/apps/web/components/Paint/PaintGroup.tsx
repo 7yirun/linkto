@@ -9,9 +9,6 @@ interface IProps extends GroupConfig{
 const PaintGroup:React.FC<IProps> = (props) => {
   const node = useRef<any>(null);
   useEffect(()=>{
-    /*requestAnimationFrame(()=>{
-      node.current.cache();
-    })*/
     setTimeout(()=>{
       node.current.cache();
     }, 300)
@@ -39,6 +36,7 @@ const PaintGroup:React.FC<IProps> = (props) => {
           anchorFill={'#43CF7C'}
           anchorStroke={'#43CF7C'}
           borderStroke={'#43CF7C'}
+
         >
         </Transformer>
       }

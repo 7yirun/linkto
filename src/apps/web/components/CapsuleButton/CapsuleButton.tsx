@@ -10,7 +10,7 @@ const CapsuleButton = ({...props}) => {
         {...props}
         onClick={(e)=>{
           e.preventDefault();
-          props.onClick(e)
+          props.onClick && props.onClick(e)
         }}
         className={props.className ? `${props.className} capsule-button` : 'capsule-button'}
       >

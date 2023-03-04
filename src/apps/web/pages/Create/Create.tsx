@@ -14,11 +14,11 @@ import {
   setLanMap,
   setLoadedImages,
   SearchStateType,
-  StateType, setDescription, setCanvasHeight, setCanvasWidth
+  StateType, setDescription
 } from "apps/web/store/store";
 import {useDispatch, useSelector} from "react-redux"
 import Slider from '@mui/material/Slider';
-import {message, Dropdown, InputNumber} from 'antd'
+import {message, Dropdown} from 'antd'
 import UpLoad from "apps/web/components/UpLoad/UpLoad";
 import Paint from "apps/web/components/Paint/Konva2"
 import type {MenuProps} from 'antd';
@@ -219,6 +219,7 @@ const Create = (props: any) => {
   //创作图片
   const createImg = (e: any) => {
     e.preventDefault();
+    konvaRef.current.changeCurrentLayer('背景图层001')
     //英文关键词数组
     let keywordArr = searchState.mapArr.join().split(',').filter(str => str);
     //行业词汇
@@ -416,7 +417,7 @@ const Create = (props: any) => {
 											</div>
 										</>
                   }
-                  <div className={'choose dimension'}>
+                  {/*<div className={'choose dimension'}>
                     <p>尺寸</p>
                     {
                       mode !== MODE.superior ?
@@ -501,8 +502,7 @@ const Create = (props: any) => {
                           </div>
                         </div>
                     }
-                  </div>
-
+                  </div>*/}
                   {
                     (mode === MODE.senior || mode === MODE.superior) &&
 										<div className="choose choose-tags">
