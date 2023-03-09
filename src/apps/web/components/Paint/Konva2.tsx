@@ -434,6 +434,7 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
+                  textAlign: 'center',
                   transform: `scale(${ratio / 100})`,
                 }}
                 onMouseDown={(e) => {
