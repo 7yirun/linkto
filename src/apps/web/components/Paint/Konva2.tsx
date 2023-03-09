@@ -1,5 +1,5 @@
-import React, {useRef, useState, useEffect, forwardRef, useImperativeHandle, useCallback} from 'react';
-import {Stage, Layer, Line, Transformer, Group, Rect, Circle} from 'react-konva';
+import React, {useRef, useState, useEffect, forwardRef, useImperativeHandle} from 'react';
+import {Stage, Layer,Group, Circle} from 'react-konva';
 import {Vector2d} from "konva/lib/types"
 import URLImage from "./URLImage"
 import styles from "./Konva.module.scss"
@@ -59,7 +59,7 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
 
   const pixelRatioRef = useRef<number>(1);
   useEffect(() => {
-    pixelRatioRef.current = window.devicePixelRatio
+    pixelRatioRef.current = Math.max(window.devicePixelRatio, 1)
   }, [])
   const getFinishedPic = () => {
     return stageRef.current.toDataURL({
@@ -100,6 +100,11 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
       message.warning('无法删除背景层')
       return;
     }
+    /*console.log(pictureState.loadedImages.length);
+    if (pictureState.loadedImages.length === 2){
+      dispatch(setCanvasWidth(2048))
+      dispatch(setCanvasHeight(2048))
+    }*/
     const oldHistory = history.slice(0, stepIndex + 1);
     const currentState = oldHistory.slice(-1)[0];
 
@@ -288,8 +293,8 @@ const Paint = forwardRef((props: IProps, konvaRef) => {
   }
 
   /*黑白方格*/
-  const WIDTH = useRef<number>(Math.round(16 / pixelRatioRef.current));
-  const HEIGHT = useRef<number>(Math.round(16 / pixelRatioRef.current));
+  const WIDTH = useRef<number>(Math.round(64 / pixelRatioRef.current));
+  const HEIGHT = useRef<number>(Math.round(64 / pixelRatioRef.current));
   const grid = useRef([['white', 'grey'], ['grey', 'white']])
 
 

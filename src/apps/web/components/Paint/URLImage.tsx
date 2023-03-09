@@ -19,7 +19,7 @@ const URLImage: React.FC<IProps> = ({imgUrl, maxWidth, maxHeight,onLoad, ...prop
   const [img] = useImage(imgUrl, 'anonymous');
   const pixelRatioRef = useRef<number>(1);
   useEffect(()=>{
-    pixelRatioRef.current = window.devicePixelRatio
+    pixelRatioRef.current = Math.max(window.devicePixelRatio, 1)
   }, [])
   const [imgProps, setImgProps] = useState<{
     x: number,
@@ -48,6 +48,7 @@ const URLImage: React.FC<IProps> = ({imgUrl, maxWidth, maxHeight,onLoad, ...prop
     if(pictureState.canvasWidth === 2048 && pictureState.canvasHeight === 2048){
       const stageWidth = Math.min(img.width, 2048)
       const stageHeight = Math.min(img.height, 2048)
+      console.log(stageWidth, stageHeight);
       dispatch(setCanvasWidth(stageWidth))
       dispatch(setCanvasHeight(stageHeight))
     }
